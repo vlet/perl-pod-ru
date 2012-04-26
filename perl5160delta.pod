@@ -428,22 +428,22 @@ C<local $$> делал её доступной для записи снова.  
 указывать префиксом к номеру строки имя файла. Смотрите
 L<perldebug/"b [file]:[line] [condition]">.
 
-=head2 The C<CORE> Namespace
+=head2 Пространство имён C<CORE>
 
-=head3 The C<CORE::> prefix
+=head3 Префикс C<CORE::>
 
-The C<CORE::> prefix can now be used on keywords enabled by
-L<feature.pm|feature>, even outside the scope of C<use feature>.
+Префикс C<CORE::> теперь может быть использован в ключевых словах
+подключаемых через L<feature.pm|feature> даже вне контекста C<use feature>.
 
-=head3 Subroutines in the C<CORE> namespace
+=head3 Подпрограммы в пространстве имён C<CORE>
 
-Many Perl keywords are now available as subroutines in the CORE namespace.
-This allows them to be aliased:
+Многие ключевые слова Perl теперь доступны как подпрограммы в пространстве
+имён CORE. Это позволяет задавать для них псевдонимы:
 
     BEGIN { *entangle = \&CORE::tie }
     entangle $variable, $package, @args;
 
-And for prototypes to be bypassed:
+и для обхода прототипов:
 
     sub mytie(\[%$*@]$@) {
 	my ($ref, $pack, @args) = @_;
@@ -451,10 +451,10 @@ And for prototypes to be bypassed:
 	goto &CORE::tie;
     }
 
-Some of these cannot be called through references or via C<&foo> syntax,
-but must be called as barewords.
+Некоторые из них не могут быть вызваны через ссылки или через C<&foo>
+синтаксис и должны вызываться только как bareword
 
-See L<CORE> for details.
+Смотрите подробности в L<CORE>.
 
 =head2 Other Changes
 
