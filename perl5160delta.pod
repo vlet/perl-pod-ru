@@ -404,28 +404,28 @@ C<local $$> делал её доступной для записи снова.  
 Это делает перемещаемые инсталляции perl более полезными на данных
 платформах. (Смотри "Перемещаемый @INC" в F<INSTALL>)
 
-=head2 Debugger Changes
+=head2 Изменения в Отладчике
 
-=head3 Features inside the debugger
+=head3 Функции (features) внутри отладчика
 
-The current Perl's L<feature> bundle is now enabled for commands entered
-in the interactive debugger.
+Текущий набор L<feature> Perl'а стал доступен для команд вводимых в отладчике
+в интерактивном режиме.
 
-=head3 New option for the debugger's B<t> command
+=head3 Новая опция для команды отладчика B<t>
 
-The B<t> command in the debugger, which toggles tracing mode, now
-accepts a numeric argument that determines how many levels of subroutine
-calls to trace.
+Команда отладчика B<t>, которая переключает режим трассировки, сейчас
+принимает числовой аргумент, который определяет как много уровней
+вызовов подпрограмм надо отслеживать.
 
-=head3 C<enable> and C<disable>
+=head3 C<enable> и C<disable>
 
-The debugger now has C<disable> and C<enable> commands for disabling
-existing breakpoints and re-enabling them.  See L<perldebug>.
+В отладчике появились команды C<disable> и C<enable> для отключения существующих
+точек останова и повторного включения их.  Смотрите L<perldebug>.
 
-=head3 Breakpoints with file names
+=head3 Точки останова с именами файлов
 
-The debugger's "b" command for setting breakpoints now allows a line
-number to be prefixed with a file name.  See
+Команда отладчика "b" для установки точки останова теперь позволяет
+указывать префиксом к номеру строки имя файла. Смотрите
 L<perldebug/"b [file]:[line] [condition]">.
 
 =head2 The C<CORE> Namespace
