@@ -383,25 +383,26 @@ UTF-8 кодированную строку предполагают, что UTF
 Много новых функций было добавлено в API для манипуляции с лексическими
 панелями.  Смотрите больше информации в L<perlapi/Pad Data Structures>.
 
-=head2 Changes to Special Variables
+=head2 Изменения в Специальных Переменных
 
-=head3 C<$$> can be assigned to
+=head3 C<$$> можно присваивать значения
 
-C<$$> was made read-only in Perl 5.8.0.  But only sometimes: C<local $$>
-would make it writable again.  Some CPAN modules were using C<local $$> or
-XS code to bypass the read-only check, so there is no reason to keep C<$$>
-read-only.  (This change also allowed a bug to be fixed while maintaining
-backward compatibility.)
+C<$$> была сделана доступной только на чтение в Perl 5.8.0.  Но иногда:
+C<local $$> делал её доступной для записи снова.  Некоторые CPAN модули
+использовали C<local $$> или XS код, чтобы обойти проверку на доступность
+только на чтение, поэтому нет никакого смысла оставлять C<$$> доступной
+только на чтение.  (Это изменение также позволило исправить баг при
+сохранении обратной совместимости)
 
-=head3 C<$^X> converted to an absolute path on FreeBSD, OS X and Solaris
+=head3 C<$^X> преобразуется в абсолютный путь на FreeBSD, OS X и Solaris
 
-C<$^X> is now converted to an absolute path on OS X, FreeBSD (without
-needing F</proc> mounted) and Solaris 10 and 11.  This augments the
-previous approach of using F</proc> on Linux, FreeBSD and NetBSD
-(in all cases, where mounted).
+Сейчас C<$^X> преобразуется в абсолютный путь на OS X, FreeBSD (без
+необходимости монтировать F</proc>) и Solaris 10 и 11. Это улучшает
+предыдущий подход по использованию F</proc> on Linux, FreeBSD and NetBSD
+(во всех случаях, когда он смонтирован).
 
-This makes relocatable perl installations more useful on these platforms.
-(See "Relocatable @INC" in F<INSTALL>)
+Это делает перемещаемые инсталляции perl более полезными на данных
+платформах. (Смотри "Перемещаемый @INC" в F<INSTALL>)
 
 =head2 Debugger Changes
 
