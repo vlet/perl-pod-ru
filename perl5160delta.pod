@@ -337,50 +337,51 @@ C<fc> (включаемый S<C<"use feature 'fc'">>, или C<use v5.16>, ил�
 Новое в Юникод 6.0, это улучшенное свойство C<Script>. Детали описаны
 в разделе L<perlunicode/Scripts>.
 
-=head2 XS Changes
+=head2 Изменения в XS
 
-=head3 Improved typemaps for Some Builtin Types
+=head3 Улучшенные typemaps для Некоторых Встроенных Типов
 
-Most XS authors will be aware that there is a longstanding bug in the
-OUTPUT typemap for T_AVREF (C<AV*>), T_HVREF (C<HV*>), T_CVREF (C<CV*>),
-and T_SVREF (C<SVREF> or C<\$foo>) that requires manually decrementing
-the reference count of the return value instead of the typemap taking
-care of this.  For backwards-compatibility, this cannot be changed in the
-default typemaps.  But we now provide additional typemaps
-C<T_AVREF_REFCOUNT_FIXED>, etc. that do not exhibit this bug.  Using
-them in your extension is as simple as having one line in your
-C<TYPEMAP> section:
+Большинство авторов XS в курсе существования давнего бага в OUTPUT
+typemap для T_AVREF (C<AV*>), T_HVREF (C<HV*>), T_CVREF (C<CV*>),
+и T_SVREF (C<SVREF> илиr C<\$foo>), который требует вручную уменьшать
+число ссылок возвращаемого значения вместо того, чтобы typemap сам
+позаботился об этом.  Для обратной совместимости это не может быть
+изменено в typemap'ах по умолчанию. Но сейчас мы предоставляем
+дополнительные typemap'ы C<T_AVREF_REFCOUNT_FIXED> и подобные, которые
+не страдают от этого бага.  Использовать их в ваших расширениях также
+просто, как иметь дополнительную строку в секции C<TYPEMAP>:
 
   HV*	T_HVREF_REFCOUNT_FIXED
 
 =head3 C<is_utf8_char()>
 
-The XS-callable function C<is_utf8_char()>, when presented with
-malformed UTF-8 input, can read up to 12 bytes beyond the end of the
-string.  This cannot be fixed without changing its API.  It is not
-called from CPAN.  The documentation now describes how to use it
-safely.
+Доступная в XS функция C<is_utf8_char()>, при получении на вход специально
+сформированной UTF-8 строки, может прочитать на 12 байт за пределы конца
+строки.  Это не может быть исправлено без изменения её API.  Функция не
+используется на CPAN.  Сейчас в документации описано как безопасно её
+использовать.
 
-=head3 Added C<is_utf8_char_buf()>
+=head3 Добавлена C<is_utf8_char_buf()>
 
-This function is designed to replace the deprecated L</is_utf8_char()>
-function.  It includes an extra parameter to make sure it doesn't read
-past the end of the input buffer.
+Эта функция предназначена для замены устаревшей функции
+L</is_utf8_char()>. Она включает дополнительный параметр, чтобы быть
+уверенным в том, что она не читает за пределами входного буфера.
 
-=head3 Other C<is_utf8_foo()> functions, as well as C<utf8_to_foo()>, etc.
+=head3 Другие C<is_utf8_foo()> функции, так и C<utf8_to_foo()>, т.д..
 
-Most of the other XS-callable functions that take UTF-8 encoded input
-implicitly assume that the UTF-8 is valid (not malformed) in regards to
-buffer length.  Do not do things such as change a character's case or
-see if it is alphanumeric without first being sure that it is valid
-UTF-8.  This can be safely done for a whole string by using one of the
-functions C<is_utf8_string()>, C<is_utf8_string_loc()>, and
-C<is_utf8_string_loclen()>.
+Большая часть других XS-вызываемых функций, которые получают на вход
+UTF-8 кодированную строку предполагают, что UTF-8 полностью корректен
+(не искажён) в отношении длины буфера.  Не делайте никаких действий,
+таких как изменение регистра символа или проверки является ли он
+буквоцифровым символом, без предварительной проверки, что UTF-8 строка
+корректна.  Это может быть безопасно выполнено для целых строк при
+помощи одной из функций C<is_utf8_string()>, C<is_utf8_string_loc()>,
+и C<is_utf8_string_loclen()>.
 
-=head3 New Pad API
+=head3 Новое Pad API
 
-Many new functions have been added to the API for manipulating lexical
-pads.  See L<perlapi/Pad Data Structures> for more information.
+Много новых функций было добавлено в API для манипуляции с лексическими
+панелями.  Смотрите больше информации в L<perlapi/Pad Data Structures>.
 
 =head2 Changes to Special Variables
 
