@@ -456,56 +456,59 @@ L<perldebug/"b [file]:[line] [condition]">.
 
 Смотрите подробности в L<CORE>.
 
-=head2 Other Changes
+=head2 Другие изменения
 
-=head3 Anonymous handles
+=head3 Анонимные дескрипторы
 
-Automatically generated file handles are now named __ANONIO__ when the
-variable name cannot be determined, rather than $__ANONIO__.
+Автоматически генерируемые файловые дескрипторы теперь именуются
+__ANONIO__, когда имя переменной не может быть определено лучше
+чем $__ANONIO__.
 
-=head3 Autoloaded sort Subroutines
+=head3 Автозагружаемые подпрограммы сортировки
 
-Custom sort subroutines can now be autoloaded [perl #30661]:
+Пользовательские подпрограммы сортировки теперь могут быть
+автоматически загружены [perl #30661]:
 
     sub AUTOLOAD { ... }
     @sorted = sort foo @list; # uses AUTOLOAD
 
-=head3 C<continue> no longer requires the "switch" feature
+=head3 C<continue> больше не требует подключения "switch" функционала
 
-The C<continue> keyword has two meanings.  It can introduce a C<continue>
-block after a loop, or it can exit the current C<when> block.  Up till now,
-the latter meaning was only valid with the "switch" feature enabled, and
-was a syntax error otherwise.  Since the main purpose of feature.pm is to
-avoid conflicts with user-defined subroutines, there is no reason for
-C<continue> to depend on it.
+Ключевое слово  C<continue> имеет два смысла. Оно может представлять
+C<continue> блок после цикла или может использоваться для выхода из
+текущего блока C<when>. До этого момента, последний смысл был
+допустимым только при включения функционала "switch", и являлось
+синтаксической ошибкой в противном случае.  Поскольку основное
+назначение модуля feature.pm - это избежание конфликтов с определёнными
+пользователем именами подпрограммам, никаких причин для C<continue>
+зависеть от него нет.
 
-=head3 DTrace probes for interpreter phase change
+=head3 Замеры DTrace при изменении фазы интерпретатора
 
-The C<phase-change> probes will fire when the interpreter's phase
-changes, which tracks the C<${^GLOBAL_PHASE}> variable.  C<arg0> is
-the new phase name; C<arg1> is the old one.  This is useful mostly
-for limiting your instrumentation to one or more of: compile time,
-run time, destruct time.
+Замеры C<phase-change> стартуют когда происходит смена фазы
+интерпретатора, которая отслеживается в переменной C<${^GLOBAL_PHASE}>.
+C<arg0> - это новое имя фазы; C<arg1> - старое имя фазы.  Это полезно
+в основном для ограничения набора вашего инструментария одним или
+несколькими частями: время компиляции, время работы, время уничтожения.
 
-=head3 C<__FILE__()> Syntax
+=head3 Синтаксис C<__FILE__()>
 
-The C<__FILE__>, C<__LINE__> and C<__PACKAGE__> tokens can now be written
-with an empty pair of parentheses after them.  This makes them parse the
-same way as C<time>, C<fork> and other built-in functions.
+Лексемы C<__FILE__>, C<__LINE__> и C<__PACKAGE__> теперь могут быть
+записаны с пустой парой скобок после них.  Это делает возможным парсинг
+тем же образом, что и C<time>, C<fork> и другие встроенные функции.
 
-=head3 The C<\$> prototype accepts any scalar lvalue
+=head3 Прототип C<\$> принимает любое скалярное lvalue
 
-The C<\$> and C<\[$]> subroutine prototypes now accept any scalar lvalue
-argument.  Previously they only accepted scalars beginning with C<$> and
-hash and array elements.  This change makes them consistent with the way
-the built-in C<read> and C<recv> functions (among others) parse their
-arguments.  This means that one can override the built-in functions with
-custom subroutines that parse their arguments the same way.
+Прототипы подпрограмм C<\$> и C<\[$]> теперь принимают любой скалярный
+lvalue аргумент.  Раньше они принимали только скаляры начинающиеся с C<$>
+и элементы хэша и массива.  Это изменение согласовывает их поведение с
+встроенными C<read> и C<recv> функциями при разборе их аргументов.  Это
+означает, что можно переопределить встроенные функции пользовательской
+подпрограммой, которая тем же образом разбирает свои аргументы.
 
-=head3 C<_> in subroutine prototypes
+=head3 C<_> в прототипах подпрограмм
 
-The C<_> character in subroutine prototypes is now allowed before C<@> or
-C<%>.
+Символ C<_> в прототипах подпрограмм теперь разрешён перед C<@> или C<%>.
 
 =head1 Security
 
