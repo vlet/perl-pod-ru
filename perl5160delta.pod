@@ -510,38 +510,39 @@ lvalue аргумент.  Раньше они принимали только с
 
 Символ C<_> в прототипах подпрограмм теперь разрешён перед C<@> или C<%>.
 
-=head1 Security
+=head1 Безопасность
 
-=head2 Use C<is_utf8_char_buf()> and not C<is_utf8_char()>
+=head2 Используйте C<is_utf8_char_buf()> вместо C<is_utf8_char()>
 
-The latter function is now deprecated because its API is insufficient to
-guarantee that it doesn't read (up to 12 bytes in the worst case) beyond
-the end of its input string.  See
+Первая функция теперь является устаревшей, поскольку её API недостаточен
+для гарантии того, что она не прочитает (до 12 байт в худшем случае) за
+пределами входной строки. Смотрите
 L<is_utf8_char_buf()|/Added is_utf8_char_buf()>.
 
-=head2 Malformed UTF-8 input could cause attempts to read beyond the end of the buffer
+=head2 Искажённый UTF-8 ввод может привести к попыткам чтения за пределами буфера
 
-Two new XS-accessible functions, C<utf8_to_uvchr_buf()> and
-C<utf8_to_uvuni_buf()> are now available to prevent this, and the Perl
-core has been converted to use them.
-See L</Internal Changes>.
+Две новые XS-доступные функции, C<utf8_to_uvchr_buf()> и
+C<utf8_to_uvuni_buf()> теперь доступны для предотвращения этого и ядро
+Perl уже перешло на их использование.
+Смотрите L</Внутренние Изменения>.
 
-=head2 C<File::Glob::bsd_glob()> memory error with GLOB_ALTDIRFUNC (CVE-2011-2728).
+=head2 C<File::Glob::bsd_glob()> ошибка памяти с GLOB_ALTDIRFUNC (CVE-2011-2728).
 
-Calling C<File::Glob::bsd_glob> with the unsupported flag
-GLOB_ALTDIRFUNC would cause an access violation / segfault.  A Perl
-program that accepts a flags value from an external source could expose
-itself to denial of service or arbitrary code execution attacks.  There
-are no known exploits in the wild.  The problem has been corrected by
-explicitly disabling all unsupported flags and setting unused function
-pointers to null.  Bug reported by Clément Lecigne.
+Вызов C<File::Glob::bsd_glob> с не поддерживаемым флагом GLOB_ALTDIRFUNC
+может привести нарушению доступа / сегфолту.  Perl программа, которая
+получает значение флагов из внешнего источника может быть подвержена атакам
+на отказ в обслуживании или выполнения произвольного кода.  Пока не известно
+о существовании действующих эксплойтов.  Проблема была исправлена явным
+запретом всех не поддерживаемых флагов и установкой незадействованных
+указателей функций в null.  О баге сообщил Clément Lecigne.
 
-=head2 Privileges are now set correctly when assigning to C<$(>
+=head2 Теперь привилегии выставляются коректно при присваивании C<$(>
 
-A hypothetical bug (probably non-exploitable in practice) due to the
-incorrect setting of the effective group ID while setting C<$(> has been
-fixed.  The bug would only have affected systems that have C<setresgid()>
-but not C<setregid()>, but no such systems are known of.
+Был исправлен гипотетический баг (вероятно невозможный для применения
+на практике) вследствие некорректной установки ID эффективной группы
+при задании C<$(>.  Баг возможен только на системах, которые имеют
+C<setresgid()>, но не имеют C<setregid()>, но ни об одной такой системе
+нам неизвестно.
 
 =head1 Deprecations
 
