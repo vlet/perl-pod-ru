@@ -566,20 +566,21 @@ C<utf8_to_uvuni()>
 L<is_utf8_char_buf()|/Добавлена is_utf8_char_buf()>, C<utf8_to_uvchr_buf()>
 и C<utf8_to_uvuni_buf()>.
 
-=head1 Future Deprecations
+=head1 Устаревающий Функционал
 
-This section serves as a notice of features that are I<likely> to be
-removed or L<deprecated|perlpolicy/deprecated> in the next release of
-perl (5.18.0).  If your code depends on these features, you should
-contact the Perl 5 Porters via the L<mailing
-list|http://lists.perl.org/list/perl5-porters.html> or L<perlbug> to
-explain your use case and inform the deprecation process.
+Эта секция служит для уведомления о функционале, который I<вероятно> будет
+удалён или L<устареет|perlpolicy/deprecated> в следующем релизе perl
+(5.18.0).  Если ваш код зависит от этого функционала, вы должны
+связаться с Perl 5 Porters через
+L<список рассылки|http://lists.perl.org/list/perl5-porters.html> или
+L<perlbug> для того, чтобы объяснить ваш конкретный случай и информировать
+процесс отказа.
 
-=head2 Core Modules
+=head2 Базовые Модули
 
-These modules may be marked as deprecated I<from the core>.  This only
-means that they will no longer be installed by default with the core
-distribution, but will remain available on the CPAN.
+Эти модули могут быть помечены как устаревшие I<из ядра>.  Это всего лишь
+означает, что они больше не будут устанавливаться по умолчанию с базовым
+дистрибутивом, но по прежнему будут доступны на CPAN.
 
 =over
 
@@ -613,11 +614,10 @@ Thread.pm
 
 =back
 
-=head2 Platforms with no supporting programmers:
+=head2 Платформы, для которых нет поддерживающих программистов:
 
-These platforms will probably have their
-special build support removed during the
-5.17.0 development series.
+Поддержка сборки для этих платформ вероятно будет удалена в
+ветке разработки 5.17.0.
 
 =over
 
@@ -655,16 +655,16 @@ VM/ESA
 
 =back
 
-=head2 Other Future Deprecations
+=head2 Прочий устаревающий Функционал
 
 =over
 
 =item *
 
-Swapping of $< and $>
+Обмен $< и $>
 
-For more information about this future deprecation, see L<the relevant RT
-ticket|https://rt.perl.org/rt3/Ticket/Display.html?id=96212>.
+Для большей информации об устаревании этого функционала смотрите
+L<относящийся к проблеме баг в RT|https://rt.perl.org/rt3/Ticket/Display.html?id=96212>.
 
 =item *
 
@@ -672,22 +672,22 @@ sfio, stdio
 
 =item *
 
-Unescaped literal C<< "{" >> in regular expressions.
+Не экранированный литерал C<< "{" >> в регулярном выражении.
 
-It is planned starting in v5.20 to require a literal C<"{"> to be
-escaped by, for example, preceding it with a backslash.  In v5.18, a
-deprecated warning message will be emitted for all such uses.  Note that
-this only affects patterns which are to match a literal C<"{">.  Other
-uses of this character, such as part of a quantifier or sequence like in
-the ones below are completely unaffected:
+Запланировано, начиная с v5.20, требовать экранирование литерала  C<"{">,
+например, предшествующим символом обратного слэша. В v5.18 будет выводиться
+предупреждение для всех подобных случаев.  Следует отметить, что это касается
+только случаев когда в шаблоне ищутся совпадения с литералом C<"{">.
+Другие виды использования этого символа, такие как часть квантора или
+последовательности, приведённые ниже, не затронуты этим изменением:
 
     /foo{3,5}/
     /\p{Alphabetic}/
     /\N{DIGIT ZERO}
 
-The removal of this will allow extensions to pattern syntax, and better
-error checking of existing syntax.  See L<perlre/Quantifiers> for an
-example.
+Удаление этого позволит делать расширения для синтаксиса шаблонов и лучше
+делать проверки на ошибки в существующем синтаксисе.  Смотрите
+L<perlre/Quantifiers> для примера.
 
 =back
 
