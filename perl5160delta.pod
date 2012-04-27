@@ -544,26 +544,27 @@ Perl уже перешло на их использование.
 C<setresgid()>, но не имеют C<setregid()>, но ни об одной такой системе
 нам неизвестно.
 
-=head1 Deprecations
+=head1 Устаревшее
 
-=head2 Don't read the Unicode data base files in F<lib/unicore>
+=head2 Не читайте файлы данных Юникода в F<lib/unicore>
 
-It is now deprecated to directly read the Unicode data base files.
-These are stored in the F<lib/unicore> directory.  Instead, you should
-use the new functions in L<Unicode::UCD>.  These provide a stable API,
-and give complete information.
+Теперь прямое обращение к файлам данных Юникода не рекомендуется. Они
+хранятся в каталоге F<lib/unicore>.  Вместо этого вы должны использовать
+новые функции в L<Unicode::UCD>.  Они предоставляют стабильное API и
+дают исчерпывающую информацию.
 
-Perl may at some point in the future change or remove the files.  The
-file most likely for applications to have used is
-F<lib/unicore/ToDigit.pl>.  L<Unicode::UCD/prop_invmap()> can be used to
-get at its data instead.
+Perl может с какого-то момента в будущем изменить или удалить данные
+файлы. Вероятно наиболее используемым файлом был
+F<lib/unicore/ToDigit.pl>. Вместо этого можно использовать функцию
+L<Unicode::UCD/prop_invmap()> для получения этих данных.
 
-=head2 XS functions C<is_utf8_char()>, C<utf8_to_uvchr()> and
+=head2 XS функции C<is_utf8_char()>, C<utf8_to_uvchr()> и
 C<utf8_to_uvuni()>
 
-This function is deprecated because it could read beyond the end of the
-input string.  Use the new L<is_utf8_char_buf()|/Added is_utf8_char_buf()>,
-C<utf8_to_uvchr_buf()> and C<utf8_to_uvuni_buf()> instead.
+Эта функция не рекомендуется, поскольку она может попытаться прочитать
+данные за пределами входной строки.  Используйте вместо них новые функции
+L<is_utf8_char_buf()|/Добавлена is_utf8_char_buf()>, C<utf8_to_uvchr_buf()>
+и C<utf8_to_uvuni_buf()>.
 
 =head1 Future Deprecations
 
