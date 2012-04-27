@@ -691,59 +691,61 @@ L<perlre/Quantifiers> для примера.
 
 =back
 
-=head1 Incompatible Changes
+=head1 Несовместимые изменения
 
-=head2 Special blocks called in void context
+=head2 Специальные блоки вызываются в пустом контексте
 
-Special blocks (C<BEGIN>, C<CHECK>, C<INIT>, C<UNITCHECK>, C<END>) are now
-called in void context.  This avoids wasteful copying of the result of the
-last statement [perl #108794].
+Специальные блоки (C<BEGIN>, C<CHECK>, C<INIT>, C<UNITCHECK>, C<END>) теперь
+вызываются в пустом контексте.  Это позволяет избежать расточительного
+копирования результатов последнего оператора [perl #108794].
 
-=head2 The C<overloading> pragma and regexp objects
+=head2 Прагма C<overloading> и объекты regexp
 
-With C<no overloading>, regular expression objects returned by C<qr//> are
-now stringified as "Regexp=REGEXP(0xbe600d)" instead of the regular
-expression itself [perl #108780].
+С C<no overloading>, объекты регулярного выражения возвращаемые C<qr//>
+теперь преобразуются к строке вида "Regexp=REGEXP(0xbe600d)" вместо
+самого регулярного выражения [perl #108780].
 
-=head2 Two XS typemap Entries removed
+=head2 Удалены две записи XS typemap 
 
-Two presumably unused XS typemap entries have been removed from the
-core typemap: T_DATAUNIT and T_CALLBACK.  If you are, against all odds,
-a user of these, please see the instructions on how to regain them
-in L<perlxstypemap>.
+Две, предположительно неиспользуемые, XS typemap записи были удалены
+из базовых typemap: T_DATAUNIT и T_CALLBACK. Если вы против изменений,
+пользователь этих typemap, пожалуйста смотрите инструкцию о том как
+вернуть их в L<perlxstypemap>.
 
-=head2 Unicode 6.1 has incompatibilities with Unicode 6.0
+=head2 Юникод 6.1 имеет несовместимости с Юникод 6.0
 
-These are detailed in L</Supports (almost) Unicode 6.1> above.
-You can compile this version of Perl to use Unicode 6.0.  See
-L<perlunicode/Hacking Perl to work on earlier Unicode versions (for very serious hackers only)>.
-
-=head2 Borland compiler
-
-All support for the Borland compiler has been dropped.  The code had not
-worked for a long time anyway.
-
-=head2 Certain deprecated Unicode properties are no longer supported by default
-
-Perl should never have exposed certain Unicode properties that are used
-by Unicode internally and not meant to be publicly available.  Use of
-these has generated deprecated warning messages since Perl 5.12.  The
-removed properties are Other_Alphabetic,
-Other_Default_Ignorable_Code_Point, Other_Grapheme_Extend,
-Other_ID_Continue, Other_ID_Start, Other_Lowercase, Other_Math, and
-Other_Uppercase.
-
-Perl may be recompiled to include any or all of them; instructions are
-given in
+Они детально описаны в L</Поддержка (почти) Юникода 6.1> выше.
+Вы можете скомпилировать эту версию Perl для работы с Юникод 6.0.
+Смотрите
 L<perluniprops/Unicode character properties that are NOT accepted by Perl>.
 
-=head2 Dereferencing IO thingies as typeglobs
+=head2 Компилятор Borland
 
-The C<*{...}> operator, when passed a reference to an IO thingy (as in
-C<*{*STDIN{IO}}>), creates a new typeglob containing just that IO object.
-Previously, it would stringify as an empty string, but some operators would
-treat it as undefined, producing an "uninitialized" warning.
-Now it stringifies as __ANONIO__ [perl #96326].
+Вся поддержка компилятора Borland была выкинута. В любом случае этот код
+не работал уже достаточно долгое время.
+
+=head2 Некоторые устаревшие свойства в Юникоде больше не поддерживается
+
+Perl никогда не раскрывает некоторые свойства Юникода, которые
+используются в Юникоде для внутренних целей и не предполагают публичной
+доступности.  Использование их приводило к генерации сообщения
+предупреждения начиная с Perl 5.12.  Удалены следующие свойства
+Other_Alphabetic, Other_Default_Ignorable_Code_Point, Other_Grapheme_Extend,
+Other_ID_Continue, Other_ID_Start, Other_Lowercase, Other_Math, и
+Other_Uppercase.
+
+Perl может быть пересобран для включения любой из них; инструкции
+даны в 
+L<perluniprops/Unicode character properties that are NOT accepted by Perl>.
+
+=head2 Разыменование IO сущностей как typeglob'ов
+
+Оператор C<*{...}> при передаче ссылки на IO сущность (как
+C<*{*STDIN{IO}}>), создаёт новый typeglob содержащий только это IO объект.
+Ранее, он приводил в строковой вид как пустую строку, но некоторые
+операторы могли их воспринимать как неопределённое значение, выдавая
+предупреждение о не инициализированном значении.
+Теперь это приводится к строке вида __ANONIO__ [perl #96326].
 
 =head2 User-defined case-changing operations
 
