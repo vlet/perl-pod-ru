@@ -747,105 +747,110 @@ C<*{*STDIN{IO}}>), создаёт новый typeglob содержащий то�
 предупреждение о не инициализированном значении.
 Теперь это приводится к строке вида __ANONIO__ [perl #96326].
 
-=head2 User-defined case-changing operations
+=head2 Определённые пользователем операции изменяющие регистр
 
-This feature was deprecated in Perl 5.14, and has now been removed.
-The CPAN module L<Unicode::Casing> provides better functionality without
-the drawbacks that this feature had, as are detailed in the 5.14
-documentation:
+Этот функционал являлся устаревшим в Perl 5.14 и сейчас был удалён.
+Модуль CPAN L<Unicode::Casing> предоставляет лучшую функциональность
+без недостатков, которые были свойствены этому функционалу, изложенные
+в документации 5.14:
 L<http://perldoc.perl.org/5.14.0/perlunicode.html#User-Defined-Case-Mappings-%28for-serious-hackers-only%29>
 
-=head2 XSUBs are now 'static'
+=head2 XSUB'ы теперь статические
 
-XSUB C functions are now 'static', that is, they are not visible from
-outside the compilation unit.  Users can use the new C<XS_EXTERNAL(name)>
-and C<XS_INTERNAL(name)> macros to pick the desired linking behaviour.
-The ordinary C<XS(name)> declaration for XSUBs will continue to declare
-non-'static' XSUBs for compatibility, but the XS compiler,
-C<ExtUtils::ParseXS> (C<xsubpp>) will emit 'static' XSUBs by default.
-C<ExtUtils::ParseXS>'s behaviour can be reconfigured from XS using the
-C<EXPORT_XSUB_SYMBOLS> keyword.  See L<perlxs> for details.
+XSUB C функции теперь статические (static), т.е. они не видимы за
+пределами скомпилированного модуля.  Пользователи теперь могут
+использовать новые макросы C<XS_EXTERNAL(name)> и C<XS_INTERNAL(name)>
+для выбора предпочитаемого поведения линкера. Обычная декларация
+C<XS(name)> для XSUB по прежнему создаёт нестатические XSUBs для
+совместимости, но XS компилятор, C<ExtUtils::ParseXS> (C<xsubpp>)
+будет создавать статические XSUB по умолчанию. Поведение
+C<ExtUtils::ParseXS> может быть изменено из XS, используя ключевое
+слово C<EXPORT_XSUB_SYMBOLS>.  Смотрите детали в L<perlxs>.
 
-=head2 Weakening read-only references
+=head2 Ослабление (weakening) доступной только на чтение ссылки
 
-Weakening read-only references is no longer permitted.  It should never
-have worked anyway, and in some cases could result in crashes.
+Ослабление (weakening) доступной только на чтение ссылки больше не
+позволяется.  Это в любом случае не работало, а в некоторых случаях
+приводило к краху.
 
-=head2 Tying scalars that hold typeglobs
+=head2 Связывание скаляров, которые содержат typeglob'ы
 
-Attempting to tie a scalar after a typeglob was assigned to it would
-instead tie the handle in the typeglob's IO slot.  This meant that it was
-impossible to tie the scalar itself.  Similar problems affected C<tied> and
-C<untie>: C<tied $scalar> would return false on a tied scalar if the last
-thing returned was a typeglob, and C<untie $scalar> on such a tied scalar
-would do nothing.
+Попытка связать скаляр после того, как ему был присвоен typeglob,
+вместо этого связывала дескриптор в IO слоте typelglob'а.  Это означало,
+что было невозможно связать непосредственно сам скаляр.  Схожие
+проблемы затрагивают и C<tied> C<untie>: C<tied $scalar> будет
+возвращать ложь на связанные скаляры, если последний возвращённый объект
+был typeglob'ом, и C<untie $scalar> на таком связанном скаляре не будет
+делать ничего.
 
-We fixed this problem before Perl 5.14.0, but it caused problems with some
-CPAN modules, so we put in a deprecation cycle instead.
+Мы исправили эту проблему до Perl 5.14.0, но это вызвало проблемы с
+некоторыми модулями CPAN, поэтому мы поместили это изменение в цикл
+устаревания.
 
-Now the deprecation has been removed and this bug has been fixed.  So
-C<tie $scalar> will always tie the scalar, not the handle it holds.  To tie
-the handle, use C<tie *$scalar> (with an explicit asterisk).  The same
-applies to C<tied *$scalar> and C<untie *$scalar>.
+Теперь статус устаревшего был удален и это баг был окончательно исправлен.
+Т.о. C<tie $scalar> теперь всегда связывает сам скаляр, но не
+содержащийся в нём дескриптор. Для связывания дескриптора используйте
+C<tie *$scalar> (с явным указанием звёздочки).  Тоже самое относится к
+C<tied *$scalar> и C<untie *$scalar>.
 
-=head2 IPC::Open3 no longer provides C<xfork()>, C<xclose_on_exec()>
-and C<xpipe_anon()>
+=head2 IPC::Open3 больше не предоставляет C<xfork()>, C<xclose_on_exec()>
+и C<xpipe_anon()>
 
-All three functions were private, undocumented and unexported.  They do
-not appear to be used by any code on CPAN.  Two have been inlined and one
-deleted entirely.
+Все три функции были приватными, недокументированными и неэкспортируемыми.
+Они не использовались в каком-либо коде на CPAN. Две из них были встроены
+в код, а одна удалена полностью.
 
-=head2 C<$$> no longer caches PID
+=head2 C<$$> больше не кэширует значение PID
 
-Previously, if one called fork(3) from C, Perl's
-notion of C<$$> could go out of sync with what getpid() returns.  By always
-fetching the value of C<$$> via getpid(), this potential bug is eliminated.
-Code that depends on the caching behavior will break.  As described in
-L<Core Enhancements|/C<$$> can be assigned to>,
-C<$$> is now writable, but it will be reset during a
-fork.
+Раньше при вызове fork(3) из C, значение C<$$> в Perl приходило в
+рассинхронизацию с тем, что возвращал getpid(). Всегда получая значение
+C<$$> через вызов getpid(), этот баг был исправлен. Код, который зависел
+от кэширующего поведения теперь сломается.  Как описано в
+L<Улучшения Ядра|/C<$$> можно присваивать значения>, C<$$> доступна для
+записи, но будет сброшена при fork.
 
-=head2 C<$$> and C<getppid()> no longer emulate POSIX semantics under LinuxThreads
+=head2 C<$$> и C<getppid()> больше не эмулируют POSIX семантику в LinuxThreads
 
-The POSIX emulation of C<$$> and C<getppid()> under the obsolete
-LinuxThreads implementation has been removed.
-This only impacts users of Linux 2.4 and
-users of Debian GNU/kFreeBSD up to and including 6.0, not the vast
-majority of Linux installations that use NPTL threads.
+Эмуляция POSIX C<$$> и C<getppid()> в вышедшей из употребления
+реализации LinuxThreads была удалена.
+Это касается только пользователей Linux 2.4 и пользователей
+Debian GNU/kFreeBSD до версии 6.0 включительно, но не обширное
+множество инсталляций Linux, которые используют NPTL нити.
 
-This means that C<getppid()>, like C<$$>, is now always guaranteed to
-return the OS's idea of the current state of the process, not perl's
-cached version of it.
+Это означает, что C<getppid()>, как и C<$$>, теперь всегда гарантируют,
+что возвращается мнение ОС о текущем состоянии процесса, а не кэшированый
+в perl вариант этого мнения.
 
-See the documentation for L<$$|perlvar/$$> for details.
+Смотрите документацию по L<$$|perlvar/$$> для подробностей.
 
-=head2 C<< $< >>, C<< $> >>, C<$(> and C<$)> are no longer cached
+=head2 C<< $< >>, C<< $> >>, C<$(> и C<$)> теперь больше не кэшируются
 
-Similarly to the changes to C<$$> and C<getppid()>, the internal
-caching of C<< $< >>, C<< $> >>, C<$(> and C<$)> has been removed.
+Схожее с изменениями C<$$> и C<getppid()>, внутреннее кэширование
+C<< $< >>, C<< $> >>, C<$(> и C<$)> было удалено.
 
-When we cached these values our idea of what they were would drift out
-of sync with reality if someone (e.g., someone embedding perl) called
-C<sete?[ug]id()> without updating C<PL_e?[ug]id>.  Having to deal with
-this complexity wasn't worth it given how cheap the C<gete?[ug]id()>
-system call is.
+Когда мы закэшировали эти значения, наше представление о том, чему они
+равны, могут разойтись с реальностью, если кто-либо (например,
+встраивающий perl) вызовет C<sete?[ug]id()> без обновления
+C<PL_e?[ug]id>. Цена учёта такой сложности не сопоставима с дешёвым
+системным вызовом C<gete?[ug]id()>.
 
-This change will break a handful of CPAN modules that use the XS-level
-C<PL_uid>, C<PL_gid>, C<PL_euid> or C<PL_egid> variables.
+Это изменение сломает горстку модулей на CPAN, которые используют
+переменные XS-уровня C<PL_uid>, C<PL_gid>, C<PL_euid> или C<PL_egid>
 
-The fix for those breakages is to use C<PerlProc_gete?[ug]id()> to
-retrieve them (e.g. C<PerlProc_getuid()>), and not to assign to
-C<PL_e?[ug]id> if you change the UID/GID/EUID/EGID.  There is no longer
-any need to do so since perl will always retrieve the up-to-date
-version of those values from the OS.
+Исправлением для этих разломов является использование функции
+C<PerlProc_gete?[ug]id()> для получения их значения (например,
+C<PerlProc_getuid()>), и не присваивать значение C<PL_e?[ug]id>,
+если вы хотите сменить UID/GID/EUID/EGID.  Теперь нет необходимости
+делать это, так как perl всегда получает актуальные значения из ОС.
 
-=head2 Which Non-ASCII characters get quoted by C<quotemeta> and C<\Q> has changed
+=head2 Изменился список не-ASCII символов, которые квотятся C<quotemeta> и C<\Q>
 
-This is unlikely to result in a real problem, as Perl does not attach
-special meaning to any non-ASCII character, so it is currently
-irrelevant which are quoted or not.  This change fixes bug [perl #77654] and
-bring Perl's behavior more into line with Unicode's recommendations.
-See L<perlfunc/quotemeta>.
+Это вряд ли приведёт к каким-то реальным проблемам, т.е. Perl не
+придаёт специального значения для не-ASCII символов, поэтому не важно
+какие из них квотятся, а какие нет.  Это изменение исправляет баг
+[perl #77654] и делает поведение Perl более соответствующим рекомендациям
+Юникода.
+Смотрите L<perlfunc/quotemeta>.
 
 =head1 Performance Enhancements
 
