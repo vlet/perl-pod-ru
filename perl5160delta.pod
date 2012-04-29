@@ -852,104 +852,103 @@ C<PerlProc_getuid()>), и не присваивать значение C<PL_e?[u
 Юникода.
 Смотрите L<perlfunc/quotemeta>.
 
-=head1 Performance Enhancements
+=head1 Увеличение Производительности
 
 =over
 
 =item *
 
-Improved performance for Unicode properties in regular expressions
+Улучшена производительность для свойств Юникода в регулярных выражениях
 
-=for comment Can this be compacted some? -- rjbs, 2012-02-20
+=for comment Может ли это быть как-то сокращено? -- rjbs, 2012-02-20
 
-Matching a code point against a Unicode property is now done via a
-binary search instead of linear.  This means for example that the worst
-case for a 1000 item property is 10 probes instead of 1000.  This
-inefficiency has been compensated for in the past by permanently storing
-in a hash the results of a given probe plus the results for the adjacent
-64 code points, under the theory that near-by code points are likely to
-be searched for.  A separate hash was used for each mention of a Unicode
-property in each regular expression.  Thus, C<qr/\p{foo}abc\p{foo}/>
-would generate two hashes.  Any probes in one instance would be unknown
-to the other, and the hashes could expand separately to be quite large
-if the regular expression were used on many different widely-separated
-code points.  This can lead to running out of memory in extreme cases.
-Now, however, there is just one hash shared by all instances of a given
-property.  This means that if C<\p{foo}> is matched against "A" in one
-regular expression in a thread, the result will be known immediately to
-all regular expressions, and the relentless march of using up memory is
-slowed considerably.
-
-=item *
-
-Version declarations with the C<use> keyword (e.g., C<use 5.012>) are now
-faster, as they enable features without loading F<feature.pm>.
+Поиск совпадений для свойств Юникода теперь производится через бинарный
+поиск вместо линейного.  Это означает, что например в худшем случае поиск
+1000-го свойства потребует 10 проб вместо 1000. Эта неэффективность в
+прошлом была скомпенсирована постоянным хранением в хэше результата поиска
+плюс результат соседних 64 кодов, в предположении, что чаще ищутся коды
+расположенные рядом. Отдельный хэш использовался для каждого упоминания
+свойства Юникод в каждом регулярном выражении. Таким образом
+C<qr/\p{foo}abc\p{foo}/> создаст два хэша. Любой поиск в каждом случае
+будет оставаться неизвестным для других и хэши будут расширяться
+независимо до внушительных размеров в случае если регулярное выражение
+использовалось для большого количества кодов в широком диапазоне.  В
+экстремальных ситуациях это может привести к израсходованию доступной
+памяти. Теперь, однако, есть только один хэш доступный всем экземплярам
+данного свойства.  Это значит, что если C<\p{foo}> совпадает с "A" в
+одном регулярном выражении в нити, результат станет известен немедленно
+во всех регулярных выражениях и потребление памяти заметно сократится.
 
 =item *
 
-C<local $_> is faster now, as it no longer iterates through magic that it
-is not going to copy anyway.
+Определение версии с ключевым словом C<use> (например, C<use 5.012>)
+теперь работает быстрее, так как включает функционал без загрузки
+F<feature.pm>.
 
 =item *
 
-Perl 5.12.0 sped up the destruction of objects whose classes define
-empty C<DESTROY> methods (to prevent autoloading), by simply not
-calling such empty methods.  This release takes this optimisation a
-step further, by not calling any C<DESTROY> method that begins with a
-C<return> statement.  This can be useful for destructors that are only
-used for debugging:
+C<local $_> теперь быстрее, так как больше не проходит через магию,
+которая в любом случае не приводит к копированию.
+
+=item *
+
+Perl 5.12.0 ускорил уничтожение объектов, чьи классы задавали пустые
+C<DESTROY> методы (для предотвращения автозагрузки), просто не
+запуская эти пустые методы.  Этот релиз продвигает эту оптимизацию
+на шаг вперёд не вызывая любой C<DESTROY> метод, который начинается с
+оператора C<return>. Это может быть полезно для деструкторов, которые
+используются только для отладки:
 
     use constant DEBUG => 1;
     sub DESTROY { return unless DEBUG; ... }
 
-Constant-folding will reduce the first statement to C<return;> if DEBUG
-is set to 0, triggering this optimisation.
+Вычисление константы сократит первый оператор до C<return;> если DEBUG
+будет установлен в 0, тем самым приводя к выполнению оптимизации.
 
 =item *
 
-Assigning to a variable that holds a typeglob or copy-on-write scalar
-is now much faster.  Previously the typeglob would be stringified or
-the copy-on-write scalar would be copied before being clobbered.
+Присвоение переменной, которая содержит typeglob или скаляр
+копируемый при записи, теперь происходит гораздо быстрей.  Раньше
+typeglob приводился к строке, а скаляр копируемый при записи
+копировался перед изменением.
 
 =item *
 
-Assignment to C<substr> in void context is now more than twice its
-previous speed.  Instead of creating and returning a special lvalue
-scalar that is then assigned to, C<substr> modifies the original string
-itself.
+Присвоение C<substr> в пустом контексте теперь происходит в два раза
+быстрее.  Вместо создания и возвращения специального lvalue скаляра,
+к которому будет присваиваться результат, C<substr> изменяет саму
+оригинальную строку.
 
 =item *
 
-C<substr> no longer calculates a value to return when called in void
-context.
+C<substr> больше не вычисляет значение, которое должен вернуть, когда
+вызывается в пустом контексте.
 
 =item *
 
-Due to changes in L<File::Glob>, Perl's C<glob> function and its C<<
-<...> >> equivalent are now much faster.  The splitting of the pattern
-into words has been rewritten in C, resulting in speed-ups of 20% in
-some cases.
+Из-за изменений в L<File::Glob>, функция Perl C<glob> и её C<< <...> >> 
+эквивалент теперь значительно быстрее.  Разбитие шаблона на слова было
+переписано на C, приведя к 20% ускорению в некоторых случаях.
 
-This does not affect C<glob> on VMS, as it does not use File::Glob.
+Это не затрагивает C<glob> на VMS, т.к. там не используется File::Glob.
+
+=item *
+Укороченные логические операторы C<&&>, C<||>, и C<//>, при связке в
+цепочку (как например C<$a || $b || $c>), теперь работают значительно
+быстрее, вследствие укороченного обхода дерева операций.
 
 =item *
 
-The short-circuiting operators C<&&>, C<||>, and C<//>, when chained
-(such as C<$a || $b || $c>), are now considerably faster to short-circuit,
-due to reduced optree traversal.
+Реализация C<s///r> делает ещё одну копию значения скаляра.
 
 =item *
 
-The implementation of C<s///r> makes one fewer copy of the scalar's value.
+C<study> теперь ни делает ничего (no-op).
 
 =item *
 
-C<study> is now a no-op.
-
-=item *
-
-Recursive calls to lvalue subroutines in lvalue scalar context use less
-memory.
+Рекурсивный вызов к lvalue подпрограмме в lvalue скалярном контексте
+использует меньше памяти.
 
 =back
 
