@@ -952,63 +952,63 @@ C<study> теперь ни делает ничего (no-op).
 
 =back
 
-=head1 Modules and Pragmata
+=head1 Модули и Прагмы
 
-=head2 Deprecated Modules
+=head2 Устаревшие Модули
 
 =over
 
 =item L<Version::Requirements>
 
-Version::Requirements is now DEPRECATED, use L<CPAN::Meta::Requirements>,
-which is a drop-in replacement.  It will be deleted from perl.git blead
-in v5.17.0.
+Version::Requirements теперь устарел, используйте
+L<CPAN::Meta::Requirements>, который является подходящей заменой. Он
+будет удалён из perl.git blead в версии v5.17.0.
 
 =back
 
-=head2 New Modules and Pragmata
+=head2 Новые Модули и Прагмы
 
 =over 4
 
 =item *
 
-L<arybase> -- this new module implements the C<$[> variable.
+L<arybase> -- этот новый модуль является реализация переменной C<$[>.
 
 =item *
 
-C<PerlIO::mmap> 0.010 has been added to the Perl core.
+C<PerlIO::mmap> 0.010 был добавлен в базовый Perl.
 
-The C<mmap> PerlIO layer is no longer implemented by perl itself, but has
-been moved out into the new L<PerlIO::mmap> module.
+Слой C<mmap> PerlIO больше не предоставляется самим perl, а был вынесен
+в новый модуль L<PerlIO::mmap>.
 
 =back
 
-=head2 Updated Modules and Pragmata
+=head2 Обновлённые Модули и Прагмы
 
 =over 4
 
 =item *
 
-L<XXX> has been upgraded from version 0.69 to version 0.70.
+L<XXX> был обновлён с версии 0.69 до версии 0.70.
 
 =back
 
-=head2 Removed Modules and Pragmata
+=head2 Удалённые Модули и Прагмы
 
-As promised in Perl 5.14.0's release notes, the following modules have
-been removed from the core distribution, and if needed should be installed
-from CPAN instead.
+Как и было обещано в заметках к выпуску Perl 5.14.0, следующие модули
+были удалены из базового дистрибутива и при необходимости могут быть
+установлены из CPAN.
 
 =over
 
 =item *
 
-C<Devel::DProf> has been removed from the Perl core.  Prior version was
+C<Devel::DProf> был удалён из базового Perl.  Предыдущая версия была
 20110228.00.
 
 =item *
 
-C<Shell> has been removed from the Perl core.  Prior version was 0.72_01.
+C<Shell> был удалён из базового Perl.  Предыдущая версия была 0.72_01.
 
 =back
 
