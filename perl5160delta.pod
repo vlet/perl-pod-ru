@@ -1510,7 +1510,7 @@ L<Possible attempt to separate words with commas|perldiag/"Possible attempt to s
 
 =back
 
-=head1 Utility Changes
+=head1 Изменения в Утилитах
 
 =head3 L<h2ph>
 
@@ -1518,15 +1518,15 @@ L<Possible attempt to separate words with commas|perldiag/"Possible attempt to s
 
 =item *
 
-L<h2ph> used to generate code of the form
+L<h2ph> генерировал код в следующей форме
 
   unless(defined(&FOO)) {
     sub FOO () {42;}
   }
 
-But the subroutine is a compile-time declaration, and is hence unaffected
-by the condition.  It has now been corrected to emit a string C<eval>
-around the subroutine [perl #99368].
+Но объявление подпрограмм происходит при компиляции и поэтому условие
+на это не влияет.  Теперь это было исправлено заключением подпрограммы
+в блок C<eval> [perl #99368].
 
 =back
 
@@ -1536,9 +1536,9 @@ around the subroutine [perl #99368].
 
 =item *
 
-F<splain> no longer emits backtraces with the first line number repeated.
+F<splain> больше не выводит трассировки с повторяющейся первой строкой.
 
-This:
+Было:
 
     Uncaught exception from user code:
             Cannot fwiddle the fwuddle at -e line 1.
@@ -1547,7 +1547,7 @@ This:
             main::bar() called at -e line 1
             main::foo() called at -e line 1
 
-has become this:
+Стало:
 
     Uncaught exception from user code:
             Cannot fwiddle the fwuddle at -e line 1.
@@ -1557,9 +1557,10 @@ has become this:
 
 =item *
 
-Some error messages consist of multiple lines that are listed as separate
-entries in L<perldiag>.  splain has been taught to find the separate
-entries in these cases, instead of simply failing to find the message.
+Некоторые сообщения об ошибках состоявшие из нескольких строк
+указаны в разных разделах в L<perldiag>. splain пытался найти отельный
+раздел, включающий все строки, вместо того, чтобы просто найти
+сообщение.
 
 =back
 
@@ -1569,12 +1570,11 @@ entries in these cases, instead of simply failing to find the message.
 
 =item *
 
-This is a new utility, included as part of an
-L<IO::Compress::Base> upgrade.
+Это новая утилита, включённая как часть обновления L<IO::Compress::Base>
 
-L<zipdetails> displays information about the internal record structure
-of the zip file.  It is not concerned with displaying any details of
-the compressed data stored in the zip file.
+L<zipdetails> показывает информацию о внутренней структуре записи zip
+файла.  Она не имеет отношения к деталям сжатых данных, сохранённых в
+zip файле.
 
 =back
 
