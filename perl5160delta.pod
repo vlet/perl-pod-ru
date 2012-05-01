@@ -1671,9 +1671,9 @@ C<XS::Typemap> - это тестовый модуль, который не ус�
 
 =back
 
-=head1 Platform Support
+=head1 Поддержка Платформ
 
-=head2 Platform-Specific Notes
+=head2 Платформо-специфичные Заметки
 
 =head3 Cygwin
 
@@ -1681,13 +1681,13 @@ C<XS::Typemap> - это тестовый модуль, который не ус�
 
 =item *
 
-Since version 1.7, Cygwin supports native UTF-8 paths.  If Perl is built
-under that environment, directory and filenames will be UTF-8 encoded.
+Начиная с версии 1.7, Cygwin поддерживает родные UTF-8 пути. Если Perl
+собран в этом окружении, имена директорий и файлов будут кодированные в
+UTF-8.
 
-Cygwin does not initialize all original Win32 environment variables.  See
-F<README.cygwin> for a discussion of the newly-added
-C<Cygwin::sync_winenv()> function [perl #110190] and for
-further links.
+Cygwin не инициализирует все оригинальные переменные окружения Win32.
+Смотрите F<README.cygwin> обсуждение новой добавленной функции
+C<Cygwin::sync_winenv()> [perl #110190] и дальнейшие ссылки.
 
 =back
 
@@ -1697,10 +1697,10 @@ further links.
 
 =item *
 
-HP-UX PA-RISC/64 now supports gcc-4.x
+HP-UX PA-RISC/64 теперь поддерживает gcc-4.x
 
-A fix to correct the socketsize now makes the test suite pass on HP-UX
-PA-RISC for 64bitall builds.
+Исправление для исправления socketsize теперь делает прохождение набора
+тестов успешным на HP-UX PA-RISC для 64bitall сборок.
 
 =back
 
@@ -1710,48 +1710,47 @@ PA-RISC for 64bitall builds.
 
 =item *
 
-Remove unnecessary includes, fix miscellaneous compiler warnings and
-close some unclosed comments on F<vms/vms.c>.
+Удалены ненужные включения, исправлены различные предупреждения
+компилятора и закрыты незакрытые комментарии в F<vms/vms.c>.
 
-Remove sockadapt layer from the VMS build.
-
-=item *
-
-Explicit support for VMS versions prior to v7.0 and DEC C versions
-prior to v6.0 has been removed.
+Из сборки VMS удалён слой sockadapt.
 
 =item *
 
-Since Perl 5.10.1, the home-grown C<stat> wrapper has been unable to
-distinguish between a directory name containing an underscore and an
-otherwise-identical filename containing a dot in the same position
-(e.g., t/test_pl as a directory and t/test.pl as a file).  This problem
-has been corrected.
+Явная поддержка для VMS версий до v7.0 и DEC C версий до v6.0
+была удалена.
 
 =item *
 
-The build on VMS now allows names of the resulting symbols in C code for
-Perl longer than 31 characters.  Symbols like
-C<Perl__it_was_the_best_of_times_it_was_the_worst_of_times> can now be
-created freely without causing the VMS linker to seize up.
+Начиная с Perl 5.10.1, доморощенная обёртка C<stat> не могла
+различить директорию с именем содержащим подчёркивание или же идентичным
+файлом, содержащим точку в той позиции (например, t/test_pl как
+директория и t/test.pl как файл).  Эта проблема была исправлена.
+
+=item *
+
+Сборка на VMS теперь позволяет иметь имена получаемых символов в C коде
+для Perl длиннее чем 31 символ. Символы вида
+C<Perl__it_was_the_best_of_times_it_was_the_worst_of_times> теперь могут
+быть создано свободно без изменения размера VMS линкером.
 
 =back
 
 =head3 GNU/Hurd
 
-Numerous build and test failures on GNU/Hurd have been resolved with hints
-for building DBM modules, detection of the library search path, and enabling
-of large file support.
+Некоторые ошибки сборки и неудачные тесты на GNU/Hurd были исправлены с
+помощью сборки DBM модулей, определения путей поиска библиотек и включения
+поддержки больших файлов.
 
 =head3 OpenVOS
 
-Perl is now built with dynamic linking on OpenVOS, the minimum supported
-version of which is now Release 17.1.0.
+Perl теперь собирается с динамической линковкой на OpenVOS, минимальная
+поддерживаемая версия которого, теперь стала Релизом 17.1.0.
 
 =head3 SunOS
 
-The CC workshop C++ compiler is now detected and used on systems that ship
-without cc.
+Теперь определяется CC workshop C++ компилятор и используется на
+системах, который поставляются без cc.
 
 =head1 Internal Changes
 
