@@ -1306,15 +1306,15 @@ perlbot (набор рецептов по объектов) также был у
 Файлы perldelta для выпусков для разработчиков больше не пакуются с perl.
 Они по-прежнему могут быть найдены в репозитории исходного кода.
 
-=head1 Diagnostics
+=head1 Диагностика
 
-The following additions or changes have been made to diagnostic output,
-including warnings and fatal error messages.  For the complete list of
-diagnostic messages, see L<perldiag>.
+Следующие дополнения или изменения были сделаны с диагностическим
+выводом, включая предупреждения и сообщения о фатальных ошибках. Для
+полного списка диагностических сообщений смотрите L<perldiag>.
 
-=head2 New Diagnostics
+=head2 Новая диагностика
 
-=head3 New Errors
+=head3 Новые Ошибки
 
 =over 4
 
@@ -1322,36 +1322,39 @@ diagnostic messages, see L<perldiag>.
 
 L<Cannot set tied @DB::args|perldiag/"Cannot set tied @DB::args">
 
-This error occurs when C<caller> tries to set C<@DB::args> but finds it
-tied.  Before this error was added, it used to crash instead.
+Эта ошибка возникает, когда C<caller> пытается установить C<@DB::args>,
+но обнаруживает, что тот связанный.  Раньше, до добавления этой ошибки,
+он просто падал.
 
 =item *
 
 L<Cannot tie unreifiable array|perldiag/"Cannot tie unreifiable array">
 
-This error is part of a safety check that the C<tie> operator does before
-tying a special array like C<@_>.  You should never see this message.
+Эта ошибка часть проверки на безопасность, которую оператор C<tie>
+выполняет перед связыванием специальный массивов типа C<@_>.  Вы никогда
+не должны увидеть это сообщение.
 
 =item *
 
 L<&CORE::%s cannot be called directly|perldiag/"&CORE::%s cannot be called directly">
 
-This occurs when a subroutine in the C<CORE::> namespace is called
-with C<&foo> syntax or through a reference.  Some subroutines
-in this package cannot yet be called that way, but must be
-called as barewords.  See L</Subroutines in the C<CORE> namespace>, above.
+Это происходит, когда подпрограмма из пространства имён C<CORE::>
+вызывается с использованием синтаксиса C<&foo> или через ссылку.
+Некоторые подпрограммы в этом пакете не могут пока вызываться таким
+образом и должны вызываться как bareword. Смотрите
+L</Подпрограммы в пространстве имён C<CORE>> выше.
 
 =item *
 
 L<Source filters apply only to byte streams|perldiag/"Source filters apply only to byte streams">
 
-This new error occurs when you try to activate a source filter (usually by
-loading a source filter module) within a string passed to C<eval> under the
-C<unicode_eval> feature.
+Эта новая ошибка возникает, когда вы пытаетесь активировать фильтр
+исходного кода (обычно при загрузке модуля фильтра кода) со строкой
+переданной в C<eval> во время действия функционала C<unicode_eval>.
 
 =back
 
-=head3 New Warnings
+=head3 Новые Предупреждения
 
 =over 4
 
@@ -1359,23 +1362,24 @@ C<unicode_eval> feature.
 
 L<defined(@array) is deprecated|perldiag/"defined(@array) is deprecated">
 
-The long-deprecated C<defined(@array)> now also warns for package variables.
-Previously it only issued a warning for lexical variables.
+Давно устаревший C<defined(@array)> теперь также выдаёт предупреждения для
+переменных пакета.  Ранее предупреждение выдавалось только для лексических
+переменных.
 
 =item *
 
 L<length() used on %s|perldiag/length() used on %s>
 
-This new warning occurs when C<length> is used on an array or hash, instead
-of C<scalar(@array)> or C<scalar(keys %hash)>.
+Это новое предупреждение возникает, когда C<length> используется на массивах
+или хэшах, вместо C<scalar(@array)> или C<scalar(keys %hash)>.
 
 =item *
 
 L<lvalue attribute %s already-defined subroutine|perldiag/"lvalue attribute %s already-defined subroutine">
 
-L<attributes.pm|attributes> now emits this warning when the :lvalue
-attribute is applied to a Perl subroutine that has already been defined, as
-doing so can have unexpected side-effects.
+L<attributes.pm|attributes> теперь выводит предупреждение, когда атрибут
+:lvalue применяется к Perl подпрограмме, которая уже была определена и
+выполнение этой операции может привести к непредсказуемым побочным эффектам.
 
 =item *
 
@@ -1389,26 +1393,25 @@ operator.
 
 L<$[ used in %s (did you mean $] ?)|perldiag/"$[ used in %s (did you mean $] ?)">
 
-This new warning exists to catch the mistaken use of C<$[> in version
-checks.  C<$]>, not C<$[>, contains the version number.
+Это новое предупреждение предназначено отлавливать ошибочное использование
+C<$[> в проверках версии. C<$]>, а не C<$[> содержит значение версии.
 
 =item *
 
 L<Useless assignment to a temporary|perldiag/"Useless assignment to a temporary">
 
-Assigning to a temporary scalar returned
-from an lvalue subroutine now produces this
-warning [perl #31946].
+Присвоение временному скаляру, возвращаемому из lvalue подпрограммы,
+теперь выводит это предупреждение [perl #31946].
 
 =item *
 
 L<Useless use of \E|perldiag/"Useless use of \E">
 
-C<\E> does nothing unless preceded by C<\Q>, C<\L> or C<\U>.
+C<\E> ни делает ничего, если не предварён C<\Q>, C<\L> или C<\U>.
 
 =back
 
-=head2 Removed Errors
+=head2 Удалённые Ошибки
 
 =over
 
@@ -1416,91 +1419,94 @@ C<\E> does nothing unless preceded by C<\Q>, C<\L> or C<\U>.
 
 "sort is now a reserved word"
 
-This error used to occur when C<sort> was called without arguments,
-followed by C<;> or C<)>.  (E.g., C<sort;> would die, but C<{sort}> was
-OK.)  This error message was added in Perl 3 to catch code like
-C<close(sort)> which would no longer work.  More than two decades later,
-this message is no longer appropriate.  Now C<sort> without arguments is
-always allowed, and returns an empty list, as it did in those cases
-where it was already allowed [perl #90030].
+Эта ошибка использовалась, когда sort вызывался без аргументов с
+последующими символами C<;> или C<)>. (Например, C<sort;> умрёт,
+а C<{sort}> нет).  Это сообщение об ошибке было добавлено в Perl 3
+для выявления кода, типа C<close(sort)>, который больше не работает.
+Два десятка лет спустя, это сообщение больше неуместно. Теперь C<sort>
+без аргументов всегда допустим и возвращает пустой список, как он
+это и делал в подобных случаях, в которых он уже был разрешён
+[perl #90030].
 
 =back
 
-=head2 Changes to Existing Diagnostics
+=head2 Изменения в Существующей Диагностике
 
 =over 4
 
 =item *
 
-The "Applying pattern match..." or similar warning produced when an
-array or hash is on the left-hand side of the C<=~> operator now
-mentions the name of the variable.
+"Applying pattern match..." или подобные предупреждения вызываемые,
+когда массив или хэш находится по левую сторону оператора C<=~>,
+теперь упоминают имя переменной.
 
 =item *
 
-The "Attempt to free non-existent shared string" has had the spelling
-of "non-existent" corrected to "nonexistent".  It was already listed
-with the correct spelling in L<perldiag>.
+В сообщении "Attempt to free non-existent shared string" было
+исправлено написание "non-existent" как "nonexistent".  Это было
+уже исправлено в описании в L<perldiag>.
 
 =item *
 
-The error messages for using C<default> and C<when> outside of a
-topicalizer have been standardised to match the messages for C<continue>
-and loop controls.  They now read 'Can't "default" outside a
-topicalizer' and 'Can't "when" outside a topicalizer'.  They both used
-to be 'Can't use when() outside a topicalizer' [perl #91514].
+Сообщение об ошибке при использовании C<default> и C<when> вне
+блока было стандартизовано для соответствия сообщениям для C<continue>
+и управляющих циклом.  Теперь они читаются 'Can't "default" outside a
+topicalizer' и 'Can't "when" outside a topicalizer'.  Ранее они оба 
+имели вид 'Can't use when() outside a topicalizer' [perl #91514].
 
 =item *
 
-The message, "Code point 0x%X is not Unicode, no properties match it;
-all inverse properties do" has been changed to "Code point 0x%X is not
+Сообщение "Code point 0x%X is not Unicode, no properties match it;
+all inverse properties do" было изменено на "Code point 0x%X is not
 Unicode, all \p{} matches fail; all \P{} matches succeed".
 
 =item *
 
-Redefinition warnings for constant subroutines used to be mandatory,
-even occurring under C<no warnings>.  Now they respect the L<warnings>
-pragma.
+Предупреждения о переопределении для постоянных подпрограмм было
+обязательным, и происходили даже при C<no warnings>.  Теперь они
+соблюдают требования прагмы L<warnings>. 
 
 =item *
 
-The "glob failed" warning message is now suppressible via C<no warnings>
+Предупреждение "glob failed" теперь подавляется при C<no warnings>
 [perl #111656].
 
 =item *
 
-The L<Invalid version format|perldiag/"Invalid version format (%s)">
-error message now says "negative version number" within the parentheses,
-rather than "non-numeric data", for negative numbers.
+Сообщение об ошибке
+L<Invalid version format|perldiag/"Invalid version format (%s)">
+теперь говорит о "negative version number" (отрицательный номер версии)
+в скобках, вместо "non-numeric data" (не числовые данные) для
+отрицательных чисел.
 
 =item *
 
-The two warnings
+Два предупреждения
 L<Possible attempt to put comments in qw() list|perldiag/"Possible attempt to put comments in qw() list">
-and
+и
 L<Possible attempt to separate words with commas|perldiag/"Possible attempt to separate words with commas">
-are no longer mutually exclusive: the same C<qw> construct may produce
-both.
+больше не взаимоисключающие: один и тот же C<qw> может вывести оба.
 
 =item *
 
-The uninitialized warning for C<y///r> when C<$_> is implicit and
-undefined now mentions the variable name, just like the non-/r variation
-of the operator.
+Предупреждение о не инициализированном значении для C<y///r>, когда C<$_>
+используется неявно и неопределенно, теперь упоминает имя переменной,
+также как и для вариант оператора без /r .
 
 =item *
 
-The 'Use of "foo" without parentheses is ambiguous' warning has been
-extended to apply also to user-defined subroutines with a (;$)
-prototype, and not just to built-in functions.
+Предупреждение 'Use of "foo" without parentheses is ambiguous' (
+Использование "foo" без скобок двусмысленно) было расширенно для
+случая пользовательских подпрограмм с прототипом (;$), а не только
+встроенных функций.
 
 =item *
 
-Warnings that mention the names of lexical (C<my>) variables with
-Unicode characters in them now respect the presence or absence of the
-C<:utf8> layer on the output handle, instead of outputting UTF8
-regardless.  Also, the correct names are included in the strings passed
-to C<$SIG{__WARN__}> handlers, rather than the raw UTF8 bytes.
+Предупреждения, в которых упоминаются лексических переменных (C<my>) с
+символами Юникода учитывают наличие или отсутствие слоя C<:utf8> на
+дескрипторе вывода вместо вывода в UTF8, не обращая на это внимание.
+Также правильные имена включаются в строки передаваемые в
+дескрипторы C<$SIG{__WARN__}>, вместо необработанных UTF8 байтов.
 
 =back
 
