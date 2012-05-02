@@ -2220,45 +2220,47 @@ L<Storable>, L<Devel::Peek> и L<PerlIO::scalar> имели схожие про�
 
 =back
 
-=head2 The debugger
+=head2 Отладчик
 
 =over
 
 =item *
 
-F<dumpvar.pl>, and consequently the C<x> command in the debugger, have been
-fixed to handle objects blessed into classes whose names contain "=".  The
-contents of such objects used not to be dumped [perl #101814].
+F<dumpvar.pl> и следовательно команда C<x> в отладчике была исправлена
+в обработке объектов "благословлённые" (blessed) в классы, чьи имена
+содержат "=".  Содержимое таких объектов раньше не выводилось
+[perl #101814].
 
 =item *
 
-The "R" command for restarting a debugger session has been fixed to work on
-Windows, or any other system lacking a C<POSIX::_SC_OPEN_MAX> constant
-[perl #87740].
+Команда "R" для перезапуска сессии отладчика была исправлена для работы
+в Windows или любой другой операционной системе, где отсутствует константа
+C<POSIX::_SC_OPEN_MAX> [perl #87740].
 
 =item *
 
-The C<#line 42 foo> directive used not to update the arrays of lines used
-by the debugger if it occurred in a string eval.  This was partially fixed
-in 5.14, but it only worked for a single C<#line 42 foo> in each eval.  Now
-it works for multiple.
+Директива C<#line 42 foo> раньше не обновляла массивы линий, используемых
+отладчиком, если это происходило при eval'е строки.  Это было частично
+исправлено в 5.14, но работало только с одним C<#line 42 foo> в каждом
+eval.  Теперь это работает и для нескольких директив.
 
 =item *
 
-When subroutine calls are intercepted by the debugger, the name of the
-subroutine or a reference to it is stored in C<$DB::sub>, for the debugger
-to access.  In some cases (such as C<$foo = *bar; undef *bar; &$foo>)
-C<$DB::sub> would be set to a name that could not be used to find the
-subroutine, and so the debugger's attempt to call it would fail.  Now the
-check to see whether a reference is needed is more robust, so those
-problems should not happen anymore [rt.cpan.org #69862].
+Когда вызов подпрограммы перехватывается отладчиком, имя подпрограммы или
+ссылка на неё сохраняется в C<$DB::sub>, для доступа отладчиком.  В
+некоторых случаях (такие как C<$foo = *bar; undef *bar; &$foo>) C<$DB::sub>
+будет установлен в значение, которое не может быть использовано для поиска
+подпрограммы, и попытка её вызова отладчиком приведёт к отказу. Теперь
+проверка на необходимость ссылки более продуманна, поэтому эта проблема
+больше не должна происходить [rt.cpan.org #69862].
 
 =item *
 
-Every subroutine has a filename associated with it that the debugger uses.
-The one associated with constant subroutines used to be misallocated when
-cloned under threads.  Consequently, debugging threaded applications could
-result in memory corruption [perl #96126].
+Каждая подпрограмма имеет файл ассоциированный с ней, которые используются
+отладчиком. Для тех, что ассоциировались с постоянными подпрограммами,
+раньше ошибочно выделялась память при клонировании в нитях.  Следовательно
+при отладке многопоточных приложений это приводило к порче памяти
+[perl #96126].
 
 =back
 
