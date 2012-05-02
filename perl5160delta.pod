@@ -2119,99 +2119,104 @@ C<is_utf8_string_loclen()> могут читать до 12 байтов за п�
 
 =back
 
-=head2 Compile-time hints
+=head2 Hint'ы времени компиляции
 
 =over
 
 =item *
 
-Tying C<%^H> no longer causes perl to crash or ignore the contents of
-C<%^H> when entering a compilation scope [perl #106282].
+Связывание C<%^H> больше не приводит к краху perl или игнорированию
+содержимого C<%^H>, при входе в контекст компиляции [perl #106282].
 
 =item *
 
-C<eval $string> and C<require> used not to
-localise C<%^H> during compilation if it
-was empty at the time the C<eval> call itself was compiled.  This could
-lead to scary side effects, like C<use re "/m"> enabling other flags that
-the surrounding code was trying to enable for its caller [perl #68750].
+C<eval $string> и C<require> раньше не локализовали C<%^H> в ходе
+компиляции, если он был пуст во время, когда сам вызов C<eval>
+компилировался.  Это приводило к таким жутким сторонним эффектам, как,
+например, C<use re "/m"> включал другие флаги, которые окружающий код
+пытался включить для вызывающей процедуры [perl #68750].
 
 =item *
 
-C<eval $string> and C<require> no longer localise hints (C<$^H> and C<%^H>)
-at run time, but only during compilation of the $string or required file.
-This makes C<BEGIN { $^H{foo}=7 }> equivalent to
-C<BEGIN { eval '$^H{foo}=7' }> [perl #70151].
+C<eval $string> и C<require> больше не локализуют hint'ы (C<$^H> и
+C<%^H>) во время работы, а только во время компиляции $string или
+подключаемого файла.  Это делает запись C<BEGIN { $^H{foo}=7 }>
+эквивалентной C<BEGIN { eval '$^H{foo}=7' }> [perl #70151].
 
 =item *
 
-Creating a BEGIN block from XS code (via C<newXS> or C<newATTRSUB>) would,
-on completion, make the hints of the current compiling code the current
-hints.  This could cause warnings to occur in a non-warning scope.
+Создание блока BEGIN из XS кода (через C<newXS> или C<newATTRSUB>) в
+завершении сделает hint'ы компилируемого в данный момент кода текущими
+hint'ами.  Это может привести к предупреждениям в контексте с подавленными
+предупреждениями.
 
 =back
 
-=head2 Copy-on-write scalars
+=head2 Скаляры копируемые-при-записи
 
-Copy-on-write or shared hash key scalars
-were introduced in 5.8.0, but most Perl code
-did not encounter them (they were used mostly internally).  Perl
-5.10.0 extended them, such that assigning C<__PACKAGE__> or a
-hash key to a scalar would make it copy-on-write.  Several parts
-of Perl were not updated to account for them, but have now been fixed.
+Копируемые-при-записи или общие скаляры ключа хэша были введены в
+5.8.0, но большая часть Perl кода не сталкивается с ними (они
+используются в основном для внутренних целей).  Perl 5.10.0
+расширил их, так, например, присвоение C<__PACKAGE__> или ключа хэша
+скаляру, делает его копируемым-при-записи.  Некоторые части Perl не
+были обновлены с учётом их присутствия, теперь это было исправлено.
 
 =over
 
 =item *
 
-C<utf8::decode> had a nasty bug that would modify copy-on-write scalars'
-string buffers in place (i.e., skipping the copy).  This could result in
-hashes having two elements with the same key [perl #91834].
+В C<utf8::decode> был неприятный баг, который модифицировал на месте
+строковой буфер копируемого-при-записи скаляра (т.е. не создавая
+промежуточной копии).  Это приводило к появлению двух элементов в хэше
+с одинаковым ключом [perl #91834].
 
 =item *
 
-Lvalue subroutines were not allowing COW scalars to be returned.  This was
-fixed for lvalue scalar context in Perl 5.12.3 and 5.14.0, but list context
-was not fixed until this release.
+Для Lvalue подпрограмм не позволялось возвращать COW (копируемые-при-записи)
+скаляры.  Это было исправлено для lvalue скалярного контекста в perl 5.12.3
+и 5.14.0, но для списочного контекста это оставалось не исправленным до этого
+релиза.
 
 =item *
 
-Elements of restricted hashes (see the L<fields> pragma) containing
-copy-on-write values couldn't be deleted, nor could such hashes be cleared
-(C<%hash = ()>).
+Элементы ограниченных хэшей (смотрите прагму L<fields>), содержащие
+копируемые-при-записи значения не могут быть удалены и не могут быть
+очищены (C<%hash = ()>).
 
 =item *
 
-Localising a tied variable used to make it read-only if it contained a
-copy-on-write string.
+Локализация связанной переменной раньше делало её доступной только на
+чтение, если она содержала копируемую-при-записи строку.
 
 =item *
 
-Assigning a copy-on-write string to a stash
-element no longer causes a double free.  Regardless of this change, the
-results of such assignments are still undefined.
+Присвоение копируемой-при-записи строки к элементу stash больше не
+приводит к двойному освобождению.  Несмотря на это изменение, результат
+подобного присвоения по-прежнему неопределён.
 
 =item *
 
-Assigning a copy-on-write string to a tied variable no longer stops that
-variable from being tied if it happens to be a PVMG or PVLV internally.
+Присвоение копируемой-при-записи строки к связанной переменной больше
+не препятствует связыванию этой переменной, если она внутренне
+представлена как PVMG или PVLV.
 
 =item *
 
-Doing a substitution on a tied variable returning a copy-on-write
-scalar used to cause an assertion failure or an "Attempt to free
-nonexistent shared string" warning.
+Делая подстановку в связанной переменной, возвращавшей
+копируемый-при-записи скаляр, раньше приводило к ошибкам утверждения
+(assert) или предупреждениям "Attempt to free nonexistent shared
+string" (Попытка освободить несуществующую общую строку).
 
 =item *
 
-This one is a regression from 5.12: In 5.14.0, the bitwise assignment
-operators C<|=>, C<^=> and C<&=> started leaving the left-hand side
-undefined if it happened to be a copy-on-write string [perl #108480].
+Это регрессия по-сравнению с 5.12: в 5.14.0 битовые операторы
+присвоения C<|=>, C<^=> и C<&=> оставляли левую часть неопределённой,
+в случае если она была строкой копируемая-при-записи [perl #108480].
 
 =item *
 
-L<Storable>, L<Devel::Peek> and L<PerlIO::scalar> had similar problems.
-See L</Updated Modules and Pragmata>, above.
+L<Storable>, L<Devel::Peek> и L<PerlIO::scalar> имели схожие проблемы.
+Смотрите L</Обновлённые Модули и Прагмы> выше.
 
 =back
 
