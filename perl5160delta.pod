@@ -2343,118 +2343,121 @@ C<tell> и C<eof> без аргумента.
 
 =back
 
-=head2 Filetests and C<stat>
+=head2 Файловые тесты и C<stat>
 
-The term "filetests" refers to the operators that consist of a hyphen
-followed by a single letter: C<-r>, C<-x>, C<-M>, etc.  The term "stacked"
-when applied to filetests means followed by another filetest operator
-sharing the same operand, as in C<-r -x -w $fooo>.
-
-=over
-
-=item *
-
-C<stat> produces more consistent warnings.  It no longer warns for "_"
-[perl #71002] and no longer skips the warning at times for other unopened
-handles.  It no longer warns about an unopened handle when the operating
-system's C<fstat> function fails.
-
-=item *
-
-C<stat> would sometimes return negative numbers for large inode numbers,
-because it was using the wrong internal C type. [perl #84590]
-
-=item *
-
-C<lstat> is documented to fall back to C<stat> (with a warning) when given
-a filehandle.  When passed an IO reference, it was actually doing the
-equivalent of S<C<stat _>> and ignoring the handle.
-
-=item *
-
-C<-T _> with no preceding C<stat> used to produce a
-confusing "uninitialized" warning, even though there
-is no visible uninitialized value to speak of.
-
-=item *
-
-C<-T>, C<-B>, C<-l> and C<-t> now work
-when stacked with other filetest operators
-[perl #77388].
-
-=item *
-
-In 5.14.0, filetest ops (C<-r>, C<-x>, etc.) started calling FETCH on a
-tied argument belonging to the previous argument to a list operator, if
-called with a bareword argument or no argument at all.  This has been
-fixed, so C<push @foo, $tied, -r> no longer calls FETCH on C<$tied>.
-
-=item *
-
-In Perl 5.6, C<-l> followed by anything other than a bareword would treat
-its argument as a file name.  That was changed in 5.8 for glob references
-(C<\*foo>), but not for globs themselves (C<*foo>).  C<-l> started
-returning C<undef> for glob references without setting the last
-stat buffer that the "_" handle uses, but only if warnings
-were turned on.  With warnings off, it was the same as 5.6.
-In other words, it was simply buggy and inconsistent.  Now the 5.6
-behaviour has been restored.
-
-=item *
-
-C<-l> followed by a bareword no longer "eats" the previous argument to
-the list operator in whose argument list it resides.  Hence,
-C<print "bar", -l foo> now actually prints "bar", because C<-l>
-on longer eats it.
-
-=item *
-
-Perl keeps several internal variables to keep track of the last stat
-buffer, from which file(handle) it originated, what type it was, and
-whether the last stat succeeded.
-
-There were various cases where these could get out of synch, resulting in
-inconsistent or erratic behaviour in edge cases (every mention of C<-T>
-applies to C<-B> as well):
+Термин "Файловые тесты" относится к операторам, которые состоят из
+дефиса и последующей одной буквы: C<-r>, C<-x>, C<-M> и прочие. Термин
+"стековые" применяется для файловых тестов следующих за другим оператором
+файлового теста с общим операндом, такие как C<-r -x -w $fooo>.
 
 =over
 
 =item *
 
-C<-T I<HANDLE>>, even though it does a C<stat>, was not resetting the last
-stat type, so an C<lstat _> following it would merrily return the wrong
-results.  Also, it was not setting the success status.
+C<stat> выдаёт более логичные предупреждения. Он больше не предупреждает
+для "_" [perl #71002] и больше не пропускает временами предупреждения для
+других неоткрытых дескрипторов.  Он больше не предупреждает о неоткрытых
+дескрипторах, когда системный вызов C<fstat> завершился неудачно.
 
 =item *
 
-Freeing the handle last used by C<stat> or a filetest could result in
-S<C<-T _>> using an unrelated handle.
+C<stat> мог иногда возвращать отрицательные числа для больших номеров
+inode, поскольку использовал неверный внутренний C тип [perl #84590].
 
 =item *
 
-C<stat> with an IO reference would not reset the stat type or record the
-filehandle for S<C<-T _>> to use.
+C<lstat> задокументирован, что откатывается на C<stat> (с предупреждением),
+когда передан дескриптор файла.  Когда передана IO ссылка, он, фактически,
+делал то же самое, что и S<C<stat _>> и игнорировал дескриптор.
 
 =item *
 
-Fatal warnings could cause the stat buffer not to be reset
-for a filetest operator on an unopened filehandle or C<-l> on any handle.
-Fatal warnings also stopped C<-T> from setting C<$!>.
+C<-T _> без предшествующего C<stat> раньше выдавал смущающее "uninitialized"
+предупреждение, даже если не было видимых неинициализированных значений,
+о которых можно было бы говорить.
 
 =item *
 
-When the last stat was on an unreadable file, C<-T _> is supposed to
-return C<undef>, leaving the last stat buffer unchanged.  But it was
-setting the stat type, causing C<lstat _> to stop working.
+C<-T>, C<-B>, C<-l> и C<-t> теперь работают в стеке с другими файловыми
+тестами [perl #77388].
 
 =item *
 
-C<-T I<FILENAME>> was not resetting the internal stat buffers for
-unreadable files.
+В 5.14.0, операции файловых тестов (C<-r>, C<-x>, и т.д.) вызывали
+FETCH на связанных аргументах, принадлежащих предыдущему аргументу
+списочного оператора, если вызывались с bareword аргументом или без
+аргумента вообще.  Это было исправлено, и  C<push @foo, $tied, -r>
+больше не вызывает FETCH на C<$tied>.
+
+=item *
+
+В Perl 5.6, C<-l> с последующим аргументом отличным от bareword,
+рассматривал этот аргумент как имя файла.  Это было изменено в 5.8 для
+ссылок на glob (C<\*foo>), но не самих glob'ов (C<*foo>).  C<-l> начал
+возвращать C<undef> для ссылок на glob без установки последнего stat
+буфера, который использовал дескриптор "_", только если были
+включены предупреждения.  С отключёнными предупреждениями он вёл себя
+как в 5.6.  Другими словами он был глючным и непоследовательным.
+Теперь поведение 5.6 было восстановлено.
+
+=item *
+
+C<-l> с последующим bareword больше не проглатывает предыдущий аргумент
+списочного оператора, в списке которого он находится. Поэтому
+C<print "bar", -l foo> теперь выведет "bar", поскольку C<-l> больше
+его не проглатывает.
+
+=item *
+
+Perl поддерживает несколько внутренних переменных, чтобы следить за
+последним буфером stat, откуда происходит file(handle), какого типа
+он был и был ли успешен последний stat.
+
+Существовали различные случаи, где эти значения выходили из
+синхронизации, приводя к противоречивому и ошибочному поведению в
+граничных случаях (любое упоминание C<-T> влияло на также на C<-B>):
+
+=over
+
+=item *
+
+C<-T I<HANDLE>>, даже несмотря на то, что он выполнял C<stat>, не
+сбрасывал последний тип stat, а значит последующий за ним C<lstat _>
+бодро рапортовал неверные результаты. Также он не устанавливал 
+успешный статус.
+
+=item *
+
+Освобождение последнего использованного в C<stat> дескриптора или
+файлового теста могло приводить к тому, что S<C<-T _>> будет
+использовать другой несвязанный дескриптор.
+
+=item *
+
+C<stat> с IO ссылкой не сбрасывает тип stat или не записывает
+файловый дескриптор для использования в S<C<-T _>>. 
+
+=item *
+
+Фатальные предупреждения могут привести к тому, что буфер stat не будет
+сброшен для операций файловых тестов на неоткрытых файловых дескрипторах
+или C<-l> на любых дескрипторах.  Фатальные предупреждения также не
+позволяли C<-T> установить C<$!>.
+
+=item *
+
+Когда последний stat происходил на нечитаемом файле,  C<-T _> должен
+был возвращать C<undef>, оставляя последний буфер stat нетронутым.  Но
+он устанавливал тип stat, приводя к тому, что C<lstat _> не работал.
+
+=item *
+
+C<-T I<FILENAME>> не сбрасывал внутренний буфер stat для нечитаемых
+файлов.
 
 =back
 
-These have all been fixed.
+Это всё было исправлено.
 
 =back
 
