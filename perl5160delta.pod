@@ -2264,33 +2264,34 @@ eval.  Теперь это работает и для нескольких ди�
 
 =back
 
-=head2 Dereferencing operators
+=head2 Операторы Разыменования
 
 =over
 
 =item *
 
-C<defined(${"..."})>, C<defined(*{"..."})>, etc., used to
-return true for most, but not all built-in variables, if
-they had not been used yet.  This bug affected C<${^GLOBAL_PHASE}> and
-C<${^UTF8CACHE}>, among others.  It also used to return false if the
-package name was given as well (C<${"::!"}>) [perl #97978, #97492].
+C<defined(${"..."})>, C<defined(*{"..."})>, и т.д., раньше возвращали
+истину для большинства, но не всех встроенных переменных, если они
+ещё не были использованы.  Этот баг затрагивал C<${^GLOBAL_PHASE}> и
+C<${^UTF8CACHE}>, как и другие.  Также раньше возвращалась ложь, если
+передавалось имя пакета (C<${"::!"}>) [perl #97978, #97492].
 
 =item *
 
-Perl 5.10.0 introduced a similar bug: C<defined(*{"foo"})> where "foo"
-represents the name of a built-in global variable used to return false if
-the variable had never been used before, but only on the I<first> call.
-This, too, has been fixed.
+В Perl 5.10.0 появился схожий баг: C<defined(*{"foo"})>, где "foo"
+представляет собой имя встроенной глобальной переменной, возвращало
+ложь, если переменная никогда до этого не использовалась, но только
+до I<первого> вызова.  Это также было исправлено.
 
 =item *
 
-Since 5.6.0, C<*{ ... }> has been inconsistent in how it treats undefined
-values.  It would die in strict mode or lvalue context for most undefined
-values, but would be treated as the empty string (with a warning) for the
-specific scalar return by C<undef()> (C<&PL_sv_undef> internally).  This
-has been corrected.  C<undef()> is now treated like other undefined
-scalars, as in Perl 5.005.
+Начиная с 5.6.0, C<*{ ... }> был непоследователен в том, как
+обрабатывать неопределённые значения.  Он умирал в strict режиме или
+в lvalue контексте для большинства неопределённых значений, но
+трактовался как пустая строка (с предупреждением) для специфических
+скаляров, возвращаемых C<undef()> (C<&PL_sv_undef> внутренне).  Это было
+исправлено. C<undef()> теперь воспринимается как и другие неопределённые
+скаляры, как и в Perl 5.005.
 
 =back
 
