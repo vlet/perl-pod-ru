@@ -2295,38 +2295,39 @@ C<${^UTF8CACHE}>, как и другие.  Также раньше возвра�
 
 =back
 
-=head2 Filehandle, last-accessed
+=head2 Дескриптор файла, последний, к которому было обращение
 
-Perl has an internal variable that stores the last filehandle to be
-accessed.  It is used by C<$.> and by C<tell> and C<eof> without
-arguments.
+Perl имеет внутреннюю переменную, которая хранит дескриптор файла,
+к которому было последнее обращение.  Это значение используется в C<$.>,
+C<tell> и C<eof> без аргумента.
 
 =over
 
 =item *
 
-It used to be possible to set this internal variable to a glob copy and
-then modify that glob copy to be something other than a glob, and still
-have the last-accessed filehandle associated with the variable after
-assigning a glob to it again:
+Раньше было возможно выставить эту внутреннюю переменную в копию glob'а
+и затем модифицировать эту копию glob'а во что-то, отличное от glob, и
+снова получить последний файловый дескриптор, к которому было обращение,
+ассоциированный с переменной после присвоения к ней glob'а опять:
 
-    my $foo = *STDOUT;  # $foo is a glob copy
-    <$foo>;             # $foo is now the last-accessed handle
-    $foo = 3;           # no longer a glob
-    $foo = *STDERR;     # still the last-accessed handle
+    my $foo = *STDOUT;  # $foo теперь копия glob'а
+    <$foo>;             # $foo теперь последний дескриптор, к которому было обращение
+    $foo = 3;           # больше не glob
+    $foo = *STDERR;     # снова последний дескриптор, к которому было обращение
 
-Now the C<$foo = 3> assignment unsets that internal variable, so there
-is no last-accessed filehandle, just as if C<< <$foo> >> had never
-happened.
+Теперь присвоение C<$foo = 3> сбрасывает эту внутреннюю переменную, таким
+образом больше нет последнего дескриптора, к которому было обращение, как
+если бы C<< <$foo> >> никогда не происходило.
 
-This also prevents some unrelated handle from becoming the last-accessed
-handle if $foo falls out of scope and the same internal SV gets used for
-another handle [perl #97988].
+Это также не даёт некоторым несвязанным дескрипторам становится
+последними, к которым было обращение, если $foo выходит из контекста,
+и тот же внутренний SV затем используется для другого дескриптора
+[perl #97988].
 
 =item *
 
-A regression in 5.14 caused these statements not to set that internal
-variable:
+Регрессия в 5.14 приводила к тому, что данные операторы не выставляли
+внутреннюю переменную:
 
     my $fh = *STDOUT;
     tell $fh;
@@ -2337,8 +2338,8 @@ variable:
     seek     *$fh, 0,0;
     readline *$fh;
 
-This is now fixed, but C<tell *{ *$fh }> still has the problem, and it
-is not clear how to fix it [perl #106536].
+Теперь это исправлено, но C<tell *{ *$fh }> по-прежнему имеет проблему,
+и непонятно как это исправлять [perl #106536].
 
 =back
 
