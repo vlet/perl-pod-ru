@@ -2510,35 +2510,35 @@ C<given> не вызывал set-magic на неявную лексическу�
 
 =back
 
-=head2 The C<glob> operator
+=head2 Оператор C<glob>
 
 =over
 
 =item *
 
-On OSes other than VMS, Perl's C<glob> operator (and the C<< <...> >> form)
-use L<File::Glob> underneath.  L<File::Glob> splits the pattern into words,
-before feeding each word to its C<bsd_glob> function.
+На ОС отличных от VMS, Perl оператор C<glob> (и форма C<< <...> >>)
+использует L<File::Glob>.  L<File::Glob> разбивает шаблон на слова перед
+передачей каждого слова в свою функцию C<bsd_glob>.
 
-There were several inconsistencies in the way the split was done.  Now
-quotation marks (' and ") are always treated as shell-style word delimiters
-(that allow whitespace as part of a word) and backslashes are always
-preserved, unless they exist to escape quotation marks.  Before, those
-would only sometimes be the case, depending on whether the pattern
-contained whitespace.  Also, escaped whitespace at the end of the pattern
-is no longer stripped [perl #40470].
-
-=item *
-
-C<CORE::glob> now works as a way to call the default globbing function.  It
-used to respect overrides, despite the C<CORE::> prefix.
+Существовало несколько противоречий в том как происходило это разбитие.
+Теперь метки цитирования (' и ") всегда трактуются как слова разделители
+в стиле shell (что позволяет использовать пробелы как часть слова) и
+обратные слэши всегда сохраняются, если они присутствуют не для
+экранирования меток.  Ранее, это иногда случалось, в зависимости от того
+содержал ли шаблон пробелы. Также, экранированные пробелы в конце
+шаблонов больше не обрезаются [perl #40470].
 
 =item *
 
-Under miniperl (used to configure modules when perl itself is built),
-C<glob> now clears %ENV before calling csh, since the latter croaks on some
-systems if it does not like the contents of the LS_COLORS enviroment
-variable [perl #98662].
+C<CORE::glob> теперь является способом запуска функции glob по-умолчанию.
+Используется для учёта переопределения, несмотря на C<CORE::> префикс.
+
+=item *
+
+В miniperl (используется для конфигурирования модулей, когда сам perl
+собирается), C<glob> теперь очищает %ENV перед запуском csh, так как
+последний ругается на некоторых системах, если ему не нравится
+содержимое переменной окружения LS_COLORS [perl #98662].
 
 =back
 
