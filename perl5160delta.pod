@@ -2486,26 +2486,27 @@ C<formline> больше не конвертирует свой аргумент
 
 =back
 
-=head2 C<given> and C<when>
+=head2 C<given> и C<when>
 
 =over
 
 =item *
 
-C<given> was not scoping its implicit $_ properly, resulting in memory
-leaks or "Variable is not available" warnings [perl #94682].
+C<given> не достаточно изолировал неявный $_, что приводило к утечкам
+памяти или предупреждения "Variable is not available" (Переменная
+недоступна) [perl #94682].
 
 =item *
 
-C<given> was not calling set-magic on the implicit lexical C<$_> that it
-uses.  This meant, for example, that C<pos> would be remembered from one
-execution of the same C<given> block to the next, even if the input were a
-different variable [perl #84526].
+C<given> не вызывал set-magic на неявную лексическую C<$_>, которую он
+использовал.  Это означало, например, что C<pos> запоминался из одного
+выполнения блока C<given> до следующего выполнения, даже если на входе
+была другая переменная [perl #84526].
 
 =item *
 
-C<when> blocks are now capable of returning variables declared inside the
-enclosing C<given> block [perl #93548].
+Блок C<when> теперь способен возвращать переменные описанные внутри
+окружающего C<given> блока [perl #93548].
 
 =back
 
