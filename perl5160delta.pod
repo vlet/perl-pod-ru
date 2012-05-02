@@ -1995,122 +1995,127 @@ C<utf8_to_uvuni> (которые теперь устарели), но прини
 
 =back
 
-=head1 Selected Bug Fixes
+=head1 Выборочные Исправления Багов
 
-=head2 Array and hash
+=head2 Массив и Хэш
 
 =over
 
 =item *
 
-A bug has been fixed that would cause a "Use of freed value in iteration"
-error if the next two hash elements that would be iterated over are
-deleted [perl #85026]. (5.14.1)
+Был исправлен баг, который вызывал ошибку "Use of freed value in iteration"
+(Использование освобождённого значения в итерации), если следующие два
+элемента хэша, через которые будет проводится итерация, были удалены
+[perl #85026]. (5.14.1)
 
 =item *
 
-Deleting the current hash iterator (the hash element that would be returend
-by the next call to C<each>) in void context used not to free it
+Удаление текущего итератора хэша (элемент хэша, который будет возвращён
+при следующем вызове C<each>) в пустом контексте не освобождает его
 [perl #85026].
 
 =item *
 
-Deletion of methods via C<delete $Class::{method}> syntax used to update
-method caches if called in void context, but not scalar or list context.
+Удаление метода через синтаксис C<delete $Class::{method}> используемое
+для обновления кэша методов работает в пустом контексте, но не в
+скалярном или списочном контексте.
 
 =item *
 
-When hash elements are deleted in void context, the internal hash entry is
-now freed before the value is freed, to prevent destructors called by that
-latter freeing from seeing the hash in an inconsistent state.  It was
-possible to cause double-frees if the destructor freed the hash itself
-[perl #100340].
+Когда элемент хэша удаляется в пустом контексте, внутренний запись хэша
+освобождается теперь перед освобождением значения, чтобы вызываемый этим
+последним освобождением деструктор, не видел хэш в рассогласованном
+состоянии.  Существовала возможность вызвать двойное освобождение, если
+деструктор сам освобождал хэш [perl #100340].
 
 =item *
 
-A C<keys> optimisation in Perl 5.12.0 to make it faster on empty hashes
-caused C<each> not to reset the iterator if called after the last element
-was deleted.
+Оптимизация C<keys> в Perl 5.12.0, чтобы сделать его быстрее на пустых
+хэшах привела к тому, что C<each> не сбрасывал итератор, если вызывался
+после удаления последнего элемента.
 
 =item *
 
-Freeing deeply nested hashes no longer crashes [perl #44225].
+Освобождение глубоко вложенных хэшей больше не приводит к
+крахам [perl #44225].
 
 =item *
 
-It is possible from XS code to create hashes with elements that have no
-values.  The hash element and slice operators used to crash
-when handling these in lvalue context.  They now
-produce a "Modification of non-creatable hash value attempted" error
-message.
+Существует возможность из XS кода создавать хэши с элементами, которые
+не имеют значений.  Раньше доступ к элементу хэша и использование slice
+оператора приводили к краху при работе в lvalue контексте.  Теперь они
+производят сообщение об ошибке "Modification of non-creatable hash
+value attempted" (Предпринята модификация несоздаваемого значения хэша).
 
 =item *
 
-If list assignment to a hash or array triggered destructors that freed the
-hash or array itself, a crash would ensue.  This is no longer the case
-[perl #107440].
+Если списочное присвоение к хэшу или массиву инициирует деструкторы,
+которые освобождают сам хэш или массив, то в результате происходит крах.
+Теперь это исправлено [perl #107440].
 
 =item *
 
-It used to be possible to free the typeglob of a localised array or hash
-(e.g., C<local @{"x"}; delete $::{x}>), resulting in a crash on scope exit.
+Раньше было возможно освободить typeglob локализованного массива или хэша
+(например, C<local @{"x"}; delete $::{x}>), приводя к краху при выходе из
+контекста.
 
 =item *
 
-Some core bugs affecting L<Hash::Util> have been fixed: locking a hash
-element that is a glob copy no longer causes subsequent assignment to it to
-corrupt the glob, and unlocking a hash element that holds a copy-on-write
-scalar no longer causes modifications to that scalar to modify other
-scalars that were sharing the same string buffer.
+Были исправлены некоторые баги в ядре, затрагивающие L<Hash::Util>:
+блокировка элемента хэша, который является копией glob, больше не приводит
+к последующему присвоению, приводящее к повреждению glob'а, и
+разблокирование элемента хэша, который содержит копируемый-при-записи
+скаляр, больше не приводит к модификации этого скаляра и изменению
+других скаляров, которые разделяют тот же буфер строки.
 
 =back
 
-=head2 C API fixes
+=head2 Исправления в C API
 
 =over
 
 =item *
 
-The C<newHVhv> XS function now works on tied hashes, instead of crashing or
-returning an empty hash.
+XS функция C<newHVhv> теперь работает со связанными хэшами, вместо краха или
+возвращения пустого хэша.
 
 =item *
 
-The C<SvIsCOW> C macro now returns false for read-only copies of typeglobs,
-such as those created by:
+C макрос C<SvIsCOW> теперь возвращает ложь для доступных только на чтение
+копий typeglob, которые были созданы так:
 
   $hash{elem} = *foo;
   Hash::Util::lock_value %hash, 'elem';
 
-It used to return true.
+Раньше возвращалась истина.
 
 =item *
 
-The C<SvPVutf8> C function no longer tries to modify its argument,
-resulting in errors [perl #108994].
+C функция C<SvPVutf8> больше не пытается изменить свой аргумент, приводящее
+к ошибкам [perl #108994].
 
 =item *
 
-C<SvPVutf8> now works properly with magical variables.
+C<SvPVutf8> теперь работает правильно с магическими переменными.
 
 =item *
 
-C<SvPVbyte> now works properly non-PVs.
+C<SvPVbyte> теперь работает правильно с не-PV.
 
 =item *
 
-When presented with malformed UTF-8 input, the XS-callable functions
-C<is_utf8_string()>, C<is_utf8_string_loc()>, and
-C<is_utf8_string_loclen()> could read beyond the end of the input
-string by up to 12 bytes.  This no longer happens.  [perl #32080].
-However, currently, C<is_utf8_char()> still has this defect, see
-L</is_utf8_char()> above.
+При вызове с искажённым UTF-8 вводом, XS-запускаемые функции
+C<is_utf8_string()>, C<is_utf8_string_loc()> и
+C<is_utf8_string_loclen()> могут читать до 12 байтов за пределами конца
+входной строки. Этого больше не происходит [perl #32080]. Однако, в
+настоящий момент, C<is_utf8_char()> по-прежнему имеет этот дефект,
+смотрите L</is_utf8_char()> выше.
 
 =item *
 
-The C-level C<pregcomp> function could become confused as to whether the
-pattern was in UTF8 if the pattern was an overloaded, tied, or otherwise
-magical scalar [perl #101940].
+Функция C-уровня C<pregcomp> может быть смущена если шаблон был в UTF8,
+если шаблон был перегружен, связан или иной магический скаляр
+[perl #101940].
 
 =back
 
