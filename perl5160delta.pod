@@ -2668,25 +2668,28 @@ lvalue подпрограмм, был исправлен. Ранее, возвр
 
 =back
 
-=head2 Overloading
+=head2 Перегрузка
 
 =over
 
 =item *
 
-Arithmetic assignment (C<$left += $right>) involving overloaded objects
-that rely on the 'nomethod' override no longer segfault when the left
-operand is not overloaded.
+Арифметическое присвоение (C<$left += $right>) включающее
+перегруженные объекты, которые полагаются на 'безметодную' перегрузку
+больше не приводит к ошибке сегментирования, когда левый операнд не
+перегружен.
 
 =item *
 
-Errors that occur when methods cannot be found during overloading now
-mention the correct package name, as they did in 5.8.x, instead of
-erroneously mentioning the "overload" package, as they have since 5.10.0.
+Ошибки возникающие, когда методы не могут быть найдены при перегрузке
+теперь упоминают корректное имя пакета, как они это делали в 5.8.x,
+вместо ошибочного упоминания "overload" пакета, как стало происходить
+начиная с 5.10.0
 
 =item *
 
-Undefining C<%overload::> no longer causes a crash.
+Присвоение неопределённого значения C<%overload::> больше не приводит
+к краху.
 
 =back
 
