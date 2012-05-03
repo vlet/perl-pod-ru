@@ -2948,21 +2948,21 @@ C<%+>, C<%-> и C<%!> [perl #105024].
 
 =back
 
-=head2 Smartmatching
+=head2 Умное сравнение
 
 =over
 
 =item *
 
-C<~~> now correctly handles the precedence of Any~~Object, and is not tricked
-by an overloaded object on the left-hand side.
+C<~~> теперь корректно обрабатывает приоритет Любого~~Объект и не может быть
+обманут перегруженными объектами на левой стороне.
 
 =item *
 
-In Perl 5.14.0, C<$tainted ~~ @array> stopped working properly.  Sometimes
-it would erroneously fail (when C<$tainted> contained a string that occurs
-in the array I<after> the first element) or erroneously succeed (when
-C<undef> occurred after the first element) [perl #93590].
+В Perl 5.14.0 C<$tainted ~~ @array> перестало работать правильно. Иногда он
+ошибочно неудачен (когда C<$tainted> содержит строку, которая встречается в
+массиве I<после> первого элемента) или ошибочно успешен (когда C<undef>
+встречается после первого элемента) [perl #93590].
 
 =back
 
