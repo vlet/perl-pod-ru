@@ -2966,42 +2966,44 @@ C<~~> теперь корректно обрабатывает приорите�
 
 =back
 
-=head2 The C<sort> operator
+=head2 Оператор C<sort>
 
 =over
 
 =item *
 
-C<sort> was not treating C<sub {}> and C<sub {()}> as equivalent when
-such a sub was provided as the comparison routine.  It used to croak on
-C<sub {()}>.
+C<sort> не считал C<sub {}> и C<sub {()}> эквивалентными, когда такие
+подпрограммы представлены как процедуры сравнения.  Раньше он сообщал об
+ошибке на запись C<sub {()}>.
 
 =item *
 
-C<sort> now works once more with custom sort routines that are XSUBs.  It
-stopped working in 5.10.0.
+C<sort> теперь снова работает с XSUB пользовательскими процедурами
+сортировки.  Это перестало работать в 5.10.0.
 
 =item *
 
-C<sort> with a constant for a custom sort routine, although it produces
-unsorted results, no longer crashes.  It started crashing in 5.10.0.
+C<sort> с константной пользовательской процедурой сортировки хоть и
+производит неотсортированные результаты, но больше не падает.  Он
+начал падать начиная с 5.10.0.
 
 =item *
 
-Warnings emitted by C<sort> when a custom comparison routine returns a
-non-numeric value now contain "in sort" and show the line number of the
-C<sort> operator, rather than the last line of the comparison routine.  The
-warnings also occur now only if warnings are enabled in the scope where
-C<sort> occurs.  Previously the warnings would occur if enabled in the
-comparison routine's scope.
+Предупреждения выдаваемые C<sort>, когда пользовательская процедура
+сравнения возвращает нечисловое значение, теперь содержит фразу "in sort"
+и показывает номер строки оператора C<sort>, вместо последней строки
+сравнивающей процедуры.  Предупреждение также происходит теперь только если
+предупреждения включены в контексте, где находится C<sort>.  Ранее
+предупреждения выдавались, если были включены в контексте сравнивающей
+процедуры.
 
 =item *
 
-C<< sort { $a <=> $b } >>, which is optimised internally, now produces
-"uninitialized" warnings for NaNs (not-a-number values), since C<< <=> >>
-returns C<undef> for those.  This brings it in line with
-S<C<< sort { 1; $a <=> $b } >>> and other more complex cases, which are not
-optimised [perl #94390].
+C<< sort { $a <=> $b } >>, который внутренне оптимизирован, теперь выдаёт
+"uninitialized" предупреждения для NaNs (нечисловые значения), так как
+C<< <=> >> возвращает C<undef> для них.  Что ставит их наравне с
+S<C<< sort { 1; $a <=> $b } >>> и другими более сложными случаями, которые
+не оптимизированы [perl #94390].
 
 =back
 
