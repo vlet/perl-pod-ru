@@ -1,4 +1,4 @@
-=encoding utf8
+мencoding utf8
 
 =head1 ИМЯ
 
@@ -2720,71 +2720,74 @@ C<not> и C<select>--были исправлены или по крайне ме
 
 =back
 
-=head2 Regular expressions
+=head2 Регулярные Выражения
 
-=for comment Is it possible to merge some of these items?
+=for comment Можно ли объединить некоторые из этих пунктов?
 
 =over 4
 
 =item *
 
-C</[[:ascii:]]/> and C</[[:blank:]]/> now use locale rules under
-C<use locale> when the platform supports that.  Previously, they used
-the platform's native character set.
+C</[[:ascii:]]/> и C</[[:blank:]]/> теперь используют правила локали
+при C<use locale>, если платформа поддерживает это.  Ранее, они
+использовали родной набор символов платформы.
 
 =item *
 
-C<m/[[:ascii:]]/i> and C</\p{ASCII}/i> now match identically (when not
-under a differing locale).  This fixes a regression introduced in 5.14
-in which the first expression could match characters outside of ASCII,
-such as the KELVIN SIGN.
+C<m/[[:ascii:]]/i> и C</\p{ASCII}/i> теперь сравнивают идентично (когда
+не работают под разными локалями).  Это исправление регрессии, появившейся
+в 5.14, в которой первое выражение могло искать совпадения с символами за
+пределами ASCII, такими как KELVIN SIGN.
 
 =item *
 
-C</.*/g> would sometimes refuse to match at the end of a string that ends
-with "\n".  This has been fixed [perl #109206].
+C</.*/g> иногда могло не совпадать в конце строки, которая заканчивается
+на "\n". Это было исправлено [perl #109206].
 
 =item *
 
-Starting with 5.12.0, Perl used to get its internal bookkeeping muddled up
-after assigning C<${ qr// }> to a hash element and locking it with
-L<Hash::Util>.  This could result in double frees, crashes or erratic
-behaviour.
+Начиная с 5.12.0, Perl мог привести свой внутренний учёт в беспорядок
+после присвоения C<${ qr// }> элементу хэша, который затем блокировался
+с помощью L<Hash::Util>.  Это приводило к двойному освобождению, крахам
+или ошибочному поведению.
 
 =item *
 
-The new (in 5.14.0) regular expression modifier C</a> when repeated like
-C</aa> forbids the characters outside the ASCII range that match
-characters inside that range from matching under C</i>.  This did not
-work under some circumstances, all involving alternation, such as:
+Новый (в 5.14.0) модификатор регулярного выражения C</a> при повторении,
+вида C</aa>, запрещает символам за пределами диапазона ASCII совпадать
+с символами внутри этого диапазона при действии модификатора C</i>.  Это
+не работало в некоторых случаях, использующих альтернативы, такие как:
 
  "\N{KELVIN SIGN}" =~ /k|foo/iaa;
 
-succeeded inappropriately.  This is now fixed.
+ошибочно вернёт совпадение. Теперь это исправлено.
 
 =item *
 
-5.14.0 introduced some memory leaks in regular expression character
-classes such as C<[\w\s]>, which have now been fixed. (5.14.1)
+В 5.14.0 появились некоторые утечки памяти в классах регулярных выражений,
+таких как C<[\w\s]>, которые теперь были исправлены. (5.14.1)
 
 =item *
 
-An edge case in regular expression matching could potentially loop.
-This happened only under C</i> in bracketed character classes that have
-characters with multi-character folds, and the target string to match
-against includes the first portion of the fold, followed by another
-character that has a multi-character fold that begins with the remaining
-portion of the fold, plus some more.
+В крайних случаях регулярные выражения потенциально могут зациклиться.
+Это происходит только при модификаторе C</i> для заключённых в скобки
+классов символов, которые имеют символы, становящиеся многосимвольным
+при смене регистра, а исходная строка, в которой ищется совпадение,
+включает начальную порцию символа в этом регистре, с последующим
+символом, также становящимся многосимвольным при смене регистра, и
+который начинается с фрагмента, на который заканчивается предыдущий
+символ, плюс ещё немного.
 
  "s\N{U+DF}" =~ /[\x{DF}foo]/i
 
-is one such case.  C<\xDF> folds to C<"ss">. (5.14.1)
+один из таких случае. Изменение регистра для C<\xDF> соответствует
+C<"ss">. (5.14.1)
 
 =item *
 
-A few characters in regular expression pattern matches did not
-match correctly in some circumstances, all involving C</i>.  The
-affected characters are:
+Несколько символов в шаблонах регулярных выражений не совпадают
+корректно в некоторых случаях при использовании модификатора C</i>.
+Вот список затронутых символов:
 COMBINING GREEK YPOGEGRAMMENI,
 GREEK CAPITAL LETTER IOTA,
 GREEK CAPITAL LETTER UPSILON,
@@ -2795,52 +2798,54 @@ GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND OXIA,
 GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS,
 LATIN SMALL LETTER LONG S,
 LATIN SMALL LIGATURE LONG S T,
-and
+и
 LATIN SMALL LIGATURE ST.
 
 =item *
 
-A memory leak regression in regular expression compilation
-under threading has been fixed.
+Регрессия с утечкой памяти при компиляции регулярных выражений в
+многопоточных приложениях была исправлено.
 
 =item *
 
-A regression introduced in 5.13.6 has
-been fixed.  This involved an inverted
-bracketed character class in a regular expression that consisted solely
-of a Unicode property.  That property wasn't getting inverted outside the
-Latin1 range.
+Регрессия, появившаяся в 5.13.6 была исправлена. Это затрагивало, заключённый
+в скобки инвертированный класс символов в регулярных выражениях, который
+состоял только из свойств Юникода.  Эти свойства не инвертировались за
+пределами диапазона Latin1.
 
 =item *
 
-Three problematic Unicode characters now work better in regex pattern matching under C</i>
+Три проблематичные символы Юникода теперь работают лучше в шаблонах регулярного
+выражения при C</i>.
 
-In the past, three Unicode characters:
+Раньше, три символа Юникода:
 LATIN SMALL LETTER SHARP S,
 GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS,
-and
+и
 GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS,
-along with the sequences that they fold to
-(including "ss" in the case of LATIN SMALL LETTER SHARP S),
-did not properly match under C</i>.  5.14.0 fixed some of these cases,
-but introduced others, including a panic when one of the characters or
-sequences was used in the C<(?(DEFINE)> regular expression predicate.
-The known bugs that were introduced in 5.14 have now been fixed; as well
-as some other edge cases that have never worked until now.  All these
-involve using the characters and sequences outside bracketed character
-classes under C</i>.  This closes [perl #98546].
+вместе с последовательностями, которыми они становятся при преобразовании
+регистра (включая "ss" в случае LATIN SMALL LETTER SHARP S), неправильно
+сопоставлялись при C</i>.  В 5.14.0 были исправлены некоторые подобные
+случаи, но были внесены другие, включая панику, когда один из символов
+или последовательностей были использованы в регулярном выражении с
+предикатом C<(?(DEFINE)>.  Известные проблемы, появившиеся в 5.14 теперь
+были исправлены, как и некоторые крайние случаи, которые никогда не
+работали до этого.  Всё это относится к использованию символов и
+последовательностей за пределами, помещённых в скобки классов символов
+при модификаторе C</i>. Это исправляет проблему [perl #98546].
 
-There remain known problems when using certain characters with
-multi-character folds inside bracketed character classes, including such
-constructs as C<qr/[\N{LATIN SMALL LETTER SHARP}a-z]/i>.  These
-remaining bugs are addressed in [perl #89774].
+По-прежнему остаются известные проблемы с некоторыми символами, с
+изменяющимся числом символов при изменении регистра, внутри
+помещённых в скобки классов символов, включая такие конструкции, как
+C<qr/[\N{LATIN SMALL LETTER SHARP}a-z]/i>.  Эти оставшиеся проблемы
+описаны в [perl #89774].
 
 =item *
 
-RT #78266: The regex engine has been leaking memory when accessing
-named captures that weren't matched as part of a regex ever since 5.10
-when they were introduced, e.g. this would consume over a hundred MB of
-memory:
+RT #78266: В движке регулярных выражений имелись утечки памяти при
+доступе к именованным захватам, для которых не было совпадений в
+части регулярного выражения, начиная с версии 5.10, где они впервые
+появились. Т.е. подобный код мог поглотить более сотни Мб памяти:
 
     for (1..10_000_000) {
         if ("foo" =~ /(foo|(?<capture>bar))?/) {
@@ -2851,90 +2856,95 @@ memory:
 
 =item *
 
-In 5.14, C</[[:lower:]]/i> and C</[[:upper:]]/i> no longer matched the
-opposite case.  This has been fixed [perl #101970].
+В 5.14 C</[[:lower:]]/i> и C</[[:upper:]]/i> больше не совпадали 
+с символами в противоположном регистре.  Это было исправлено
+[perl #101970].
 
 =item *
 
-A regular expression match with an overloaded object on the right-hand side
-would in some cases stringify the object too many times.
+Сопоставление регулярного выражения с перегруженным объектом на правой
+стороне в некоторых случаях приводило к многократному преобразованию
+объекта к строке.
 
 =item *
 
-A regression has been fixed that was introduced in 5.14, in C</i>
-regular expression matching, in which a match improperly fails if the
-pattern is in UTF-8, the target string is not, and a Latin-1 character
-precedes a character in the string that should match the pattern.
-[perl #101710]
+Была устранена регрессия, появившаяся в 5.14, при C</i> поиске
+совпадения, в которых совпадение ошибочно не происходило, если
+шаблон был в UTF_8, а целевая строка - нет, и символы Latin-1
+предшествовали символам строки, которая должна была совпадать с
+шаблоном [perl #101710].
 
 =item *
 
-In case-insensitive regular expression pattern matching, no longer on
-UTF-8 encoded strings does the scan for the start of match only look at
-the first possible position.  This caused matches such as
-C<"f\x{FB00}" =~ /ff/i> to fail.
+В регистронезависимых шаблонах регулярного выражения, на UTF-8
+кодированных строках не производилось сканирование на начало
+соответствия, только до первой возможной позиции, что приводило
+к тому, что сравнения C<"f\x{FB00}" =~ /ff/i> завершались
+неудачно.
 
 =item *
 
-The regexp optimiser no longer crashes on debugging builds when merging
-fixed-string nodes with inconvenient contents.
+Оптимизатор регулярных выражений больше не падает на отладочных
+сборках, когда объединяет узлы фиксированной строки с неудобным
+содержимым.
 
 =item *
 
-A panic involving the combination of the regular expression modifiers
-C</aa> and the C<\b> escape sequence introduced in 5.14.0 has been
-fixed [perl #95964].
+Паника, включающая комбинацию модификаторов регулярных выражений C</aa>
+и экранирующую последовательность C<\b>, появившаяся в 5.14.0 была
+исправлена [perl #95964].
 
 =item *
 
-The combination of the regular expression modifiers C</aa> and the C<\b>
-and C<\B> escape sequences did not work properly on UTF-8 encoded
-strings.  All non-ASCII characters under C</aa> should be treated as
-non-word characters, but what was happening was that Unicode rules were
-used to determine wordness/non-wordness for non-ASCII characters.  This
-is now fixed [perl #95968].
+Комбинация модификаторов регулярных выражений C</aa> и экранирующих
+последовательностей C<\b> и C<\B> не работали корректно на UTF-8
+кодированных строках.  Все не-ASCII символы при C</aa> должны были
+восприниматься как не символы слова, но происходило так, что
+правила Юникода тем не менее использовались для определения
+символ слова/неслова для не-ASCII символов. Это было исправлено
+[perl #95968].
 
 =item *
 
-C<< (?foo: ...) >> no longer loses passed in character set.
+C<< (?foo: ...) >> больше не теряется при передаче в набор символов.
 
 =item *
 
-The trie optimisation used to have problems with alternations containing
-an empty C<(?:)>, causing C<< "x" =~ /\A(?>(?:(?:)A|B|C?x))\z/ >> not to
-match, whereas it should [perl #111842].
+Оптимизация trie раньше имела проблемы с альтернативами, содержащие
+пустые C<(?:)>, приводя C<< "x" =~ /\A(?>(?:(?:)A|B|C?x))\z/ >> к
+отсутствию совпадения, там где оно должно было быть [perl #111842].
 
 =item *
 
-Use of lexical (C<my>) variables in code blocks embedded in regular
-expressions will no longer result in memory corruption or crashes.
+Использование лексических (C<my>) переменных в блоках кода, внедрённых
+в регулярные выражения больше не приводит к порче памяти и крахам.
 
-Nevertheless, these code blocks are still experimental, as there are still
-problems with the wrong variables being closed over (in loops for instance)
-and with abnormal exiting (e.g., C<die>) causing memory corruption.
-
-=item *
-
-The C<\h>, C<\H>, C<\v> and C<\V> regular expression metacharacters used to
-cause a panic error message when attempting to match at the end of the
-string [perl #96354].
+Тем не менее, эти кодовые блоки по-прежнему экспериментальные, поскольку
+есть проблемы с неправильными переменными закрытыми там (в циклах,
+например), при ненормальном выходе (например, через C<die>) приводящие
+к повреждению памяти.
 
 =item *
 
-The abbreviations for four C1 control characters C<MW> C<PM>, C<RI>, and
-C<ST> were previously unrecognized by C<\N{}>, vianame(), and
-string_vianame().
+Метасимволы регулярных выражений C<\h>, C<\H>, C<\v> и C<\V>, раньше
+вызывали панические сообщения об ошибке, при попытке сравнения в конце
+строки  [perl #96354].
 
 =item *
 
-Mentioning a variable named "&" other than C<$&> (i.e., C<@&> or C<%&>) no
-longer stops C<$&> from working.  The same applies to variables named "'"
-and "`" [perl #24237].
+Аббревиатуры  для четырёх C1 контрольных символов C<MW> C<PM>, C<RI> и
+C<ST> раньше не распознавались в C<\N{}>, vianame() и string_vianame().
 
 =item *
 
-Creating a C<UNIVERSAL::AUTOLOAD> sub no longer stops C<%+>, C<%-> and
-C<%!> from working some of the time [perl #105024].
+Упоминание переменной с названием "&", отличным от C<$&> (например, C<@&>
+или C<%&>) больше не останавливает работу  C<$&>.  Тоже относится и к
+переменным с именем "'" и and "`" [perl #24237].
+
+=item *
+
+Создание подпрограммы C<UNIVERSAL::AUTOLOAD> больше не прекращает действие
+C<%+>, C<%-> и C<%!> [perl #105024].
 
 =back
 
