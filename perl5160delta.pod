@@ -2542,123 +2542,129 @@ C<CORE::glob> теперь является способом запуска фу
 
 =back
 
-=head2 Lvalue subroutines
+=head2 Lvalue подпрограммы
 
 =over
 
 =item *
 
-Explicit return now returns the actual argument passed to return, instead
-of copying it [perl #72724, #72706].
+Явный return теперь возвращает собственно аргумент переданный в return,
+вместо его копирования [perl #72724, #72706].
 
 =item *
 
-Lvalue subroutines used to enforce lvalue syntax (i.e., whatever can go on
-the left-hand side of C<=>) for the last statement and the arguments to
-return.  Since lvalue subroutines are not always called in lvalue context,
-this restriction has been lifted.
+Раньше для lvalue подпрограмм принудительно требовалось использовать
+lvalue синтаксис (т.е. чтобы ни шло на левой стороне C<=>) для
+последнего оператора и аргументам для return. Так как lvalue
+подпрограммы не всегда вызываются в lvalue контексте, это ограничение
+было снято.
 
 =item *
 
-Lvalue subroutines are less restrictive as to what values can be returned.
-It used to croak on values returned by C<shift> and C<delete> and from
-other subroutines, but no longer does so [perl #71172].
+Lvalue подпрограммы теперь менее ограниченны в том, какие значения могут
+быть возвращены.  Раньше подпрограмма вылетала с ошибкой на значения
+возвращённые от C<shift>, C<delete> и других подпрограмм, но сейчас больше
+так не делает [perl #71172].
 
 =item *
 
-Empty lvalue subroutines (C<sub :lvalue {}>) used to return C<@_> in list
-context.  In fact, all subroutines used to, but regular subs were fixed in
-Perl 5.8.2.  Now lvalue subroutines have been likewise fixed.
+Раньше пустая lvalue подпрограмма (C<sub :lvalue {}>) возвращала C<@_> в
+списочном контексте.  В действительности, раньше все подпрограммы делали
+тоже самое, но обычные подпрограммы были исправлены в Perl 5.8.2.  Теперь
+lvalue подпрограммы также были исправлены.
 
 =item *
 
-Autovivification now works on values returned from lvalue subroutines
-[perl #7946], as does returning C<keys> in lvalue context.
+Автовивификация теперь работает на значениях возвращаемых из lvalue
+подпрограмм [perl #7946], также как и возвращает C<keys> в lvalue
+контексте.
 
 =item *
 
-Lvalue subroutines used to copy their return values in rvalue context.  Not
-only was this a waste of CPU cycles, but it also caused bugs.  A C<($)>
-prototype would cause an lvalue sub to copy its return value [perl #51408],
-and C<while(lvalue_sub() =~ m/.../g) { ... }> would loop endlessly
+Lvalue подпрограммы ранее копировали свои возвращаемые значения в rvalue
+контексте.  Это было не только бесполезным прожиганием циклов ЦПУ, но также
+приводило к проблемам. Прототип C<($)> заставит lvalue подпрограмму копировать
+своё возвращаемое значение [perl #51408], и цикл
+C<while(lvalue_sub() =~ m/.../g) { ... }> будет работать бесконечно
 [perl #78680].
 
 =item *
 
-When called in potential lvalue context
-(e.g., subroutine arguments or a list
-passed to C<for>), lvalue subroutines used to copy
-any read-only value that was returned.  E.g., C< sub :lvalue { $] } >
-would not return C<$]>, but a copy of it.
+Раньше lvalue подпрограммы, когда вызывались в потенциально lvalue контексте
+(например, аргументы подпрограммы или список передан в C<for>), копировали
+любое доступное только на чтение значение, которое возвращалось. Например,
+C< sub :lvalue { $] } > вернёт не C<$]>, а его копию.
 
 =item *
 
-When called in potential lvalue context, an lvalue subroutine returning
-arrays or hashes used to bind the arrays or hashes to scalar variables,
-resulting in bugs.  This was fixed in 5.14.0 if an array were the first
-thing returned from the subroutine (but not for C<$scalar, @array> or
-hashes being returned).  Now a more general fix has been applied
-[perl #23790].
+Lvalue подпрограммы, при вызове в потенциально lvalue контексте,
+возвращающие массивы или хэши, раньше привязывали массивы или хэши к
+скалярным переменным, приводя к багам.  Это было исправлено в 5.14.0,
+в случае если массив был первой сущностью, возвращённой из подпрограммы
+(но не для случая, когда возвращается C<$scalar, @array> или хэши).
+Теперь было применено более общее исправление [perl #23790].
 
 =item *
 
-Method calls whose arguments were all surrounded with C<my()> or C<our()>
-(as in C<< $object->method(my($a,$b)) >>) used to force lvalue context on
-the subroutine.  This would prevent lvalue methods from returning certain
-values.
+Вызов метода, чьи аргументы были окружены C<my()> или C<our()> (как в
+C<< $object->method(my($a,$b)) >>) раньше форсировали lvalue контекст в
+подпрограмме.  Это помешает lvalue методам возвращать некоторые значения.
 
 =item *
 
-Lvalue sub calls that are not determined to be such at compile time
-(C<&$name> or &{"name"}) are no longer exempt from strict refs if they
-occur in the last statement of an lvalue subroutine [perl #102486].
+Вызовы lvalue подпрограмм, которые не могут быть определены таковыми на
+этапе компиляции (C<&$name> или &{"name"}) больше не избегают проверки
+strict refs, если таковые присутствуют в последнем операторе lvalue
+подпрограммы [perl #102486].
 
 =item *
 
-Sub calls whose subs are not visible at compile time, if
-they occurred in the last statement of an lvalue subroutine,
-would reject non-lvalue subroutines and die with "Can't modify non-lvalue
-subroutine call" [perl #102486].
+Вызовы подпрограмм, которые не видны во время компиляции, если они
+происходят в последнем операторе lvalue подпрограммы, отвергнут не
+lvalue подпрограммы и аварийно завершаться с сообщением "Can't modify
+non-lvalue subroutine call" (Не могу модифицировать вызов не-lvalue
+подпрограммы) [perl #102486].
 
-Non-lvalue sub calls whose subs I<are> visible at compile time exhibited
-the opposite bug.  If the call occurred in the last statement of an lvalue
-subroutine, there would be no error when the lvalue sub was called in
-lvalue context.  Perl would blindly assign to the temporary value returned
-by the non-lvalue subroutine.
-
-=item *
-
-C<AUTOLOAD> routines used to take precedence over the actual sub being
-called (i.e., when autoloading wasn't needed), for sub calls in lvalue or
-potential lvalue context, if the subroutine was not visible at compile
-time.
+Вызовы не-lvalue подпрограмм, которые I<видимы> во время компиляции
+проявят противоположный баг.  Если вызов произошёл в последнем операторе
+lvalue подпрограммы, то не произойдёт никакой ошибки, когда lvalue
+подпрограмма вызвана в lvalue контексте.  Perl слепо присвоит
+во временное значение возвращаемое не-lvalue подпрограммой.
 
 =item *
 
-Applying the C<:lvalue> attribute to an XSUB or to an aliased subroutine
-stub with C<< sub foo :lvalue; >> syntax stopped working in Perl 5.12.
-This has been fixed.
+Ранее процедуры C<AUTOLOAD> могли иметь приоритет над непосредственно
+вызовом подпрограммы (т.е., когда автозагрузка и не была нужна), для
+вызовов подпрограмм в  lvalue или потенциально lvalue контексте, если
+подпрограмма не видна на этапе компиляции.
 
 =item *
 
-Applying the :lvalue attribute to subroutine that is already defined does
-not work properly, as the attribute changes the way the sub is compiled.
-Hence, Perl 5.12 began warning when an attempt is made to apply the
-attribute to an already defined sub.  In such cases, the attribute is
-discarded.
-
-But the change in 5.12 missed the case where custom attributes are also
-present: that case still silently and ineffectively applied the attribute.
-That omission has now been corrected.  C<sub foo :lvalue :Whatever> (when
-C<foo> is already defined) now warns about the :lvalue attribute, and does
-not apply it.
+Применение атрибута C<:lvalue> для XSUB или для псевдонима заглушки
+подпрограммы с синтаксисом C<< sub foo :lvalue; >> перестало работать в
+Perl 5.12. Теперь это было исправлено.
 
 =item *
 
-A bug affecting lvalue context propagation through nested lvalue subroutine
-calls has been fixed.  Previously, returning a value in nested rvalue
-context would be treated as lvalue context by the inner subroutine call,
-resulting in some values (such as read-only values) being rejected.
+Применение атрибута :lvalue для подпрограммы, которая уже определена
+не работает правильно, т.к. атрибут меняет способ компиляции подпрограммы.
+Начиная с Perl 5.12, выдаётся предупреждение при попытке применения
+атрибута к уже определённой подпрограмме.  В таких случаях атрибут
+отбрасывается.
+
+Но в изменении в 5.12 не учитывался случай, когда также существует
+пользовательский атрибут: в этом случае атрибут по-прежнему молча
+и безрезультатно применяется. Это упущение теперь было исправлено.
+C<sub foo :lvalue :Whatever> (когда C<foo> уже определена) теперь
+предупреждает о :lvalue атрибуте и не применяет его.
+
+=item *
+
+Баг, затрагивающий распространение lvalue контекста через вызовы
+lvalue подпрограмм, был исправлен. Ранее, возвращаемое во
+вложенном rvalue контексте, значение рассматривалось в lvalue
+контексте во внутреннем вызове подпрограммы, приводя к отказу принятия
+некоторых значений (например, значений доступных только на чтение).
 
 =back
 
