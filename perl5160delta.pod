@@ -3007,36 +3007,40 @@ S<C<< sort { 1; $a <=> $b } >>> и другими более сложными с
 
 =back
 
-=head2 The C<substr> operator
+=head2 Оператор C<substr>
 
 =over
 
 =item *
 
-Tied (and otherwise magical) variables are no longer exempt from the
-"Attempt to use reference as lvalue in substr" warning.
+Связанные (а значит магические) переменные больше не могут избегать
+предупреждения "Attempt to use reference as lvalue in substr" (Попытка
+использовать ссылку как lvalue в substr).
 
 =item *
 
-That warning now occurs when the returned lvalue is assigned to, not
-when C<substr> itself is called.  This only makes a difference if the
-return value of C<substr> is referenced and assigned to later.
+Это предупреждение теперь выводится, когда к возвращаемому lvalue
+делается присваивание, а не когда вызывается сам C<substr>.  Это
+проявляется, только если к возвращаемому C<substr> значению позже
+делают ссылку или присваивание.
 
 =item *
 
-Passing a substring of a read-only value or a typeglob to a function
-(potential lvalue context) no longer causes an immediate "Can't coerce"
-or "Modification of a read-only value" error.  That error only occurs
-if and when the value passed is assigned to.
+Передача подстроки доступного только на чтение значения или typeglob'а
+в функцию (потенциально lvalue контекст) больше не вызывает немедленной
+ошибки "Can't coerce" (Не могу принуждать) или "Modification of a
+read-only value" (Модификация значения, доступного только на чтение).
+Эта ошибка случится, только если к переданному значению произойдёт
+присваивание.
 
-The same thing happens with the "substr outside of string" error.  If
-the lvalue is only read, not written to, it is now just a warning, as
-with rvalue C<substr>.
+Схожее происходит с ошибкой "substr outside of string" (substr вне
+строки).  Если lvalue только читается, но не записывается, то теперь
+выводится только предупреждение, как и с rvalue C<substr>.
 
 =item *
 
-C<substr> assignments no longer call FETCH twice if the first argument
-is a tied variable, just once.
+Присвоение к C<substr> больше не вызывает FETCH дважды, если первый
+аргумент это связанная переменная, только один раз.
 
 =back
 
