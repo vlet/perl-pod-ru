@@ -3380,36 +3380,37 @@ C<..> и C<...> в списочном контексте теперь упоми
 
 =back
 
-=head2 Weak references
+=head2 Слабые ссылки
 
 =over
 
 =item *
 
-Weakening the first argument to an automatically-invoked C<DESTROY> method
-could result in erroneous "DESTROY created new reference" errors or
-crashes.  Now it is an error to weaken a read-only reference.
+"Ослабление" первого аргумента автоматически вызываемого метода C<DESTROY>
+приводит к ошибочному сообщению об ошибке "DESTROY created new reference"
+(DESTROY создал новую ссылку) или к краху.  Теперь это ошибка, только для
+слабой, доступной только на чтение, ссылки.
 
 =item *
 
-Weak references to lexical hashes going out of scope were not going stale
-(becoming undefined), but continued to point to the hash.
+Слабые ссылки лексических хэшей при выходе из контекста не пропадали 
+(становились неопределёнными), а продолжали указывать на хэш.
 
 =item *
 
-Weak references to lexical variables going out of scope are now broken
-before any magical methods (e.g., DESTROY on a tie object) are called.
-This prevents such methods from modifying the variable that will be seen
-the next time the scope is entered.
+Слабые ссылки лексических переменных при выходе из контекста теперь
+разрушены до вызова любого магического метода (например, DESTROY на
+связанном объекте).  Это предотвращает изменения переменных в этих методах,
+которые будут видны при следующем вхождении в контекст.
 
 =item *
 
-Creating a weak reference to an @ISA array or accessing the array index
-(C<$#ISA>) could result in confused internal bookkeeping for elements
-subsequently added to the @ISA array.  For instance, creating a weak
-reference to the element itself could push that weak reference on to @ISA;
-and elements added after use of C<$#ISA> would be ignored by method lookup
-[perl #85670].
+Создание слабой ссылки на массив @ISA или доступ к индексу массива
+(C<$#ISA>) может привести к искажению внутреннего учёта для элементов,
+впоследствии добавляемых к массиву @ISA.  Например, создание слабой ссылки
+элемента на самого себя, поместит слабую ссылку в @ISA; и элементы,
+которые добавляются после использования C<$#ISA>, будут игнорироваться
+при поиске методов [perl #85670].
 
 =back
 
