@@ -3291,30 +3291,32 @@ C<< version->new("version") >> и C<printf "%vd", "version"> больше не
 
 =back
 
-=head2 Warnings, redefinition
+=head2 Предупреждения, переопределения
 
 =over
 
 =item *
 
-Subroutines from the C<autouse> namespace are once more exempt from
-redefinition warnings.  This used to work in 5.005, but was broken in
-5.6 for most subroutines.  For subs created via XS that redefine
-subroutines from the C<autouse> package, this stopped working in 5.10.
+Подпрограммы из пространства имён C<autouse> ещё больше защищены от
+предупреждении о переопределении.  Раьше это работало в 5.005, но было
+сломано в 5.6 для большниства подпрограмм.  Для подпрограмм, созданных
+через XS, которые переопределяют подпрограммы в пакете C<autouse>, это
+перестало работать с версии 5.10.
 
 =item *
 
-New XSUBs now produce redefinition warnings if they overwrite existing
-subs, as they did in 5.8.x.  (The C<autouse> logic was reversed in
-5.10-14.  Only subroutines from the C<autouse> namespace would warn
-when clobbered.)
+Новые XSUB теперь выдают предупреждения о переопределении, если они
+переписывают существующие подпрограммы, как они это делали в 5.8.x.
+(Логика C<autouse> была изменена наоборот в 5.10-14).  Только
+подпрограммы из пространства имён C<autouse> могут предупреждать, когда
+перезаписываются.
 
 =item *
 
-C<newCONSTSUB> used to use compile-time warning hints, instead of
-run-time hints.  The following code should never produce a redefinition
-warning, but it used to, if C<newCONSTSUB> redefined an existing
-subroutine:
+C<newCONSTSUB> раньше использовала предупреждения на этапе компиляции,
+вместо предупреждений этапа исполнения.  Следующий код никогда не сможет
+выдать сообщение о переопределении, как раньше, если C<newCONSTSUB>
+переопределит существующую подпрограмму:
 
     use warnings;
     BEGIN {
@@ -3324,16 +3326,17 @@ subroutine:
 
 =item *
 
-Redefinition warnings for constant subroutines are on by default (what
-are known as severe warnings in L<perldiag>).  This was only the case
-when it was a glob assignment or declaration of a Perl subroutine that
-caused the warning.  If the creation of XSUBs triggered the warning, it
-was not a default warning.  This has been corrected.
+Предупреждения о переопределении для постоянных подпрограмм включены
+по-умолчанию (известные из L<perldiag>, как строгие предупреждения). Так
+было только в случаях, когда происходило присвоения glob или объявление
+Perl подпрограммы, приводившего к предупреждению.  Если создание XSUB
+вызывало предупреждение, то это не было предупреждением по-умолчанию.
+Это было исправлено.
 
 =item *
 
-The internal check to see whether a redefinition warning should occur
-used to emit "uninitialized" warnings in cases like this:
+Внутренняя проверка, должно ли происходить предупреждение о переопределении,
+раньше выдавало предупреждение "uninitialized" в таких случаях:
 
     use warnings "uninitialized";
     use constant {u => undef, v => undef};
