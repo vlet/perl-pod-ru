@@ -3345,38 +3345,38 @@ Perl подпрограммы, приводившего к предупрежд�
 
 =back
 
-=head2 Warnings, "Uninitialized"
+=head2 Предупреждения, "Неинициализированное" ("Uninitialized")
 
 =over
 
 =item *
 
-Various functions that take a filehandle argument in rvalue context
-(C<close>, C<readline>, etc.) used to warn twice for an undefined handle
-[perl #97482].
+Различные функции, которые принимают аргумент файловый дескриптор в
+rvalue контексте (C<close>, C<readline>, и прочие) раньше дважды
+предупреждали о неопределённых дескрипторах [perl #97482].
 
 =item *
 
-C<dbmopen> now only warns once, rather than three times, if the mode
-argument is C<undef> [perl #90064].
+C<dbmopen> предупреждает только один раз, вместо трёх раз, если аргумент
+является C<undef> [perl #90064].
 
 =item *
 
-The C<+=> operator does not usually warn when the left-hand side is
-C<undef>, but it was doing so for tied variables.  This has been fixed
-[perl #44895].
+Оператор C<+=> обычно не предупреждает, когда на левой стороне C<undef>,
+но делал так для связанных переменных.  Это было исправлено [perl #44895].
 
 =item *
 
-A bug fix in Perl 5.14 introduced a new bug, causing "uninitialized"
-warnings to report the wrong variable if the operator in question had
-two operands and one was C<%{...}> or C<@{...}>.  This has been fixed
-[perl #103766].
+Исправление бага в Perl 5.14, привело к новому багу, приводящему к тому,
+что предупреждение о неинициализированности сообщало о неверной
+переменной, если рассматриваемый оператор имел два операнда и один из них
+был C<%{...}> или C<@{...}>.  Это было исправлено [perl #103766].
 
 =item *
 
-C<..> and C<...> in list context now mention the name of the variable in
-"uninitialized" warnings for string (as opposed to numeric) ranges.
+C<..> и C<...> в списочном контексте теперь упоминает имя переменной в
+предупреждениях "uninitialized" для строковых (в противовес численным)
+диапазонов.
 
 =back
 
