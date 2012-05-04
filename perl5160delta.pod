@@ -3083,36 +3083,38 @@ read-only value" (Модификация значения, доступного 
 Побочный эффект этих изменений состоит в том, что "благословение"
 (blessing) на "\0" больше не приводит к тому, что C<ref()> возвращает ложь.
 
-=head2 Threading bugs
+=head2 Баги в Нитях (threads)
 
 =over
 
 =item *
 
-Typeglobs returned from threads are no longer cloned if the parent thread
-already has a glob with the same name.  This means that returned
-subroutines will now assign to the right package variables [perl #107366].
+Typeglob, возвращаемый из потока исполнения больше не клонируется, если
+родительская нить уже имеет glob с таким же именем.  Это означает, что
+возвращаемая подпрограмма теперь будет присваивать к правильным
+переменным пакета [perl #107366].
 
 =item *
 
-Some cases of threads crashing due to memory allocation during cloning have
-been fixed [perl #90006].
+Некоторые случаи крахов нитей, вызванные выделением памяти при клонировании,
+были исправлены [perl #90006].
 
 =item *
 
-Thread joining would sometimes emit "Attempt to free unreferenced scalar"
-warnings if C<caller> had been used from the C<DB> package prior to thread
-creation [perl #98092].
+Слияние нитей иногда выдавало предупреждение "Attempt to free unreferenced scalar"
+(Попытка освободить скаляр без ссылки), если C<caller> был использован из
+пакета C<DB> до создания нити [perl #98092].
 
 =item *
 
-Locking a subroutine (via C<lock &sub>) is no longer a compile-time error
-for regular subs.  For lvalue subroutines, it no longer tries to return the
-sub as a scalar, resulting in strange side effects like C<ref \$_>
-returning "CODE" in some instances.
+Блокирование подпрограммы (через C<lock &sub>) больше не является ошибкой
+на этапе компиляции для обычных подпрограмм.  Для lvalue подпрограмм больше
+не делается попыток вернуть подпрограмму как скаляр, приводящее к странным
+побочным эффектам, как возвращение "CODE" из C<ref \$_> в некоторых случаях.
 
-C<lock &sub> is now a run-time error if L<threads::shared> is loaded (a
-no-op otherwise), but that may be rectified in a future version.
+C<lock &sub> теперь становится ошибкой этапа компиляции, только если загружен
+L<threads::shared> (в противном случае это пустая операция (no-op)), но это
+может быть скорректировано в будущих версиях.
 
 =back
 
