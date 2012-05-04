@@ -3118,14 +3118,14 @@ L<threads::shared> (в противном случае это пустая оп�
 
 =back
 
-=head2 Tied variables
+=head2 Связанные переменные
 
 =over
 
 =item *
 
-Various cases in which FETCH was being ignored or called too many times
-have been fixed:
+Различные случаи, в которых FETCH игнорировался или вызывался несколько раз,
+были исправлены.
 
 =over
 
@@ -3135,20 +3135,20 @@ C<PerlIO::get_layers> [perl #97956]
 
 =item *
 
-C<$tied =~ y/a/b/>, C<chop $tied> and C<chomp $tied> when $tied holds a
-reference.
+C<$tied =~ y/a/b/>, C<chop $tied> и C<chomp $tied>, когда $tied содержит
+ссылку
 
 =item *
 
-When calling C<local $_> [perl #105912]
+При вызове C<local $_> [perl #105912]
 
 =item *
 
-Four-argument C<select>
+Четырёх-аргументный C<select>
 
 =item *
 
-A tied buffer passed to C<sysread>
+Связанный буфер, переданный в C<sysread>
 
 =item *
 
@@ -3156,21 +3156,21 @@ C<< $tied .= <> >>
 
 =item *
 
-Three-argument C<open>, the third being a tied file handle
-(as in C<< open $fh, ">&", $tied >>)
+Трёх-аргументный C<open>, когда третий - это связанный файловый дескриптор
+(как например, C<< open $fh, ">&", $tied >>)
 
 =item *
 
-C<sort> with a reference to a tied glob for the comparison routine.
+C<sort> с ссылкой на связанный glob для процедуры сравнения.
 
 =item *
 
-C<..> and C<...> in list context [perl #53554].
+C<..> и C<...> в списочном контексте [perl #53554].
 
 =item *
 
-C<${$tied}>, C<@{$tied}>, C<%{$tied}> and C<*{$tied}> where the tied
-variable returns a string (C<&{}> was unaffected)
+C<${$tied}>, C<@{$tied}>, C<%{$tied}> и C<*{$tied}>, где связанная
+переменная возвращает строку (C<&{}> это не затрагивает)
 
 =item *
 
@@ -3178,74 +3178,76 @@ C<defined ${ $tied_variable }>
 
 =item *
 
-Various functions that take a filehandle argument in rvalue context
-(C<close>, C<readline>, etc.) [perl #97482]
+Различные функции, которые принимают аргумент файловый дескриптор в
+rvalue контексте (C<close>, C<readline>, и прочие) [perl #97482]
 
 =item *
 
-Some cases of dereferencing a complex expression, such as
-C<${ (), $tied } = 1>, used to call C<FETCH> multiple times, but now call
-it once.
+Некоторые классы разыменования сложных выражений, такие как
+C<${ (), $tied } = 1>, раньше вызывали C<FETCH> несколько раз, теперь
+вызывают только раз.
 
 =item *
 
-C<$tied-E<gt>method> where $tied returns a package name--even resulting in
-a failure to call the method, due to memory corruption
+C<$tied-E<gt>method>, где $tied возвращает имя пакета, приводит к
+отказу при вызове метода, вследствие повреждения памяти.
 
 =item *
 
-Assignments like C<*$tied = \&{"..."}> and C<*glob = $tied>
+Присвоения вида C<*$tied = \&{"..."}> и C<*glob = $tied>
 
 =item *
 
-C<chdir>, C<chmod>, C<chown>, C<utime>, C<truncate>, C<stat>, C<lstat> and
-the filetest ops (C<-r>, C<-x>, etc.)
+C<chdir>, C<chmod>, C<chown>, C<utime>, C<truncate>, C<stat>, C<lstat> и
+операции файловых тестов (C<-r>, C<-x>, и другие)
 
 =back
 
 =item *
 
-C<caller> sets C<@DB::args> to the subroutine arguments when called from
-the DB package.  It used to crash when doing so if C<@DB::args> happened to
-be tied.  Now it croaks instead.
+C<caller> устанавливает C<@DB::args> в аргументы подпрограммы, когда
+вызывается из пакета DB.  Раньше происходил крах, если при этом C<@DB::args>
+были связанными.  Теперь программа останавливается с ошибкой.
 
 =item *
 
-Tying an element of %ENV or C<%^H> and then deleting that element would
-result in a call to the tie object's DELETE method, even though tying the
-element itself is supposed to be equivalent to tying a scalar (the element
-is, of course, a scalar) [perl #67490].
+Связывание элемента %ENV или C<%^H> и последующее удаление этого элемента
+приводило к вызову метода DELETE связанного объекта, даже несмотря на то,
+что связывание самого элемента, должно быть эквивалентно связыванию скаляра
+(элемент, разумеется скаляр) [perl #67490].
 
 =item *
 
-When Perl autovivifies an element of a tied array or hash (which entails
-calling STORE with a new reference), it now calls FETCH immediately after
-the STORE, instead of assuming that FETCH would have returned the same
-reference.  This can make it easier to implement tied objects [perl #35865, #43011].
+Когда Perl автовивифицирует элемент связанного массива или хэша (что влечёт
+за собой вызов STORE с новой ссылкой), то теперь он немедленно вызывает FETCH
+после STORE,  вместо предположения, что FETCH вернёт ту же ссылку.  Это
+упрощает реализацию связанных объектов [perl #35865, #43011].
 
 =item *
 
-Four-argument C<select> no longer produces its "Non-string passed as
-bitmask" warning on tied or tainted variables that are strings.
+Четырёх-аргументный C<select> больше не выводит предупреждение "Non-string
+passed as bitmask" (Передано нестроковое значение как битовая маска) на
+связанных или taint переменных, которые являются строками.
 
 =item *
 
-Localising a tied scalar that returns a typeglob no longer stops it from
-being tied till the end of the scope.
+Локализация связанных скаляров, которые возвращают typeglob, больше не
+препятствуют им становится связанными до конца контекста.
 
 =item *
 
-Attempting to C<goto> out of a tied handle method used to cause memory
-corruption or crashes.  Now it produces an error message instead
-[perl #8611].
+Попытка сделать C<goto> вне метода на связанном дескрипторе раньше вызывало
+повреждения памяти или крах.  Вместо этого теперь выводится сообщение об
+ошибке [perl #8611].
 
 =item *
 
-A bug has been fixed that occurs when a tied variable is used as a
-subroutine reference:  if the last thing assigned to or returned from the
-variable was a reference or typeglob, the C<\&$tied> could either crash or
-return the wrong subroutine.  The reference case is a regression introduced
-in Perl 5.10.0.  For typeglobs, it has probably never worked till now.
+Был исправлен баг, который происходил, когда связанная переменная
+использовалась как ссылка на подпрограмму: если последнее присвоенное
+или возвращённое значение переменной было ссылкой или typeglob'ом,
+C<\&$tied> будет или падать или возвращать неверную подпрограмму. Случай
+с ссылкой - это регрессия появившаяся в Perl 5.10.0.  Для typeglob'ов,
+это вероятно не работало до текущего момента.
 
 =back
 
