@@ -3044,44 +3044,44 @@ read-only value" (Модификация значения, доступного 
 
 =back
 
-=head2 Support for embedded nulls
+=head2 Поддержка встроенных нулей
 
-Some parts of Perl did not work correctly with nulls (C<chr 0>) embedded in
-strings.  That meant that, for instance, C<< $m = "a\0b"; foo->$m >> would
-call the "a" method, instead of the actual method name contained in $m.
-These parts of perl have been fixed to support nulls:
+Некоторые части Perl не работают корректно с нулями (C<chr 0>), встроенными
+в строки. Это означает, что например, C<< $m = "a\0b"; foo->$m >> вызовет
+метод "a", вместо метода содержащегося в $m. Эти части perl были исправлены
+для поддержки нулей:
 
 =over
 
 =item *
 
-Method names
+Имена методов
 
 =item *
 
-Typeglob names (including filehandle and subroutine names)
+Имена typeglob'ов (включая файловые дескрипторы и имена подпрограмм)
 
 =item *
 
-Package names, including the return value of C<ref()>
+Имена пакетов, включая возвращаемое C<ref()> значение
 
 =item *
 
-Typeglob elements (C<*foo{"THING\0stuff"}>)
+Элементы typeglob (C<*foo{"THING\0stuff"}>)
 
 =item *
 
-Signal names
+Имена сигналов
 
 =item *
 
-Various warnings and error messages that mention variable names or values,
-methods, etc.
+Различные сообщения ошибок и предупреждений, которые упоминают имена
+переменных или значения, методы и т.д.
 
 =back
 
-One side effect of these changes is that blessing into "\0" no longer
-causes C<ref()> to return false.
+Побочный эффект этих изменений состоит в том, что "благословение"
+(blessing) на "\0" больше не приводит к тому, что C<ref()> возвращает ложь.
 
 =head2 Threading bugs
 
