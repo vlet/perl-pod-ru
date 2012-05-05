@@ -3414,105 +3414,111 @@ C<..> и C<...> в списочном контексте теперь упоми
 
 =back
 
-=head2 Other notable fixes
+=head2 Другие заметные исправления
 
 =over
 
 =item *
 
-C<quotemeta> now quotes consistently the same non-ASCII characters under
-C<use feature 'unicode_strings'>, regardless of whether the string is
-encoded in UTF-8 or not, hence fixing the last vestiges (we hope) of the
-infamous L<perlunicode/The "Unicode Bug">.  [perl #77654].
+C<quotemeta> теперь последовательно экранирует один и те же не-ASCII символы
+при действии C<use feature 'unicode_strings'>, независимо закодирована строка
+в UTF-8 или нет, следовательно исправляя последние следы (мы надеемся)
+печально известного бага L<perlunicode/The "Unicode Bug">. [perl #77654]. 
 
-Which of these code points is quoted has changed, based on Unicode's
-recommendations.  See L<perlfunc/quotemeta> for details.
-
-=item *
-
-When one writes C<open foo || die>, which used to work in Perl 4, a
-"Precedence problem" warning is produced.  This warning used erroneously to
-apply to fully-qualified bareword handle names not followed by C<||>.  This
-has been corrected.
+Перечень кодов, экранирование которых изменилось, базируется на
+рекомендациях Юникода.  Смотрите детали в L<perlfunc/quotemeta>.
 
 =item *
 
-After package aliasing (C<*foo:: = *bar::>), C<select> with 0 or 1 argument
-would sometimes return a name that could not be used to refer to the
-filehandle, or sometimes it would return C<undef> even when a filehandle
-was selected.  Now it returns a typeglob reference in such cases.
+Когда пишут C<open foo || die>, которое работало в Perl 4, выводится
+предупреждение о "Precedence problem" (Проблема приоритета).  Это
+предупреждение ошибочно раньше применялось к полному bareword имени
+дескриптора не следующего за C<||>.  Это было исправлено.
 
 =item *
 
-C<PerlIO::get_layers> no longer ignores some arguments that it thinks are
-numeric, while treating others as filehandle names.  It is now consistent
-for flat scalars (i.e., not references).
+После создания псевдонима пакета (C<*foo:: = *bar::>), C<select> с 0 или 1
+аргументом будет иногда возвращать имя, которое не может быть использовано
+для ссылки на файловый дескриптор, или иногда будет возвращать C<undef>,
+даже когда файловый дескриптор был выбран.  Теперь он возвращает ссылку на
+typeglob в подобных случаях.
 
 =item *
 
-Unrecognised switches on C<#!> line
-
-If a switch, such as B<-x>, that cannot occur on the C<#!> line is used
-there, perl dies with "Can't emulate...".
-
-It used to produce the same message for switches that perl did not
-recognise at all, whether on the command line or the C<#!> line.
-
-Now it produces the "Unrecognized switch" error message [perl #104288].
+C<PerlIO::get_layers> больше не игнорирует некоторые аргументы, которые, как
+он полагает, числовые, при этом рассматривая другие как имена дескрипторов
+файла.  Теперь это приведено в порядок для простых скаляров (т.е. не ссылок).
 
 =item *
 
-C<system> now temporarily blocks the SIGCHLD signal handler, to prevent the
-signal handler from stealing the exit status [perl #105700].
+Неопознанные параметры в строке C<#!>
+
+Если параметр, такой как B<-x>, который не может встречаться в строке C<#!>,
+используется здесь, perl умирает с сообщением "Can't emulate..." (Не могу
+симулировать)
+
+Раньше выдавалось то же сообщение для параметров, которые perl не понимает
+вообще, если встречал их в командной строке или линии C<#!>.
+
+Теперь он выводит сообщение об ошибке "Unrecognized switch" (Неопознанный
+параметр) [perl #104288].
 
 =item *
 
-The %n formatting code for C<printf> and C<sprintf>, which causes the number
-of characters to be assigned to the next argument, now actually
-assigns the number of characters, instead of the number of bytes.
-
-It also works now with special lvalue functions like C<substr> and with
-nonexistent hash and array elements [perl #3471, #103492].
+C<system> теперь временно блокирует обработчик сигнала SIGCHLD, чтобы
+предотвратить кражу статуса выхода в обработчике сигнала [perl #105700].
 
 =item *
 
-Perl skips copying values returned from a subroutine, for the sake of
-speed, if doing so would make no observable difference.  Due to faulty
-logic, this would happen with the
-result of C<delete>, C<shift> or C<splice>, even if the result was
-referenced elsewhere.  It also did so with tied variables about to be freed
+Форматирующий код %n для C<printf> и C<sprintf>, который присваивает число
+символов следующему аргументу, теперь присваивает непосредственно число
+символов, а не число байтов.
+
+Он также работает теперь со специальными lvalue функциями, например, C<substr>
+и с несуществующими элементами хэша или массива [perl #3471, #103492].
+
+=item *
+
+Perl пропускает копирование значений, возвращаемых из подпрограммы, ради
+скорости, если выполнение этого не даёт заметной разницы.  Из-за дефектной
+логики, это произойдёт с результатами C<delete>, C<shift> или C<splice>,
+даже если на результат ссылаются где-либо.  Тоже происходило и со
+связанными переменными, которые должны были быть освобождены.
 [perl #91844, #95548].
 
 =item *
 
-C<utf8::decode> now refuses to modify read-only scalars [perl #91850].
+C<utf8::decode> теперь откажется изменять доступные только на чтение
+скаляры [perl #91850].
 
 =item *
 
-Freeing $_ inside a C<grep> or C<map> block, a code block embedded in a
-regular expression, or an @INC filter (a subroutine returned by a
-subroutine in @INC) used to result in double frees or crashes
+Освобождение $_ внутри C<grep> или C<map> блока, кодового блока, встроенного
+в регулярное выражение, или @INC фильтр (подпрограмма, возвращаемая 
+подпрограммой в @INC) раньше приводило к двойному освобождению или краху
 [perl #91880, #92254, #92256].
 
 =item *
 
-C<eval> returns C<undef> in scalar context or an empty list in list
-context when there is a run-time error.  When C<eval> was passed a
-string in list context and a syntax error occurred, it used to return a
-list containing a single undefined element.  Now it returns an empty
-list in list context for all errors [perl #80630].
+C<eval> возвращает C<undef> в скалярном контексте или пустой список в
+списочном контексте, когда присутствует ошибка этапа исполнения. Когда
+в C<eval> была передана строка в списочном контексте и возникла ошибка
+синтаксиса, возвращался список содержащий один неопределённый элемент.
+Теперь он возвращает пустой список в списочном контексте для всех
+ошибок [perl #80630].
 
 =item *
 
-C<goto &func> no longer crashes, but produces an error message, when
-the unwinding of the current subroutine's scope fires a destructor that
-undefines the subroutine being "goneto" [perl #99850].
+C<goto &func> больше не падает, но выдаёт сообщение об ошибке, когда
+раскручивание текущего контекста подпрограммы запускает деструктор, который
+делает неопределённым подпрограмму, к которой происходит переход
+[perl #99850].
 
 =item *
 
-Perl now holds an extra reference count on the package that code is
-currently compiling in.  This means that the following code no longer
-crashes [perl #101486]:
+Теперь Perl хранит дополнительный счётчик ссылок на пакет, чей код в
+данный момент компилируется.  Это означает, что следующий код больше не
+падает [perl #101486]:
 
     package Foo;
     BEGIN {*Foo:: = *Bar::}
@@ -3520,178 +3526,181 @@ crashes [perl #101486]:
 
 =item *
 
-The C<x> repetition operator no longer crashes on 64-bit builds with large
-repeat counts [perl #94560].
+Оператор повторения C<x> больше не падает на 64-битных сборках с большим
+числом повторов [perl #94560].
 
 =item *
 
-Calling C<require> on an implicit C<$_> when C<*CORE::GLOBAL::require> has
-been overridden does not segfault anymore, and C<$_> is now passed to the
-overriding subroutine [perl #78260].
+Вызов C<require> на неявном C<$_>, когда  C<*CORE::GLOBAL::require> был
+переопределён, больше не даёт ошибку сегментирования, и C<$_> теперь
+передаётся в переопределённую подпрограмму [perl #78260].
 
 =item *
 
-C<use> and C<require> are no longer affected by the I/O layers active in
-the caller's scope (enabled by L<open.pm|open>) [perl #96008].
+C<use> и C<require> больше не влияют на активные слом I/O в контексте
+вызывающего (включается при L<open.pm|open>) [perl #96008].
 
 =item *
 
-C<our $::é; $é> (which is invalid) no longer produces the "Compilation
-error at lib/utf8_heavy.pl..." error message, which it started emitting in
-5.10.0 [perl #99984].
+C<our $::é; $é> (который некорректен) больше не выдаёт сообщение об ошибке
+"Compilation error at lib/utf8_heavy.pl..." (Ошибка компиляции в
+lib/utf8_heavy.pl), которое стало происходить в 5.10.0 [perl #99984].
 
 =item *
 
-On 64-bit systems, C<read()> now understands large string offsets beyond
-the 32-bit range.
+На 64-битных системах, C<read()> теперь понимать большие строковые смещения
+за пределами 32-битного диапазона.
 
 =item *
 
-Errors that occur when processing subroutine attributes no longer cause the
-subroutine's op tree to leak.
+Ошибки, которые происходят, когда обрабатываются атрибуты подпрограммы,
+болше не приводят к утечке дерева операций подпрограммы.
 
 =item *
 
-Passing the same constant subroutine to both C<index> and C<formline> no
-longer causes one or the other to fail [perl #89218]. (5.14.1)
+Передача одной и той же постоянной подпрограмм сразу в C<index> и C<formline>
+больше не вызывает крах одной из них [perl #89218]. (5.14.1)
 
 =item *
 
-List assignment to lexical variables declared with attributes in the same
-statement (C<my ($x,@y) : blimp = (72,94)>) stopped working in Perl 5.8.0.
-It has now been fixed.
+Присвоение списком к лексической переменной, определённой с атрибутами
+в этом же операторе (C<my ($x,@y) : blimp = (72,94)>) перестало работать
+в Perl 5.8.0. Теперь это было исправлено.
 
 =item *
 
-Perl 5.10.0 introduced some faulty logic that made "U*" in the middle of
-a pack template equivalent to "U0" if the input string was empty.  This has
-been fixed [perl #90160].
+Perl 5.10.0 привнёс сбойную логику, которая делает "U*" в центре шаблона
+pack эквивалентной "U0", если строка ввода была пустой.  Это было исправлено
+[perl #90160].
 
 =item *
 
-Destructors on objects were not called during global destruction on objects
-that were not referenced by any scalars.  This could happen if an array
-element were blessed (e.g., C<bless \$a[0]>) or if a closure referenced a
-blessed variable (C<bless \my @a; sub foo { @a }>).
+Деструкторы на объектах, на которых не ссылались никакие скаляры, не
+вызывались при глобальном уничтожении объектов. Это происходило если элемент
+массива был "благословлён" (blessed) (например, C<bless \$a[0]>), или, если
+замыкание ссылалось на "благословлённую" (blessed) переменную
+(C<bless \my @a; sub foo { @a }>).
 
-Now there is an extra pass during global destruction to fire destructors on
-any objects that might be left after the usual passes that check for
-objects referenced by scalars [perl #36347].
-
-=item *
-
-Fixed a case where it was possible that a freed buffer may have been read
-from when parsing a here document [perl #90128]. (5.14.1)
+Теперь есть дополнительный проход, при глобальном уничтожении, для запуска
+деструкторов на любых объектах, которые могут остаться после обычных проходов,
+проверяющие объекты, на которых ссылаются скаляры [perl #36347].
 
 =item *
 
-C<each(I<ARRAY>)> is now wrapped in C<defined(...)>, like C<each(I<HASH>)>,
-inside a C<while> condition [perl #90888].
+Исправлен случай, когда было возможно, что освобождённый буфер мог быть
+прочитан, при разборе встроенного документа [perl #90128]. (5.14.1) 
 
 =item *
 
-A problem with context propagation when a C<do> block is an argument to
-C<return> has been fixed.  It used to cause C<undef> to be returned in
-some cases of a C<return> inside an C<if> block which itself is followed by
-another C<return>.
+C<each(I<ARRAY>)> теперь завёрнут в C<defined(...)>, как и C<each(I<HASH>)>,
+внутри условия C<while> [perl #90888].
 
 =item *
 
-Calling C<index> with a tainted constant no longer causes constants in
-subsequently compiled code to become tainted [perl #64804].
+Проблема с распространением контекста, когда C<do> блок - это аргумент для
+C<return>, была исправлена.  Раньше это приводило к возвращению C<undef> в
+некоторых случаях, когда C<return> находится внутри блока C<if>, который
+сам следует за другим C<return>.
 
 =item *
 
-Infinite loops like C<1 while 1> used to stop C<strict 'subs'> mode from
-working for the rest of the block.t
+Вызов C<index> с связанной константой больше не приводит к тому, что
+константы, в позже скомпилированном коде, становятся связанными [perl #64804].
 
 =item *
 
-For list assignments like C<($a,$b) = ($b,$a)>, Perl has to make a copy of
-the items on the right-hand side before assignment them to the left.  For
-efficiency's sake, it assigns the values on the right straight to the items
-on the left if no one variable is mentioned on both sides, as in C<($a,$b) =
-($c,$d)>.  The logic for determining when it can cheat was faulty, in that
-C<&&> and C<||> on the right-hand side could fool it.  So C<($a,$b) =
-$some_true_value && ($b,$a)> would end up assigning the value of C<$b> to
-both scalars.
+Бесконечные циклы вида C<1 while 1> раньше приостанавливали работу
+C<strict 'subs'> до конца блока.
 
 =item *
 
-Perl no longer tries to apply lvalue context to the string in
-C<("string", $variable) ||= 1> (which used to be an error).  Since the
-left-hand side of C<||=> is evaluated in scalar context, that's a scalar
-comma operator, which gives all but the last item void context.  There is
-no such thing as void lvalue context, so it was a mistake for Perl to try
-to force it [perl #96942].
+Для списочного присваивания вида C<($a,$b) = ($b,$a)>, Perl делал копию
+элементов на правой стороне перед присваиванием их к левой стороне. Ради
+эффективности, он присваивал значения на правой стороне сразу к элементам
+на левой, если ни одна переменная не упоминалась на обоих сторонах, как в
+C<($a,$b) = ($c,$d)>.  Логика для определения, когда можно сжульничать, была
+глючной, и C<&&> с C<||> на правой стороне могли обмануть её. Поэтому
+C<($a,$b) = $some_true_value && ($b,$a)> приводило к тому, что значение
+C<$b> присваивалось обоим скалярам.
 
 =item *
 
-C<caller> no longer leaks memory when called from the DB package if
-C<@DB::args> was assigned to after the first call to C<caller>.  L<Carp>
-was triggering this bug [perl #97010].
+Perl больше не пытается применить lvalue контекст к строке в
+C<("string", $variable) ||= 1> (что раньше являлось ошибкой). Так как левая
+сторона C<||=> вычисляется в скалярном контексте, скалярный оператор запятой
+возвращает последний элемент списка в пустом контексте.  Поскольку не
+существует пустого lvalue контекста, поэтому это было ошибкой для Perl
+пытаться принудительно установить его [perl #96942].
 
 =item *
 
-C<close> and similar filehandle functions, when called on built-in global
-variables (like C<$+>), used to die if the variable happened to hold the
-undefined value, instead of producing the usual "Use of uninitialized
-value" warning.
+В C<caller> больше нет утечек памяти при вызове из DB пакета, если C<@DB::args>
+были присвоены после первого вызова C<caller>.  L<Carp> приводил к этой
+проблеме [perl #97010].
 
 =item *
 
-When autovivified file handles were introduced in Perl 5.6.0, C<readline>
-was inadvertently made to autovivify when called as C<readline($foo)> (but
-not as C<E<lt>$fooE<gt>>).  It has now been fixed never to autovivify.
+C<close> и схожие функции для работы с файловыми дескрипторами, при вызове на
+встроенные глобальные переменные (вроде C<$+>), раньше умирал, если переменная
+содержала неопределённое значение, вместо вывода обычного предупреждения
+"Use of uninitialized value" (Использование неинициализированного значения).
 
 =item *
 
-Calling an undefined anonymous subroutine (e.g., what $x holds after
-C<undef &{$x = sub{}}>) used to cause a "Not a CODE reference" error, which
-has been corrected to "Undefined subroutine called" [perl #71154].
+Когда в Perl 5.6.0 появились автовивифицируемые файловый дескрипторы,
+C<readline> самопроизвольно автовивифицировал, когда вызывался как
+C<readline($foo)> (но не как C<E<lt>$fooE<gt>>).  Теперь это было исправлено,
+чтобы никогда не автовивифицировать.
 
 =item *
 
-Causing C<@DB::args> to be freed between uses of C<caller> no longer
-results in a crash [perl #93320].
+Вызывая неопределённую анонимную подпрограмму (например, то, что $x содержит
+после C<undef &{$x = sub{}}>) раньше приводило к ошибке "Not a CODE reference"
+(Не ссылка на КОД), которая теперь исправлена на "Undefined subroutine called"
+(Вызвана неопределённая подпрограмма) [perl #71154].
 
 =item *
 
-C<setpgrp($foo)> used to be equivalent to C<($foo, setpgrp)>, because
-C<setpgrp> was ignoring its argument if there was just one.  Now it is
-equivalent to C<setpgrp($foo,0)>.
+При освобождении C<@DB::args> между вызовами C<caller> больше не приводит к
+краху [perl #93320].
 
 =item *
 
-C<shmread> was not setting the scalar flags correctly when reading from
-shared memory, causing the existing cached numeric representation in the
-scalar to persist [perl #98480].
+C<setpgrp($foo)> раньше был эквивалентен C<($foo, setpgrp)>, поскольку
+C<setpgrp> игнорировал свой аргумент, если он был единственным. Теперь
+это эквивалентно C<setpgrp($foo,0)>.
 
 =item *
 
-C<++> and C<--> now work on copies of globs, instead of dying.
+C<shmread> не устанавливал скалярные флаги корректно, когда читал из
+разделённой памяти, приводя к тому, что существующее кэшированное
+численное представление в скаляре сохранялось [perl #98480].
 
 =item *
 
-C<splice()> doesn't warn when truncating
-
-You can now limit the size of an array using C<splice(@a,MAX_LEN)> without
-worrying about warnings.
+C<++> и C<--> теперь работают с копиями glob'ов, вместо аварийного сбоя.
 
 =item *
 
-C<< $$ >> is no longer tainted.  Since this value comes directly from
-C<< getpid() >>, it is always safe.
+C<splice()> теперь не выдаёт предупреждении, при обрезании
+
+Теперь вы можете ограничить размер массива, используя C<splice(@a,MAX_LEN)>
+без заботы о предупреждениях. 
 
 =item *
 
-The parser no longer leaks a filehandle if STDIN was closed before parsing
-started [perl #37033].
+C<< $$ >> больше не является taint.  Поскольку значение приходит напрямую из
+C<< getpid() >>, оно всегда безопасно.
 
 =item *
 
-C<< die; >> with a non-reference, non-string, or magical (e.g., tainted)
-value in $@ now properly propagates that value [perl #111654].
+Из парсера больше не утекает файловый дескриптор, если STDIN был закрыт перед
+началом разбора [perl #37033].
+
+=item *
+
+C<< die; >> с не-ссылочным, не-строковым, или магическим (например, taint)
+значением в $@, теперь корректно распространяет это значение [perl #111654].
 
 =back
 
