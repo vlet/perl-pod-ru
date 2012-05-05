@@ -3704,43 +3704,42 @@ C<< die; >> с не-ссылочным, не-строковым, или маги
 
 =back
 
-=head1 Known Problems
+=head1 Известные Проблемы
 
 =over 4
 
 =item *
 
-On Solaris, we have two kinds of failure.
+На Solaris, у нас имеется два вида сбоев.
 
-If F<make> is Sun's F<make≥>, we get an error about a badly formed macro
-assignment in the F<Makefile>.  That happens when F<./Configure> tries to
-make depends.  F<Configure> then exits  0, but further F<make>-ing fails.
+Если F<make> это Sun'овский F<make>, мы получим ошибку о плохо сформированном
+присвоении макросу в F<Makefile>.  Это происходит, когда F<./Configure>
+пытается выполнить цель make depends.  F<Configure> выходит с кодом 0, но 
+дальнейший сборка F<make> завершится неудачно.
 
-If F<make> is F<gmake>, F<Configure> completes, then we get errors related
-to F</usr/include/stdbool.h>
+Если F<make> это F<gmake>, F<Configure> завершится, но мы получим ошибки
+связанные с F</usr/include/stdbool.h>
 
 =item *
 
-The following CPAN modules have test failures with perl 5.16.  Patches have
-been submitted for all of these, so hopefully there will be new releases
-soon:
+Следующие CPAN модули имеют сбои в тестах в perl 5.16.  Патчи были отправлены
+для всех из них, поэтому можно надеяться, что скоро появятся новые релизы:
 
 =over
 
 =item *
 
-L<Date::Pcalc> version 6.1
+L<Date::Pcalc> версия 6.1
 
 =item *
 
-L<Module::CPANTS::Analyse> version 0.85
+L<Module::CPANTS::Analyse> версия 0.85
 
-This fails due to problems in L<Module::Find> 0.10 and L<File::MMagic>
-1.27.
+Сбой связан с проблемами в L<Module::Find> 0.10 и L<File::MMagic> 1.27.
 
 =item *
 
-L<PerlIO::Util> version 0.72
+L<PerlIO::Util> версия 0.72
 
 =back
 
