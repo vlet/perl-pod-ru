@@ -3745,9 +3745,9 @@ L<PerlIO::Util> версия 0.72
 
 =back
 
-=head1 Acknowledgements
+=head1 Благадарности
 
-XXX Generate this with:
+XXX Генерируется с помощью:
 
   perl Porting/acknowledgements.pl v5.14.0..HEAD
 
