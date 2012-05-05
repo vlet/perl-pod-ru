@@ -3775,15 +3775,14 @@ comp.lang.perl.misc и базе багов perl на L<http://rt.perl.org/perlbu
 для проблем безопасности в базовом Perl, а не для модулей, которые
 распространяются на CPAN.
 
-=head1 SEE ALSO
+=head1 Смотрите также
 
-The F<Changes> file for an explanation of how to view exhaustive details
-on what changed.
+Файл F<Changes> для просмотра исчерпывающей информации о том, что изменилось.
 
-The F<INSTALL> file for how to build Perl.
+Файл F<INSTALL> о том, как собирать Perl.
 
-The F<README> file for general stuff.
+Файл F<README> для общей информации.
 
-The F<Artistic> and F<Copying> files for copyright information.
+Файлы F<Artistic> и F<Copying> для информации по правам.
 
 =cut
