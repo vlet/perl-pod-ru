@@ -53,75 +53,79 @@ perl5180delta - что нового в perl v5.18.0
 
 =head2 Пересмотр реализации хэша
 
-Изменения в реализации хэшей в perl v5.18.0 являются наиболее заметными
+Изменения в реализации хэшей в perl v5.18.0 станут наиболее заметными
 изменениями в поведении существующего кода.
 
-По умолчанию две различные переменные хэшей с идентичными ключами и значениями
-могут возвращать их содержимое в различном порядке, тогда как раньше порядок был
-идентичен.
+По умолчанию два различных хэша с идентичными ключами и значениями могут
+возвращать их содержимое в различном порядке, тогда как раньше порядок был
+одинаковым.
 
-При столкновении с этими изменениями, ключём для исправления его последствий
-станет принятие правила, что B<хэши - это беспорядочные коллекции> и действие в
-соответствии с ним.
+При столкновении с этими изменениями, ключевым моментом для исправления
+последствий станет принятие правила, что B<хэши - это беспорядочные коллекции> и
+действие в соответствии с ним.
 
-=head3 Hash randomization
+=head3 Рандомизация хэша
 
-The seed used by Perl's hash function is now random.  This means that the
-order which keys/values will be returned from functions like C<keys()>,
-C<values()>, and C<each()> will differ from run to run.
+Ключ (seed) используемый хэш-функцией Perl теперь является случайным.  Это
+означает что порядок, в котором ключи/значения будут возвращены из функций
+C<keys()>, C<values()> и C<each()>, будет различаться от запуска к запуску.
 
-This change was introduced to make Perl's hashes more robust to algorithmic
-complexity attacks, and also because we discovered that it exposes hash
-ordering dependency bugs and makes them easier to track down.
+Это изменение было сделано, чтобы сделать хэши Perl более устойчивыми к атакам
+на алгоритмическую сложность, а также мы обнаружили, что это выявляет ошибки
+зависимости от порядка хэша, делая их простыми для обнаружения.
 
-Toolchain maintainers might want to invest in additional infrastructure to
-test for things like this.  Running tests several times in a row and then
-comparing results will make it easier to spot hash order dependencies in
-code.  Authors are strongly encouraged not to expose the key order of
-Perl's hashes to insecure audiences.
+Для разработчиков утилит сборки есть повод вложить силы в дополнительную
+инфраструктуру для тестирования подобных вещей.  Запуская тесты несколько раз
+подряд и сравнивая результаты, можно легко выявить зависимости от порядка хэша в
+коде.  Авторам настойчиво рекомендуется не демонстрировать ключ рандомизации
+хэшей Perl для небезопасной публики.
 
-Further, every hash has its own iteration order, which should make it much
-more difficult to determine what the current hash seed is.
+Кроме того, каждый хэш имеет свой собственный порядок итерации, что делает
+значительно более сложным определение какой ключ рандомизации хэша используется
+в данный момент.
 
-=head3 New hash functions
+=head3 Новые хэш-функции
 
-Perl v5.18 includes support for multiple hash functions, and changed
-the default (to ONE_AT_A_TIME_HARD), you can choose a different
-algorithm by defining a symbol at compile time.  For a current list,
-consult the F<INSTALL> document.  Note that as of Perl v5.18 we can
-only recommend use of the default or SIPHASH. All the others are
-known to have security issues and are for research purposes only.
+Perl v5.18 включает поддержку множества хэш-функций и меняет хэш-функцию по
+умолчанию (на ONE_AT_A_TIME_HARD), вы можете выбрать другой алгоритм указывая
+параметр при компиляции.  Для просмотра текущего списка обратитесь к документу
+F<INSTALL>. Обратите внимание, что начиная с Perl v5.18 мы можем рекомендовать
+использовать только хэш-функцию по умолчанию или SIPHASH. Все другие имеют
+известные проблемы с безопасностью и могут использоваться только для
+исследовательских целей.
 
-=head3 PERL_HASH_SEED environment variable now takes a hex value
+=head3 Переменная окружения PERL_HASH_SEED теперь принимает шестнадцатиричное значение
 
-C<PERL_HASH_SEED> no longer accepts an integer as a parameter;
-instead the value is expected to be a binary value encoded in a hex
-string, such as "0xf5867c55039dc724".  This is to make the
-infrastructure support hash seeds of arbitrary lengths, which might
-exceed that of an integer.  (SipHash uses a 16 byte seed).
+C<PERL_HASH_SEED> больше не принимает целочисленное значение как параметр;
+вместо этого ожидается бинарное значение закодированное в шестнадцатиричную
+строку, как например, "0xf5867c55039dc724". Это сделано для того, чтобы
+поддерживать ключи рандомизации хэша произвольной длины, которые могут превышать
+лимит целого числа (int).  (SipHash использует ключ в 16 байт).
 
-=head3 PERL_PERTURB_KEYS environment variable added
+=head3 Добавлена переменная окружения PERL_PERTURB_KEYS
 
-The C<PERL_PERTURB_KEYS> environment variable allows one to control the level of
-randomization applied to C<keys> and friends.
+Переменная окружения C<PERL_PERTURB_KEYS> позволяет контролировать уровень
+случайности, применяемый к C<keys> и подобным.
 
-When C<PERL_PERTURB_KEYS> is 0, perl will not randomize the key order at all. The
-chance that C<keys> changes due to an insert will be the same as in previous
-perls, basically only when the bucket size is changed.
+Когда C<PERL_PERTURB_KEYS> установлен в 0, perl не будет рандомизировать порядок
+ключей.  Шанс, что изменения в C<keys> из-за вставки будут такими же как в
+предыдущих perl, в основном из-за изменения размера ячейки.
 
-When C<PERL_PERTURB_KEYS> is 1, perl will randomize keys in a non-repeatable
-way. The chance that C<keys> changes due to an insert will be very high.  This
-is the most secure and default mode.
 
-When C<PERL_PERTURB_KEYS> is 2, perl will randomize keys in a repeatable way.
-Repeated runs of the same program should produce the same output every time.
+Когда C<PERL_PERTURB_KEYS> установлен в 1, perl будет рандомизировать ключи в
+неповторяющемся порядке. Шанс, что вывод C<keys> изменится в результате вставки,
+крайне высок.  Это наиболее безопасно и является режимом по умолчанию.
 
-C<PERL_HASH_SEED> implies a non-default C<PERL_PERTURB_KEYS> setting. Setting
-C<PERL_HASH_SEED=0> (exactly one 0) implies C<PERL_PERTURB_KEYS=0> (hash key
-randomization disabled); settng C<PERL_HASH_SEED> to any other value implies
-C<PERL_PERTURB_KEYS=2> (deterministic and repeatable hash key randomization).
-Specifying C<PERL_PERTURB_KEYS> explicitly to a different level overrides this
-behavior.
+Когда C<PERL_PERTURB_KEYS> установлен в 2, perl будет рандомизировать ключи в
+воспроизводимом порядке. Повторные запуски одной и той же программы каждый раз
+будут выводить один и тот же результат.
+
+C<PERL_HASH_SEED> подразумевает установку нестандартного C<PERL_PERTURB_KEYS>.
+Устанавливая C<PERL_HASH_SEED=0> (именно один 0) устанавливает
+C<PERL_PERTURB_KEYS=0> (рандомизация хэша отключена); установка
+C<PERL_HASH_SEED> в любое другое значение подразумевает C<PERL_PERTURB_KEYS=2>
+(детерминированную и повторяемую рандомизацию хэша). Явное указание
+C<PERL_PERTURB_KEYS> в другое значение переопределяет это поведение.
 
 =head3 Hash::Util::hash_seed() now returns a string
 
