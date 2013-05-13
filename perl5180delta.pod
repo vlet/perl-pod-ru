@@ -1,62 +1,68 @@
 =encoding utf8
 
-=head1 NAME
+=head1 Имя
 
-perldelta - what is new for perl v5.18.0
+perl5180delta - что нового в perl v5.18.0
 
-=head1 DESCRIPTION
+=head1 Описание
 
-This document describes differences between the v5.16.0 release and the v5.18.0
-release.
+Этот документ описывает различия между релизом v5.16.0 и релизом v5.18.0.
 
-If you are upgrading from an earlier release such as v5.14.0, first read
-L<perl5160delta>, which describes differences between v5.14.0 and v5.16.0.
+Если вы обновляетесь с более раннего релиза, такого как v5.14.0, сначала
+прочтите L<perl5160delta>, который описывает различия между v5.14.0 и v5.16.0.
 
-=head1 Core Enhancements
+=head1 Улучшения ядра
 
-=head2 New mechanism for experimental features
+=head2 Новый механизм экспериментальных возможностей
 
-Newly-added experimental features will now require this incantation:
-
-    no warnings "experimental::feature_name";
-    use feature "feature_name";  # would warn without the prev line
-
-There is a new warnings category, called "experimental", containing
-warnings that the L<feature> pragma emits when enabling experimental
-features.
-
-Newly-added experimental features will also be given special warning IDs,
-which consist of "experimental::" followed by the name of the feature.  (The
-plan is to extend this mechanism eventually to all warnings, to allow them
-to be enabled or disabled individually, and not just by category.)
-
-By saying
+Впервые добавляемые экспериментальные возможности теперь требуют подобного
+вызова:
 
     no warnings "experimental::feature_name";
+    use feature "feature_name";  # будет выводить предупреждения без предыдущей
+                                 # строки
 
-you are taking responsibility for any breakage that future changes to, or
-removal of, the feature may cause.
+Появилась новая категория предупреждений, называемых "экспериментальными",
+содержащие предупреждения, которые выдаёт прагма L<feature>, когда подключаются
+экспериментальные возможности.
 
-Since some features (like C<~~> or C<my $_>) now emit experimental warnings,
-and you may want to disable them in code that is also run on perls that do not
-recognize these warning categories, consider using the C<if> pragma like this:
+Впервые добавляемые экспериментальные возможности также будут содержать
+специальные идентификаторы предупреждения, которые состоят из "experimental::" с
+последующим названием возможности.  (Есть план для расширения действия этого
+механизма в конечном счёте на все предупреждения, позволяя включать или
+отключать их персонально, а не только по категориям.)
+
+Указывая
+
+    no warnings "experimental::feature_name";
+
+вы берёте ответственность за любую поломку, которая может возникнуть в связи с
+изменением или удалением соответствующей возможности.
+
+Так как некоторые возможности (такие как C<~~> или C<my $_>) теперь выводят
+предупреждение об их экспериментальном характере и вам может потребоваться
+отключить их в коде, который может также быть запущен под perl, который не
+распознаёт этих категорий предупреждений, рассмотрите возможность использования
+прагмы C<if> таким образом:
 
     no if $] >= 5.018, 'warnings', "experimental::feature_name";
 
-Existing experimental features may begin emitting these warnings, too.  Please
-consult L<perlexperiment> for information on which features are considered
-experimental.
+Существующие экспериментальные возможности также могут начать выводить эти
+предупреждения. Пожалуйста обратитесь к L<perlexperiment> за информацией о тех
+возможностях, которые рассматриваются как экспериментальные.
 
-=head2 Hash overhaul
+=head2 Пересмотр реализации хэша
 
-Changes to the implementation of hashes in perl v5.18.0 will be one of the most
-visible changes to the behavior of existing code.
+Изменения в реализации хэшей в perl v5.18.0 являются наиболее заметными
+изменениями в поведении существующего кода.
 
-By default, two distinct hash variables with identical keys and values may now
-provide their contents in a different order where it was previously identical.
+По умолчанию две различные переменные хэшей с идентичными ключами и значениями
+могут возвращать их содержимое в различном порядке, тогда как раньше порядок был
+идентичен.
 
-When encountering these changes, the key to cleaning up from them is to accept
-that B<hashes are unordered collections> and to act accordingly.
+При столкновении с этими изменениями, ключём для исправления его последствий
+станет принятие правила, что B<хэши - это беспорядочные коллекции> и действие в
+соответствии с ним.
 
 =head3 Hash randomization
 
