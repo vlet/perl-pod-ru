@@ -92,7 +92,7 @@ C<PERL_HASH_SEED> no longer accepts an integer as a parameter;
 instead the value is expected to be a binary value encoded in a hex
 string, such as "0xf5867c55039dc724".  This is to make the
 infrastructure support hash seeds of arbitrary lengths, which might
-exceed that of an integer.  (SipHash uses a 16 byte seed).
+exceed that of an integer.  (SipHash uses a 16 byte seed.)
 
 =head3 PERL_PERTURB_KEYS environment variable added
 
@@ -121,7 +121,7 @@ behavior.
 
 Hash::Util::hash_seed() now returns a string instead of an integer.  This
 is to make the infrastructure support hash seeds of arbitrary lengths
-which might exceed that of an integer.  (SipHash uses a 16 byte seed).
+which might exceed that of an integer.  (SipHash uses a 16 byte seed.)
 
 =head3 Output of PERL_HASH_SEED_DEBUG has been changed
 
@@ -629,14 +629,11 @@ with this in a future Perl version.  In the meantime, use of any of the
 missing characters will raise a deprecation warning, unless turned off.
 The five characters are:
 
-    U+0085 NEXT LINE,
-    U+200E LEFT-TO-RIGHT MARK,
-    U+200F RIGHT-TO-LEFT MARK,
-    U+2028 LINE SEPARATOR,
-
-and
-
-    U+2029 PARAGRAPH SEPARATOR.
+    U+0085 NEXT LINE
+    U+200E LEFT-TO-RIGHT MARK
+    U+200F RIGHT-TO-LEFT MARK
+    U+2028 LINE SEPARATOR
+    U+2029 PARAGRAPH SEPARATOR
 
 =head2 User-defined charnames with surprising whitespace
 
@@ -714,12 +711,14 @@ constructs.
 
 =head2 Pre-PerlIO IO implementations
 
-Perl supports being built without PerlIO proper, using a stdio or sfio
-wrapper instead.  A perl build like this will not support IO layers and
-thus Unicode IO, making it rather handicapped.
+In theory, you can currently build perl without PerlIO.  Instead, you'd use a
+wrapper around stdio or sfio.  In practice, this isn't very useful.  It's not
+well tested, and without any support for IO layers or (thus) Unicode, it's not
+much of a perl.  Building without PerlIO will most likely be removed in the
+next version of perl.
 
-PerlIO supports a C<stdio> layer if stdio use is desired, and similarly a
-sfio layer could be produced.
+PerlIO supports a C<stdio> layer if stdio use is desired.  Similarly a
+sfio layer could be produced in the future, if needed.
 
 =head1 Future Deprecations
 
@@ -755,7 +754,7 @@ are using Perl on such a platform and have an interest in ensuring
 Perl's future on them, please contact us.
 
 We believe that Perl has long been unable to build on mixed endian
-architectures (such as PDP-11s), and intend to remove any remain
+architectures (such as PDP-11s), and intend to remove any remaining
 support code. Similarly, code supporting the long umaintained GNU
 dld will be removed soon if no-one makes themselves known as an
 active user.
@@ -996,7 +995,7 @@ global override.
 
 =item *
 
-L<Carp> has been upgraded to 1.28.
+L<Carp> has been upgraded to 1.29.
 
 Carp is no longer confused when C<caller> returns undef for a package that
 has been deleted.
@@ -1568,7 +1567,7 @@ New APIs have been added for getting and setting the current code page.
 
 =head2 Removed Modules and Pragmata
 
-=over 
+=over
 
 =item *
 
@@ -3650,6 +3649,15 @@ becomes empty.
 There are no known regressions.  Please report any bugs you find!
 
 =back
+
+=head1 Obituary
+
+Hojung Yoon (AMORETTE), 24, of Seoul, South Korea, went to his long rest
+on May 8, 2013 with llama figurine and autographed TIMTOADY card.  He
+was a brilliant young Perl 5 & 6 hacker and a devoted member of
+Seoul.pm.  He programmed Perl, talked Perl, ate Perl, and loved Perl.  We
+believe that he is still programming in Perl with his broken IBM laptop
+somewhere.  He will be missed.
 
 =head1 Acknowledgements
 
