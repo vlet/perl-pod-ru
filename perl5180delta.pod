@@ -127,40 +127,41 @@ C<PERL_HASH_SEED> в любое другое значение подразуме
 (детерминированную и повторяемую рандомизацию хэша). Явное указание
 C<PERL_PERTURB_KEYS> в другое значение переопределяет это поведение.
 
-=head3 Hash::Util::hash_seed() now returns a string
+=head3 Hash::Util::hash_seed() теперь возвращает строку
 
-Hash::Util::hash_seed() now returns a string instead of an integer.  This
-is to make the infrastructure support hash seeds of arbitrary lengths
-which might exceed that of an integer.  (SipHash uses a 16 byte seed.)
+Hash::Util::hash_seed() теперь возвращает строку, вместо целого числа.  Это
+необходимо, чтобы сделать инфраструктурную поддержку для ключей рандомизации
+хэша произвольной длины, превышающей размер целого числа.  (SipHash использует
+ключ размером 16 байт).
 
-=head3 Output of PERL_HASH_SEED_DEBUG has been changed
+=head3 Изменился вывод PERL_HASH_SEED_DEBUG
 
-The environment variable PERL_HASH_SEED_DEBUG now makes perl show both the
-hash function perl was built with, I<and> the seed, in hex, in use for that
-process. Code parsing this output, should it exist, must change to accommodate
-the new format.  Example of the new format:
+Переменная окружения PERL_HASH_SEED_DEBUG теперь заставляет perl показывать оба
+параметра: хэш-функцию, с которой был собран perl, I<и> ключ рандомизации в
+шестнадцатиричном виде, используемый в текущем процессе.  Существующий код,
+обрабатывающий этот вывод, должен быть изменён под новый формат.  Пример нового
+формата:
 
     $ PERL_HASH_SEED_DEBUG=1 ./perl -e1
     HASH_FUNCTION = MURMUR3 HASH_SEED = 0x1476bb9f
 
-=head2 Upgrade to Unicode 6.2
+=head2 Обновление до Юникода 6.2
 
-Perl now supports Unicode 6.2.  A list of changes from Unicode
-6.1 is at L<http://www.unicode.org/versions/Unicode6.2.0>.
+Perl теперь поддерживает стандарт Юникода версии 6.2.  Список отличий от Юникода
+6.1 доступен на L<http://www.unicode.org/versions/Unicode6.2.0>.
 
-=head2 Character name aliases may now include non-Latin1-range characters
+=head2 Псевдоним символа теперь может включать символы не из диапазона Latin1
 
-It is possible to define your own names for characters for use in
-C<\N{...}>, C<charnames::vianame()>, etc.  These names can now be
-comprised of characters from the whole Unicode range.  This allows for
-names to be in your native language, and not just English.  Certain
-restrictions apply to the characters that may be used (you can't define
-a name that has punctuation in it, for example).  See L<charnames/CUSTOM
-ALIASES>.
+Теперь возможно определить ваши собственные имена для использования в
+C<\N{...}>, C<charnames::vianame()> и т.п. Эти имена теперь могут включать
+символы из всего диапазона Юникода.  /то позволяет использовать имена на вашем
+родном языке, а не только Английском. Некоторые ограничения накладываются на
+символы, которые могут быть использованы (вы не можете использовать имена со
+знаками пунктуации внутри, например).  Смотрите L<charnames/CUSTOM ALIASES>.
 
-=head2 New DTrace probes
+=head2 Новые проверки DTrace
 
-The following new DTrace probes have been added:
+Следующие новые проверки были добавлены в DTrace:
 
 =over 4
 
@@ -180,156 +181,164 @@ C<loaded-file>
 
 =head2 C<${^LAST_FH}>
 
-This new variable provides access to the filehandle that was last read.
-This is the handle used by C<$.> and by C<tell> and C<eof> without
-arguments.
+Эта новая переменная даёт доступ к последнему файловому дескриптору, из которого
+происходило чтение.  Это дескриптор, который используется в C<$.>, C<tell> и
+C<eof> без аргументов.
 
-=head2 Regular Expression Set Operations
+=head2 Операции со множествами в регулярных выражениях
 
-This is an B<experimental> feature to allow matching against the union,
-intersection, etc., of sets of code points, similar to
-L<Unicode::Regex::Set>.  It can also be used to extend C</x> processing
-to [bracketed] character classes, and as a replacement of user-defined
-properties, allowing more complex expressions than they do.  See
+Это B<экспериментальная> возможность, которая позволяет проверять совпадения в
+объединении, пересечении и другими операциями со множествами кодов символов,
+подобно модулю L<Unicode::Regex::Set>.  Это также может использоваться для
+расширения возможностей обработки в C</x> [заключённых в скобки] классов
+символов и как замена свойств, определённых пользователем, позволяя создавать
+более сложные выражения, чем это было возможно до этого.  Смотрите
 L<perlrecharclass/Extended Bracketed Character Classes>.
 
-=head2 Lexical subroutines
+=head2 Лексические подпрограммы
 
-This new feature is still considered B<experimental>.  To enable it:
+Эта возможность по прежнему рассматривается B<экспериментальной>.  Для её
+включения необходимо:
 
     use 5.018;
     no warnings "experimental::lexical_subs";
     use feature "lexical_subs";
 
-You can now declare subroutines with C<state sub foo>, C<my sub foo>, and
-C<our sub foo>.  (C<state sub> requires that the "state" feature be
-enabled, unless you write it as C<CORE::state sub foo>.)
+Теперь вы можете декларировать подпрограммы с помощью C<state sub foo>, C<my sub
+foo> и C<our sub foo>.  (C<state sub> также требует, чтобы возможность "state"
+была включена, если только вы не записывает её в виде C<CORE::state sub foo>.)
 
-C<state sub> creates a subroutine visible within the lexical scope in which
-it is declared.  The subroutine is shared between calls to the outer sub.
+C<state sub> создаёт подпрограмму видимую внутри лексической области видимости,
+в которой она определена.  Подпрограмма является разделяемой между вызовами внешней
+подпрограммы.
 
-C<my sub> declares a lexical subroutine that is created each time the
-enclosing block is entered.  C<state sub> is generally slightly faster than
-C<my sub>.
+C<my sub> декларирует лексическую подпрограмму видимую внутри лексической
+области видимости, в которой она определена.  C<state sub> в целом работает
+немного быстрее, чем C<my sub>.
 
-C<our sub> declares a lexical alias to the package subroutine of the same
-name.
+C<our sub> декларирует лексический псевдоним для подпрограммы пакета с тем же
+именем.
 
-For more information, see L<perlsub/Lexical Subroutines>.
+Для большей информации обратитесь к L<perlsub/Lexical Subroutines>.
 
-=head2 Computed Labels
+=head2 Вычисляемые метки
 
-The loop controls C<next>, C<last> and C<redo>, and the special C<dump>
-operator, now allow arbitrary expressions to be used to compute labels at run
-time.  Previously, any argument that was not a constant was treated as the
-empty string.
+Для управления циклом C<next>, C<last> и C<redo>, а также специального
+оператора C<dump>, теперь можно использовать произвольное выражение, для
+вычисления меток во время работы программы.  Ранее любые аргументы, которые не
+являлись константами рассматривались как пустая строка.
 
-=head2 More CORE:: subs
+=head2 Больше CORE:: подпрограмм
 
-Several more built-in functions have been added as subroutines to the
-CORE:: namespace - namely, those non-overridable keywords that can be
-implemented without custom parsers: C<defined>, C<delete>, C<exists>,
-C<glob>, C<pos>, C<protoytpe>, C<scalar>, C<split>, C<study>, and C<undef>.
+Ещё несколько встроенных функций было добавлено как подпрограммы в пространство
+имён CORE::, т.е. те непереопределяемые ключевые слова, которые могут быть
+определены без специальных парсеров: C<defined>, C<delete>, C<exists>,
+C<glob>, C<pos>, C<protoytpe>, C<scalar>, C<split>, C<study> и C<undef>.
 
-As some of these have prototypes, C<prototype('CORE::...')> has been
-changed to not make a distinction between overridable and non-overridable
-keywords.  This is to make C<prototype('CORE::pos')> consistent with
-C<prototype(&CORE::pos)>.
+Так как некоторые из них имеют прототипы, C<prototype('CORE::...')> был изменён
+таким образом, чтобы не делать различий между переопределяемыми и
+непереопределяемыми ключевыми словами.  Это было необходимо, чтобы согласовать
+C<prototype('CORE::pos')> с C<prototype(&CORE::pos)>.
 
-=head2 C<kill> with negative signal names
+=head2 C<kill> с отрицательным именем сигнала
 
-C<kill> has always allowed a negative signal number, which kills the
-process group instead of a single process.  It has also allowed signal
-names.  But it did not behave consistently, because negative signal names
-were treated as 0.  Now negative signals names like C<-INT> are supported
-and treated the same way as -2 [perl #112990].
+C<kill> всегда допускал использование отрицательного номера сигнала, который
+убивал группу процессов, вместо одного процесса.  Также он разрешал использовать
+и имена сигналов.  Но вёл себя непоследовательно, поскольку отрицательные имена
+сигналов рассматривались как 0.  Теперь отрицательные имена сигналов, как
+например, C<-INT> поддерживаются и рассматриваются по аналогии, что и -2
+[perl #112990].
 
-=head1 Security
+=head1 Безопасность
 
-=head2 C<Storable> security warning in documentation
+=head2 Предупреждение о безопасности в документации C<Storable>
 
-The documentation for C<Storable> now includes a section which warns readers
-of the danger of accepting Storable documents from untrusted sources. The
-short version is that deserializing certain types of data can lead to loading
-modules and other code execution. This is documented behavior and wanted
-behavior, but this opens an attack vector for malicious entities.
+Документация C<Storable> теперь включает секцию, которая предупреждает читателя
+об опасности принятия данных формата Storable от источников, к которым нет
+доверия.  В кратком изложении, десереализация некоторых типов данных может
+привести к загрузке модулей и другим вариантам выполнения кода.  Это
+задокументированное и ожидаемое поведение, но с другой стороны открывает
+вектор атаки для злоумышленников.
 
-=head2 C<Locale::Maketext> allowed code injection via a malicious template
+=head2 C<Locale::Maketext> позволял включение произвольного кода через специальный темплейт
 
-If users could provide a translation string to Locale::Maketext, this could be
-used to invoke arbitrary Perl subroutines available in the current process.
+Если пользователи имеют возможность предоставлять строки переводов для
+Locale::Maketext, это может быть использовано для вызова произвольной Perl
+подпрограммы, доступной в текущем процессе.
 
-This has been fixed, but it is still possible to invoke any method provided by
-C<Locale::Maketext> itself or a subclass that you are using. One of these
-methods in turn will invoke the Perl core's C<sprintf> subroutine.
+Это было исправлено, но по прежнему доступна возможность вызова любого метода,
+предоставляемого самим C<Locale::Maketext> или подклассом, который вы
+используете. Один из таких методов в свою очередь выполняет встроенную Perl
+подпрограмму C<sprintf>.
 
-In summary, allowing users to provide translation strings without auditing
-them is a bad idea.
+В целом, разрешать пользователям делать перевод без аудита их результата
+является плохой идеей.
 
-This vulnerability is documented in CVE-2012-6329.
+Эта уязвимость задокументирована в CVE-2012-6329.
 
-=head2 Avoid calling memset with a negative count
+=head2 Избегайте вызова memset с отрицательным цислом
 
-Poorly written perl code that allows an attacker to specify the count to perl's
-C<x> string repeat operator can already cause a memory exhaustion
-denial-of-service attack. A flaw in versions of perl before v5.15.5 can escalate
-that into a heap buffer overrun; coupled with versions of glibc before 2.16, it
-possibly allows the execution of arbitrary code.
+Плохо написанный perl код, который даёт возможность атакующему указывать число
+повторов строки в операторе C<x> уже подвержен атакам на отказ в обслуживании
+при исчерпании памяти.  Уязвимость в версиях perl до v5.15.5 позволяет сверх
+того привести к переполнение кучи, что в совокупности с использованием glibc
+версии до 2.16, позволяет привести к выполнению произвольного кода.
 
-The flaw addressed to this commit has been assigned identifier CVE-2012-5195
-and was researched by Tim Brown.
+Эта уязвимость получила идентификатор CVE-2012-5195 и была обнаружена Тимом
+Брауном (Tim Brown).
 
-=head1 Incompatible Changes
+=head1 Несовместимые изменения
 
-=head2 See also: hash overhaul
+=head2 Смотрите также: пересмотр реализации хэша
 
-Some of the changes in the L<hash overhaul|/"Hash overhaul"> are not fully
-compatible with previous versions of perl.  Please read that section.
+Некоторые изменения в L<пересмотре реализации хэша|/"Пересмотр реализации хэша">
+несовместимы с предыдущими версиями perl. Пожалуйста прочтите эту секцию.
 
-=head2 An unknown character name in C<\N{...}> is now a syntax error
+=head2 Неизвестное имя символа в C<\N{...}> теперь является синтаксической ошибкой
 
-Previously, it warned, and the Unicode REPLACEMENT CHARACTER was
-substituted.  Unicode now recommends that this situation be a syntax
-error.  Also, the previous behavior led to some confusing warnings and
-behaviors, and since the REPLACEMENT CHARACTER has no use other than as
-a stand-in for some unknown character, any code that has this problem is
-buggy.
+Ранее выводилось предупреждение и производилось замещение Юникод символом
+замещения REPLACEMENT CHARACTER. Стандарт Юникод теперь рекомендует обрабатывать
+данную ситуацию как ошибку.  Кроме того, предыдущее поведение приводило к
+некоторым сбивающим с толку предупреждениями и действиям, и, так как символ
+REPLACEMENT CHARACTER не имеет других применений, кроме как замены для
+неизвестного символа, любой код, который имеет такую проблему, - кривой.
 
-=head2 Formerly deprecated characters in C<\N{}> character name aliases are now errors.
+=head2 Ранее устаревший символ в C<\N{}> псевдониме символа теперь является ошибкой.
 
-Since v5.12.0, it has been deprecated to use certain characters in
-user-defined C<\N{...}> character names.  These now cause a syntax
-error.  For example, it is now an error to begin a name with a digit,
-such as in
+Начиная с v5.12.0 было помечено устаревшим использование некоторых символов в
+определённых пользователем C<\N{...}> именах символов.  Теперь это вызывает
+синтаксическую ошибку. Например, теперь считается ошибкой начинать имена с цифр,
+как в случае
 
- my $undraftable = "\N{4F}";    # Syntax error!
+ my $undraftable = "\N{4F}";    # Синтаксическая ошибка!
 
-or to have commas anywhere in the name.  See L<charnames/CUSTOM ALIASES>.
+или иметь запятые где угодно в имени. Смотрите L<charnames/CUSTOM ALIASES>.
 
-=head2 C<\N{BELL}> now refers to U+1F514 instead of U+0007
+=head2 C<\N{BELL}> теперь соответствует коду U+1F514 вместо U+0007
 
-Unicode 6.0 reused the name "BELL" for a different code point than it
-traditionally had meant.  Since Perl v5.14, use of this name still
-referred to U+0007, but would raise a deprecation warning.  Now, "BELL"
-refers to U+1F514, and the name for U+0007 is "ALERT".  All the
-functions in L<charnames> have been correspondingly updated.
+Unicode 6.0 использовал имя "BELL" для другого кода символа, вместо
+традиционного значения.  Начиная с Perl 5.14 использование этого имени
+по-прежнему ссылалось на код U+0007, но выводило предупреждение об устаревшей
+конструкции.  Теперь "BELL" ссылается на код U+1F514, а именем для U+0007 стало
+"ALERT".  Все соответствующие функции в L<charnames> были обновлены.
 
-=head2 New Restrictions in Multi-Character Case-Insensitive Matching in Regular Expression Bracketed Character Classes
+=head2 Новые ограничения в многосимвольном нечувствительном к регистру сравнении в регулярных выражениях для заключённых в скобки классах символов
 
-Unicode has now withdrawn their previous recommendation for regular
-expressions to automatically handle cases where a single character can
-match multiple characters case-insensitively, for example, the letter
-LATIN SMALL LETTER SHARP S and the sequence C<ss>.  This is because
-it turns out to be impracticable to do this correctly in all
-circumstances.  Because Perl has tried to do this as best it can, it
-will continue to do so.  (We are considering an option to turn it off.)
-However, a new restriction is being added on such matches when they
-occur in [bracketed] character classes.  People were specifying
-things such as C</[\0-\xff]/i>, and being surprised that it matches the
-two character sequence C<ss> (since LATIN SMALL LETTER SHARP S occurs in
-this range).  This behavior is also inconsistent with using a
-property instead of a range:  C<\p{Block=Latin1}> also includes LATIN
-SMALL LETTER SHARP S, but C</[\p{Block=Latin1}]/i> does not match C<ss>.
+Юникод теперь убрал свои ранние рекомендации для регулярных выражений для
+автоматической обработки случаев, когда один символ может совпадать с
+несколькими символами в нечувствительном к регистру сравнении, например, буква
+LATIN SMALL LETTER SHARP S и последовательность C<ss>.  Поскольку оказалось, что
+это не может быть выполнено корректно во всех случаях.  Так как Perl пытается
+сделать сделать всё от него возможное, он продолжит делать так, как раньше. (Мы
+рассматриваем вариант опции, для отключения этого поведения). Однако новые
+ограничения были добавлены на подобные сравнения, когда они происходят в
+[заключённых в скобки] классах символов.  Люди, указывающие вещи на подобии
+C</[\0-\xff]/i>, бывают удивлены, когда это совпадает с последовательностью из
+двух символов C<ss> (поскольку LATIN SMALL LETTER SHARP S входит в этот
+диапазон).  Это поведение также рассогласованно с использованием свойств вместо
+диапазонов: C<\p{Block=Latin1}> также включает LATIN SMALL LETTER SHARP S, но
+C</[\p{Block=Latin1}]/i> не совпадает с C<ss>.
+
 The new rule is that for there to be a multi-character case-insensitive
 match within a bracketed character class, the character must be
 explicitly listed, and not as an end point of a range.  This more
