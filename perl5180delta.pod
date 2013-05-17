@@ -251,6 +251,11 @@ C<kill> всегда допускал использование отрицат�
 
 =head1 Безопасность
 
+=head2 See also: hash overhaul
+
+Some of the changes in the L<hash overhaul|/"Hash overhaul"> were made to
+enhance security.  Please read that section.
+
 =head2 Предупреждение о безопасности в документации C<Storable>
 
 Документация C<Storable> теперь включает секцию, которая предупреждает читателя
@@ -355,17 +360,33 @@ insanity.  As of v5.18, these now follow the rules of other identifiers,
 in addition to accepting characters that match the C<\p{POSIX_Punct}>
 property.
 
-There are no longer any differences in the parsing of identifiers
-specified as C<$...> or C<${...}>; previously, they were dealt with in
-different parts of the core, and so had slightly different behavior. For
-instance, C<${foo:bar}> was a legal variable name.  Since they are now
-both parsed by the same code, that is no longer the case.
+There is no longer any difference in the parsing of identifiers
+specified by using braces versus without braces.  For instance, perl
+used to allow C<${foo:bar}> (with a single colon) but not C<$foo:bar>.
+Now that both are handled by a single code path, they are both treated
+the same way: both are forbidden.  Note that this change is about the
+range of permissible literal identifiers, not other expressions.
 
-=head2 C<\s> in regular expressions now matches a Vertical Tab
+=head2 Vertical tabs are now whitespace
 
 No one could recall why C<\s> didn't match C<\cK>, the vertical tab.
 Now it does.  Given the extreme rarity of that character, very little
-breakage is expected.
+breakage is expected.  That said, here's what it means:
+
+C<\s> in a regex now matches a vertical tab in all circumstances.
+
+Literal vertical tabs in a regex literal are ignored when the C</x>
+modifier is used.
+
+Leading vertical tabs, alone or mixed with other whitespace, are now
+ignored when interpreting a string as a number.  For example:
+
+  $dec = " \cK \t 123";
+  $hex = " \cK \t 0xF";
+
+  say 0 + $dec;   # was 0 with warning, now 123
+  say int $dec;   # was 0, now 123
+  say oct $hex;   # was 0, now  15
 
 =head2 C</(?{})/> and C</(??{})/> have been heavily reworked
 
@@ -466,9 +487,9 @@ that identified the caller.  Nothing on CPAN was using this, and it got in
 the way of a bug fix, so it was removed.  If you really need to identify
 the caller, see L<Devel::Callsite> on CPAN.
 
-=head2 Here-doc parsing
+=head2 Here doc parsing
 
-The body of a here-document inside a quote-like operator now always begins
+The body of a here document inside a quote-like operator now always begins
 on the line after the "<<foo" marker.  Previously, it was documented to
 begin on the line following the containing quote-like operator, but that
 was only sometimes the case [perl #114040].
@@ -556,24 +577,38 @@ C<GV_SUPER> flag.
 =head2 C<split>'s first argument is more consistently interpreted
 
 After some changes earlier in v5.17, C<split>'s behavior has been
-simplified: if the PATTERN argument evaluates to a literal string
+simplified: if the PATTERN argument evaluates to a string
 containing one space, it is treated the way that a I<literal> string
 containing one space once was.
 
 =head1 Deprecations
 
-=head2 Deprecated modules
+=head2 Module removals
 
-The following modules will be removed from the core distribution in a
-future release, and should be installed from CPAN instead. Distributions
-on CPAN which require these should add them to their prerequisites.
-The core versions of these modules will issue C<"deprecated">-category
-warnings.
+The following modules will be removed from the core distribution in a future
+release, and will at that time need to be installed from CPAN. Distributions
+on CPAN which require these modules will need to list them as prerequisites.
 
-You can silence these deprecation warnings by installing the modules
-in question from CPAN.
+The core versions of these modules will now issue C<"deprecated">-category
+warnings to alert you to this fact. To silence these deprecation warnings,
+install the modules in question from CPAN.
+
+Note that these are (with rare exceptions) fine modules that you are encouraged
+to continue to use. Their disinclusion from core primarily hinges on their
+necessity to bootstrapping a fully functional, CPAN-capable Perl installation,
+not usually on concerns over their design.
 
 =over
+
+=item L<encoding>
+
+The use of this pragma is now strongly discouraged. It conflates the encoding
+of source text with the encoding of I/O data, reinterprets escape sequences in
+source text (a questionable choice), and introduces the UTF-8 bug to all runtime
+handling of character strings. It is broken as designed and beyond repair.
+
+For using non-ASCII literal characters in source text, please refer to L<utf8>.
+For dealing with textual I/O data, please refer to L<Encode> and L<open>.
 
 =item L<Archive::Extract>
 
@@ -584,8 +619,6 @@ in question from CPAN.
 =item L<CPANPLUS> and all included C<CPANPLUS::*> modules
 
 =item L<Devel::InnerPackage>
-
-=item L<encoding>
 
 =item L<Log::Message>
 
@@ -782,8 +815,21 @@ active user.
 
 Swapping of $< and $>
 
-For more information about this future deprecation, see L<the relevant RT
-ticket|https://rt.perl.org/rt3/Ticket/Display.html?id=96212>.
+Perl has supported the idiom of swapping $< and $> (and likewise $( and
+$)) to temporarily drop permissions since 5.0, like this:
+
+    ($<, $>) = ($>, $<);
+
+However, this idiom modifies the real user/group id, which can have
+undesirable side-effects, is no longer useful on any platform perl
+supports and complicates the implementation of these variables and list
+assignment in general.
+
+As an alternative, assignment only to C<< $> >> is recommended:
+
+    local $> = $<;
+
+See also: L<Setuid Demystified|http://www.cs.berkeley.edu/~daw/papers/setuid-usenix02.pdf>.
 
 =item *
 
@@ -801,10 +847,10 @@ behavior.  The changes have not yet been settled.
 
 =item *
 
-Use of C<$^>, where C<^> stands for any actual (non-printing) C0 control
-character will be disallowed in a future Perl version.  Use C<${^}>
-instead (where again C<^> stands for a control character),
-or better, C<$^A> , where C<^> this time is a caret (CIRCUMFLEX ACCENT),
+Use of C<$x>, where C<x> stands for any actual (non-printing) C0 control
+character will be disallowed in a future Perl version.  Use C<${x}>
+instead (where again C<x> stands for a control character),
+or better, C<$^A> , where C<^> is a caret (CIRCUMFLEX ACCENT),
 and C<A> stands for any of the characters listed at the end of
 L<perlebcdic/OPERATOR DIFFERENCES>.
 
@@ -1732,8 +1778,7 @@ To use lexical subs, you must first enable them:
 
 =item *
 
-Strings with code points over 0xFF may not be mapped into in-memory file
-handles
+L<'Strings with code points over 0xFF may not be mapped into in-memory file handles'|perldiag/"Strings with code points over 0xFF may not be mapped into in-memory file handles">
 
 =item *
 
@@ -2445,7 +2490,7 @@ and C<PERL_DEBUG_READONLY_OPS>, has been retired.
 
 =item *
 
-Here-doc terminators no longer require a terminating newline character when
+Here document terminators no longer require a terminating newline character when
 they occur at the end of a file.  This was already the case at the end of a
 string eval [perl #65838].
 
@@ -2506,12 +2551,6 @@ syntax errors.
 Some failed regular expression matches such as C<'f' =~ /../g> were not
 resetting C<pos>.  Also, "match-once" patterns (C<m?...?g>) failed to reset
 it, too, when invoked a second time [perl #23180].
-
-=item *
-
-Accessing C<$&> after a pattern match now works if it had not been seen
-before the match.  I.e., this applies to C<${'&'}> (under C<no strict>) and
-C<eval '$&'>.  The same applies to C<$'> and C<$`> [perl #4289].
 
 =item *
 
@@ -2797,8 +2836,8 @@ omitted.
 
 =item *
 
-Reset the UTF-8 position cache when accessing magical variables to avoid the
-string buffer and the UTF-8 position cache getting out of sync
+The UTF-8 position cache is now reset when accessing magical variables, to
+avoid the string buffer and the UTF-8 position cache getting out of sync
 [perl #114410].
 
 =item *
@@ -3003,11 +3042,6 @@ thread-safe on VMS.
 =item *
 
 Non-blocking sockets have been fixed on VMS.
-
-=item *
-
-A bug in the compilation of a C</(?{})/> expression which affected the TryCatch
-test suite has been fixed [perl #114242].
 
 =item *
 
@@ -3561,7 +3595,7 @@ some subtleties when regular expressions are matched against
 above-Unicode code points.  There is a warning generated to draw your
 attention to this.  However, this warning was being generated
 inappropriately in some cases, such as when a program was being parsed.
-Non-Unicode matches such as C<\w> and C<[:word;]> should not generate the
+Non-Unicode matches such as C<\w> and C<[:word:]> should not generate the
 warning, as their definitions don't limit them to apply to only Unicode
 code points.  Now the message is only generated when matching against
 C<\p{}> and C<\P{}>.  There remains a bug, [perl #114148], for the very
@@ -3665,7 +3699,12 @@ becomes empty.
 
 =item *
 
-There are no known regressions.  Please report any bugs you find!
+UTF8-flagged strings in C<%ENV> on HP-UX 11.00 are buggy
+
+The interaction of UTF8-flagged strings and C<%ENV> on HP-UX 11.00 is
+currently dodgy in some not-yet-fully-diagnosed way.  Expect test
+failures in F<t/op/magic.t>, followed by unknown behavior when storing
+wide characters in the environment.
 
 =back
 
