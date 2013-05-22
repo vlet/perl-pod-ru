@@ -1017,353 +1017,353 @@ L<B::Debug> был обновлён до 1.18.
 
 =item *
 
-L<B::Deparse> has been upgraded to 1.20.
+L<B::Deparse> был обновлён до 1.20.
 
-Avoid warning when run under C<perl -w>.
+Убраны предупреждения, если запускается под C<perl -w>.
 
-It now deparses
-loop controls with the correct precedence, and multiple statements in a
-C<format> line are also now deparsed correctly.
+Теперь он разбирает управляющие конструкции циклов в правильном порядке и
+множественные операции в C<format> строке теперь также разбираются правильно.
 
-This release suppresses trailing semicolons in formats.
+В этом выпуске подавляются точки с запятой в конце записи формата.
 
-This release adds stub deparsing for lexical subroutines.
+В этом выпуске добавлена заглушка для разбора  лексических подпрограмм.
 
-It no longer dies when deparsing C<sort> without arguments.  It now
-correctly omits the comma for C<system $prog @args> and C<exec $prog
-@args>.
+Он больше не падает при разборе C<sort> без аргументов.  Теперь он корректно
+опускает запятые в C<system $prog @args> и C<exec $prog @args>.
 
 =item *
 
-L<bignum>, L<bigint> and L<bigrat> have been upgraded to 0.33.
+L<bignum>, L<bigint> и L<bigrat> были обновлены до 0.33.
 
-The overrides for C<hex> and C<oct> have been rewritten, eliminating
-several problems, and making one incompatible change:
+Переопределение для C<hex> и C<oct> было переписано, решая несколько проблем и
+внося одно несовместимое изменение:
 
 =over
 
 =item *
 
-Formerly, whichever of C<use bigint> or C<use bigrat> was compiled later
-would take precedence over the other, causing C<hex> and C<oct> not to
-respect the other pragma when in scope.
+Прежде, какой бы из модулей C<use bigint> или C<use bigrat> не был скомпилирован
+позже, он брал приоритет над другими, приводя к тому, что C<hex> и C<oct> не
+учитывали действие других прагм в данной области видимости.
 
 =item *
 
-Using any of these three pragmata would cause C<hex> and C<oct> anywhere
-else in the program to evalute their arguments in list context and prevent
-them from inferring $_ when called without arguments.
+Использование любых из этих трёх прагм приводило к тому, что C<hex> и C<oct> во
+всех других местах программы обрабатывали свои аргументы в списочном контексте и
+препятствовали работе с $_, когда вызывались без аргументов.
 
 =item *
 
-Using any of these three pragmata would make C<oct("1234")> return 1234
-(for any number not beginning with 0) anywhere in the program.  Now "1234"
-is translated from octal to decimal, whether within the pragma's scope or
-not.
+Использование любой из этих трёх прагм заставляло C<oct("1234")> возвращать 1234
+(для любого числа, не начинающегося с 0) в любом месте программы.  Теперь "1234"
+транслируются из восьмеричного к десятичному, независимо находится ли оно в
+области видимости прагмы или нет.
 
 =item *
 
-The global overrides that facilitate lexical use of C<hex> and C<oct> now
-respect any existing overrides that were in place before the new overrides
-were installed, falling back to them outside of the scope of C<use bignum>.
+Глобальное переопределение, которое устанавливает лексическое использование
+C<hex> и C<oct>, теперь учитывает любые существующие переопределения, которые
+действовали до включения нового переопределения, возвращая их вне действия
+области действия C<use bignum>.
 
 =item *
 
-C<use bignum "hex">, C<use bignum "oct"> and similar invocations for bigint
-and bigrat now export a C<hex> or C<oct> function, instead of providing a
-global override.
+C<use bignum "hex">, C<use bignum "oct"> и подобные вызовы для bigint и bigrat
+теперь экспортируют функции C<hex> или C<oct>, вместо создания глобального
+переопределения.
 
 =back
 
 =item *
 
-L<Carp> has been upgraded to 1.29.
+L<Carp> был обновлён до 1.29.
 
-Carp is no longer confused when C<caller> returns undef for a package that
-has been deleted.
+Carp больше не приходит в замешательство, если C<caller> возвращает undef для
+пакета, который был удалён.
 
-The C<longmess()> and C<shortmess()> functions are now documented.
-
-=item *
-
-L<CGI> has been upgraded to 3.63.
-
-Unrecognized HTML escape sequences are now handled better, problematic
-trailing newlines are no longer inserted after E<lt>formE<gt> tags
-by C<startform()> or C<start_form()>, and bogus "Insecure Dependency"
-warnings appearing with some versions of perl are now worked around.
+Функции C<longmess()> и C<shortmess()> теперь задокументированы.
 
 =item *
 
-L<Class::Struct> has been upgraded to 0.64.
+L<CGI> был обновлён до 3.63.
 
-The constructor now respects overridden accessor methods [perl #29230].
-
-=item *
-
-L<Compress::Raw::Bzip2> has been upgraded to 2.060.
-
-The misuse of Perl's "magic" API has been fixed.
+Нераспознаваемые экранирующие последовательности HTML теперь обрабатываются
+лучше, проблемные завершающие переводы строк больше не вставляются после тегов
+E<lt>formE<gt> функциями C<startform()> или C<start_form()>, и ложное
+предупреждение "Insecure Dependency" (небезопасная зависимость) на некоторых
+версиях perl теперь обходится.
 
 =item *
 
-L<Compress::Raw::Zlib> has been upgraded to 2.060.
+L<Class::Struct> был обновлён до 0.64.
 
-Upgrade bundled zlib to version 1.2.7.
-
-Fix build failures on Irix, Solaris, and Win32, and also when building as C++
-[rt.cpan.org #69985], [rt.cpan.org #77030], [rt.cpan.org #75222].
-
-The misuse of Perl's "magic" API has been fixed.
-
-C<compress()>, C<uncompress()>, C<memGzip()> and C<memGunzip()> have
-been speeded up by making parameter validation more efficient.
+Конструктор теперь учитывает переопределённый метод доступа [perl #29230].
 
 =item *
 
-L<CPAN::Meta::Requirements> has been upgraded to 2.122.
+L<Compress::Raw::Bzip2> был обновлён до 2.060.
 
-Treat undef requirements to C<from_string_hash> as 0 (with a warning).
-
-Added C<requirements_for_module> method.
+Неправильное использование "магического" API Perl было исправлено.
 
 =item *
 
-L<CPANPLUS> has been upgraded to 0.9135.
+L<Compress::Raw::Zlib> был обновлён до 2.060.
 
-Allow adding F<blib/script> to PATH.
+Была обновлена, поставляемый с модулем, библиотека zlib до версии 1.2.7
 
-Save the history between invocations of the shell.
+Были исправлены ошибки сборки на Irix, Solaris и Win32, а также сборка с
+использованием C++ [rt.cpan.org #69985], [rt.cpan.org #77030],
+[rt.cpan.org #75222].
 
-Handle multiple C<makemakerargs> and C<makeflags> arguments better.
+Неправильное использование "магического" API Perl было исправлено.
 
-This resolves issues with the SQLite source engine.
-
-=item *
-
-L<Data::Dumper> has been upgraded to 2.145.
-
-It has been optimized to only build a seen-scalar hash as necessary,
-thereby speeding up serialization drastically.
-
-Additional tests were added in order to improve statement, branch, condition
-and subroutine coverage.  On the basis of the coverage analysis, some of the
-internals of Dumper.pm were refactored.  Almost all methods are now
-documented.
+C<compress()>, C<uncompress()>, C<memGzip()> и C<memGunzip()> были ускорены за
+счёт более эффективной проверки параметров.
 
 =item *
 
-L<DB_File> has been upgraded to 1.827.
+L<CPAN::Meta::Requirements> был обновлён до 2.122.
 
-The main Perl module no longer uses the C<"@_"> construct.
+Обрабатываются undef зависимости в C<from_string_hash> как 0 (с предупреждением).
 
-=item *
-
-L<Devel::Peek> has been upgraded to 1.11.
-
-This fixes compilation with C++ compilers and makes the module work with
-the new pad API.
+Добавлен метод C<requirements_for_module>.
 
 =item *
 
-L<Digest::MD5> has been upgraded to 2.52.
+L<CPANPLUS> был обновлён до 0.9135.
 
-Fix C<Digest::Perl::MD5> OO fallback [rt.cpan.org #66634].
+Разрешено добавлять F<blib/script> к PATH.
 
-=item *
+Сохраняется история между запусками командной строки.
 
-L<Digest::SHA> has been upgraded to 5.84.
+Лучше поддерживаются множественные аргументы для C<makemakerargs> и
+C<makeflags>.
 
-This fixes a double-free bug, which might have caused vulnerabilities
-in some cases.
-
-=item *
-
-L<DynaLoader> has been upgraded to 1.18.
-
-This is due to a minor code change in the XS for the VMS implementation.
-
-This fixes warnings about using C<CODE> sections without an C<OUTPUT>
-section.
+Исправлены проблемы с SQLite движком.
 
 =item *
 
-L<Encode> has been upgraded to 2.49.
+L<Data::Dumper> был обновлён до 2.145.
 
-The Mac alias x-mac-ce has been added, and various bugs have been fixed
-in Encode::Unicode, Encode::UTF7 and Encode::GSM0338.
+Было оптимизировано создание хэша уже обработанных скаляров только при
+необходимости, тем самым существенно повысив скорость сериализации.
 
-=item *
-
-L<Env> has been upgraded to 1.04.
-
-Its SPLICE implementation no longer misbehaves in list context.
+Были добавлены дополнительные тесты для улучшения покрытия операторов, веток,
+условий и подпрограмм.  По данным анализа покрытия, некоторые внутренности
+Dumper.pm были переработаны.  Почти все методы теперь задокументированы.
 
 =item *
 
-L<ExtUtils::CBuilder> has been upgraded to 0.280210.
+L<DB_File> был обновлён до 1.827.
 
-Manifest files are now correctly embedded for those versions of VC++ which
-make use of them. [perl #111782, #111798].
-
-A list of symbols to export can now be passed to C<link()> when on
-Windows, as on other OSes [perl #115100].
+Основной Perl модуль больше не использует конструкцию C<"@_">.
 
 =item *
 
-L<ExtUtils::ParseXS> has been upgraded to 3.18.
+L<Devel::Peek> был обновлён до 1.11.
 
-The generated C code now avoids unnecessarily incrementing
-C<PL_amagic_generation> on Perl versions where it's done automatically
-(or on current Perl where the variable no longer exists).
-
-This avoids a bogus warning for initialised XSUB non-parameters [perl
-#112776].
+Были исправлены возможность сборки компилятором C++ и работы с новым pad API.
 
 =item *
 
-L<File::Copy> has been upgraded to 2.26.
+L<Digest::MD5> был обновлён до 2.52.
 
-C<copy()> no longer zeros files when copying into the same directory,
-and also now fails (as it has long been documented to do) when attempting
-to copy a file over itself.
+Исправлен откат на C<Digest::Perl::MD5> в ОО-интерфейсе [rt.cpan.org #66634].
 
 =item *
 
-L<File::DosGlob> has been upgraded to 1.10.
+L<Digest::SHA> был обновлён до 5.84.
 
-The internal cache of file names that it keeps for each caller is now
-freed when that caller is freed.  This means
-C<< use File::DosGlob 'glob'; eval 'scalar <*>' >> no longer leaks memory.
-
-=item *
-
-L<File::Fetch> has been upgraded to 0.38.
-
-Added the 'file_default' option for URLs that do not have a file
-component.
-
-Use C<File::HomeDir> when available, and provide C<PERL5_CPANPLUS_HOME> to
-override the autodetection.
-
-Always re-fetch F<CHECKSUMS> if C<fetchdir> is set.
+Исправлена ошибка с двойным освобождением памяти, которая могла приводить к
+уязвимости в некоторых случаях.
 
 =item *
 
-L<File::Find> has been upgraded to 1.23.
+L<DynaLoader> был обновлён до 1.18.
 
-This fixes inconsistent unixy path handling on VMS.
+Сделано небольшое исправление в XS для VMS реализации.
 
-Individual files may now appear in list of directories to be searched
+Исправлено предупреждение об использовании секции C<CODE> без секции C<OUTPUT>. 
+
+=item *
+
+L<Encode> был обновлён до 2.49.
+
+Был добавлен алиас x-mac-ce для Mac и исправлены ошибки в Encode::Unicode,
+Encode::UTF7 и Encode::GSM0338.
+
+=item *
+
+L<Env> был обновлён до 1.04.
+
+Его реализация SPLICE больше не ведёт себя неправильно в списочном контексте.
+
+=item *
+
+L<ExtUtils::CBuilder> был обновлён до 0.280210.
+
+Файлы манифестов теперь корректно встраиваются для тех версий VC++, которые
+используют их. [perl #111782, #111798].
+
+Список экспортируемых символов может быть передан в C<link()> на Windows, так же
+как и на других ОС [perl #115100].
+
+=item *
+
+L<ExtUtils::ParseXS> был обновлён до 3.18.
+
+Генерируемый C код теперь избегает ненужного увеличения C<PL_amagic_generation>
+на версиях Perl, где это делается автоматически (или на текущем Perl, где
+переменная больше не существует).
+
+Это устраняет ложное предупреждение об инициализированном XSUB без параметров
+[perl #112776].
+
+=item *
+
+L<File::Copy> был обновлён до 2.26.
+
+C<copy()> больше не обнуляет файлы при копировании в тот же каталог и теперь
+завершается с ошибкой (как это было давно задокументировано), когда пытается
+копировать файл в самого себя.
+
+=item *
+
+L<File::DosGlob> был обновлён до 1.10.
+
+Внутренний кэш имён файлов, который он поддерживает для каждого вызывающего,
+теперь освобождается, когда освобождается вызывающий код.  Это означает, что
+в C<< use File::DosGlob 'glob'; eval 'scalar <*>' >> больше не утекает память.
+
+=item *
+
+L<File::Fetch> был обновлён до 0.38.
+
+Добавлена опция 'file_default' для URL, которые не имеют файловой составляющей.
+
+Используйте C<File::HomeDir>, если доступно, и выставляйте
+C<PERL5_CPANPLUS_HOME> для замены автоопределения.
+
+Всегда запрашивает F<CHECKSUMS>, если установлен C<fetchdir>.
+
+=item *
+
+L<File::Find> был обновлён до 1.23.
+
+Была исправлена несовместимая обработка unix-путей на VMS.
+
+Выборочные файлы теперь могут указываться в списках директорий для поиска
 [perl #59750].
 
 =item *
 
-L<File::Glob> has been upgraded to 1.20.
+L<File::Glob> был обновлён до 1.20.
 
-File::Glob has had exactly the same fix as File::DosGlob.  Since it is
-what Perl's own C<glob> operator itself uses (except on VMS), this means
-C<< eval 'scalar <*>' >> no longer leaks.
+В File::Glob сделано то же исправление, что и в File::DosGlob.  Поскольку именно
+его использует собственный оператор C<glob> (кроме VMS), это означает, что
+в C<< eval 'scalar <*>' >> больше нет утечки.
 
-A space-separated list of patterns return long lists of results no longer
-results in memory corruption or crashes.  This bug was introduced in
-Perl 5.16.0.  [perl #114984]
-
-=item *
-
-L<File::Spec::Unix> has been upgraded to 3.40.
-
-C<abs2rel> could produce incorrect results when given two relative paths or
-the root directory twice [perl #111510].
+Список разделённых пробелом шаблонов, возвращающий длинный список результатов
+больше не приводит к повреждению памяти или аварийному завершению.  Эта проблема
+появилась в Perl 5.16.0.  [perl #114984]
 
 =item *
 
-L<File::stat> has been upgraded to 1.07.
+L<File::Spec::Unix> был обновлён до 3.40.
 
-C<File::stat> ignores the L<filetest> pragma, and warns when used in
-combination therewith.  But it was not warning for C<-r>.  This has been
-fixed [perl #111640].
-
-C<-p> now works, and does not return false for pipes [perl #111638].
-
-Previously C<File::stat>'s overloaded C<-x> and C<-X> operators did not give
-the correct results for directories or executable files when running as
-root. They had been treating executable permissions for root just like for
-any other user, performing group membership tests I<etc> for files not owned
-by root. They now follow the correct Unix behaviour - for a directory they
-are always true, and for a file if any of the three execute permission bits
-are set then they report that root can execute the file. Perl's builtin
-C<-x> and C<-X> operators have always been correct.
+C<abs2rel> может вывести некорректный результат, если получает два относительных
+пути, или две корневых директории [perl #111510].
 
 =item *
 
-L<File::Temp> has been upgraded to 0.23
+L<File::stat> был обновлён до 1.07.
 
-Fixes various bugs involving directory removal.  Defers unlinking tempfiles if
-the initial unlink fails, which fixes problems on NFS.
+C<File::stat> игнорирует прагму L<filetest> и предупреждает, если используется в
+комбинации с ней.  Но предупреждения не выдавалась при использовании C<-r>.  Это
+было исправлено [perl #111640].
 
-=item *
+C<-p> теперь работает и не возвращает ложь для каналов [perl #111638].
 
-L<GDBM_File> has been upgraded to 1.15.
-
-The undocumented optional fifth parameter to C<TIEHASH> has been
-removed. This was intended to provide control of the callback used by
-C<gdbm*> functions in case of fatal errors (such as filesystem problems),
-but did not work (and could never have worked). No code on CPAN even
-attempted to use it. The callback is now always the previous default,
-C<croak>. Problems on some platforms with how the C<C> C<croak> function
-is called have also been resolved.
-
-=item *
-
-L<Hash::Util> has been upgraded to 0.15.
-
-C<hash_unlocked> and C<hashref_unlocked> now returns true if the hash is
-unlocked, instead of always returning false [perl #112126].
-
-C<hash_unlocked>, C<hashref_unlocked>, C<lock_hash_recurse> and
-C<unlock_hash_recurse> are now exportable [perl #112126].
-
-Two new functions, C<hash_locked> and C<hashref_locked>, have been added.
-Oddly enough, these two functions were already exported, even though they
-did not exist [perl #112126].
+Ранее перегруженные операторы C<-x> и C<-X> из C<File::stat> не давали
+правильных результатов для директорий или исполнимых файлов, если были запущены
+с правами root.  Они рассматривали право исполнения для root также как и для
+всех других пользователей, выполняя проверку вхождения в группу, для файлов не
+принадлежащих root.  Теперь они следуют правильному поведению в Unix - для
+директорий они всегда истинны, а для файла, если любой из трёх битов разрешения
+запуска установлен, они сообщают, что root может запустить файл.  Встроенные
+операторы C<-x> и C<-X> всегда работали правильно.
 
 =item *
 
-L<HTTP::Tiny> has been upgraded to 0.025.
+L<File::Temp> был обновлён до 0.23
 
-Add SSL verification features [github #6], [github #9].
-
-Include the final URL in the response hashref.
-
-Add C<local_address> option.
-
-This improves SSL support.
+Исправлены различные ошибки, связанные с удалением директорий.  Откладывается
+удаление временных файлов, если первоначальное удаление завершаются неудачей,
+это исправляет проблемы на NFS.
 
 =item *
 
-L<IO> has been upgraded to 1.28.
+L<GDBM_File> был обновлён до 1.15.
 
-C<sync()> can now be called on read-only file handles [perl #64772].
-
-L<IO::Socket> tries harder to cache or otherwise fetch socket
-information.
-
-=item *
-
-L<IPC::Cmd> has been upgraded to 0.80.
-
-Use C<POSIX::_exit> instead of C<exit> in C<run_forked> [rt.cpan.org #76901].
+Недокументированный необязательный пятый параметр к C<TIEHASH> был удалён.  Он
+задумывался для предоставления контроля над колбэком, используемым функциями
+C<gdbm*> в случае фатальных ошибок (такие как проблемы файловой системы), но не
+работал (и никогда не работал).  Ни один модуль на CPAN даже не предпринимал
+попыток его использования.  Колбэк теперь всегда по умолчанию C<croak>.  Были
+решены проблемы с тем, как на некоторых платформах вызывается C<C> функция
+C<croak>.
 
 =item *
 
-L<IPC::Open3> has been upgraded to 1.13.
+L<Hash::Util> был обновлён до 0.15.
 
-The C<open3()> function no longer uses C<POSIX::close()> to close file
-descriptors since that breaks the ref-counting of file descriptors done by
-PerlIO in cases where the file descriptors are shared by PerlIO streams,
-leading to attempts to close the file descriptors a second time when
-any such PerlIO streams are closed later on.
+C<hash_unlocked> и C<hashref_unlocked> теперь возвращают истину, если хэш
+разблокирован, вместо того, чтобы постоянно возвращать ложь [perl #112126].
+
+C<hash_unlocked>, C<hashref_unlocked>, C<lock_hash_recurse> и
+C<unlock_hash_recurse> теперь доступны для экспорта [perl #112126].
+
+Были добавлены две новые функции: C<hash_locked> и C<hashref_locked>.
+Как это ни странно, обе этих функции уже экспортировались, несмотря на то, что
+они не существовали [perl #112126].
+
+=item *
+
+L<HTTP::Tiny> был обновлён до 0.025.
+
+Добавлены возможности проверки SSL [github #6], [github #9].
+
+Включается финальный URL в хэш-ссылку ответа.
+
+Добавлена опция C<local_address>.
+
+Улучшена поддержка SSL.
+
+=item *
+
+L<IO> был обновлён до 1.28.
+
+C<sync()> теперь можно вызывать на доступных только на чтение файловых
+дескрипторах [perl #64772].
+
+L<IO::Socket> пытается лучше кэшировать или в противном случае получить
+информацию из сокета.
+
+=item *
+
+L<IPC::Cmd> был обновлён до 0.80.
+
+Используется C<POSIX::_exit> вместо C<exit> в C<run_forked> [rt.cpan.org #76901].
+
+=item *
+
+L<IPC::Open3> был обновлён до 1.13.
+
+Функция C<open3()> больше не использует C<POSIX::close()> для закрытия файлового
+дескриптора, так как это ломает подсчёт ссылок файловых дескрипторов, который
+ведёт PerlIO в случаях если файловые дескрипторы разделены потоками PerlIO,
+что приводит к попыткам закрытия файлового дескриптора во второй раз, когда
+любой из подобных PerlIO потоков закрывается позже.
 
 =item *
 
