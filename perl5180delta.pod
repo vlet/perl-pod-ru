@@ -2520,332 +2520,336 @@ C<PERL_IMPLICIT_SYS> и C<PERL_DEBUG_READONLY_OPS> был удалён.
 
 =back
 
-=head1 Selected Bug Fixes
+=head1 Выборочные исправления ошибок
 
 =over 4
 
 =item *
 
-Here document terminators no longer require a terminating newline character when
-they occur at the end of a file.  This was already the case at the end of a
-string eval [perl #65838].
+Ограничители встроенной документации больше не требуют звершающего символа новой
+строки, если находятся в конце файла. Это уже было так в конце строки,
+выполняемой через eval [perl #65838].
 
 =item *
 
-C<-DPERL_GLOBAL_STRUCT> builds now free the global struct B<after>
-they've finished using it.
+Сборка с C<-DPERL_GLOBAL_STRUCT> теперь освобождает глобальную структуру
+B<после> того, как закончит использовать её.
 
 =item *
 
-A trailing '/' on a path in @INC will no longer have an additional '/'
-appended.
+Завершающий '/' в путях в @INC больше не дополняется ещё одним '/'.
 
 =item *
 
-The C<:crlf> layer now works when unread data doesn't fit into its own
-buffer. [perl #112244].
+Слой C<:crlf> теперь работает, когда возвращаемые данные не вмещаются в свой
+собственный буфер [perl #112244].
 
 =item *
 
-C<ungetc()> now handles UTF-8 encoded data. [perl #116322].
+C<ungetc()> теперь поддерживает данные, кодированные в UTF-8 [perl #116322].
 
 =item *
 
-A bug in the core typemap caused any C types that map to the T_BOOL core
-typemap entry to not be set, updated, or modified when the T_BOOL variable was
-used in an OUTPUT: section with an exception for RETVAL. T_BOOL in an INPUT:
-section was not affected. Using a T_BOOL return type for an XSUB (RETVAL)
-was not affected. A side effect of fixing this bug is, if a T_BOOL is specified
-in the OUTPUT: section (which previous did nothing to the SV), and a read only
-SV (literal) is passed to the XSUB, croaks like "Modification of a read-only
-value attempted" will happen. [perl #115796]
+Ошибка в базовых typemap привела к тому, что любые C типы, которые соответствуют
+базовому T_BOOL typemap элементу не устанавливаются, не обновляются и не
+модифицируются, когда T_BOOL переменная используется в OUTPUT: секции с
+исключением для RETVAL.  T_BOOL в INPUT: секции не затронут.  Использование
+возвращаемого типа T_BOOL в XSUB (RETVAL) не было затронуто.  Побочным эффектом
+исправления этой ошибки стало то, что если T_BOOL указан в секции OUTPUT: (что
+раньше ничего не меняло для SV) и передаётся доступный только для чтения SV
+(литерал) в XSUB, происходит ошибка вида Modification of a read-only value
+attempted" [perl #115796].
 
 =item *
 
-On many platforms, providing a directory name as the script name caused perl
-to do nothing and report success.  It should now universally report an error
-and exit nonzero. [perl #61362]
+На многих платформах указание имени директории как имени скрипта приводило к
+тому, что perl ни делал ничего и сообщал об успешном запуске.  Сейчас он всегда
+должен сообщать об ошибке и завершаться с ненулевым кодом возврата
+[perl #61362].
 
 =item *
 
-C<sort {undef} ...> under fatal warnings no longer crashes.  It had
-begun crashing in Perl v5.16.
+C<sort {undef} ...> при действии фатальных предупреждений больше не падает. Он
+начал падать в Perl v5.16.
 
 =item *
 
-Stashes blessed into each other
-(C<bless \%Foo::, 'Bar'; bless \%Bar::, 'Foo'>) no longer result in double
-frees.  This bug started happening in Perl v5.16.
+Стэши благословлённые друг в другу (C<bless \%Foo::, 'Bar'; bless \%Bar::,
+'Foo'>) больше не приводят к двойному освобождению.  Эта проблема стала
+возникать в Perl v5.16.
 
 =item *
 
-Numerous memory leaks have been fixed, mostly involving fatal warnings and
-syntax errors.
+Несколько утечек памяти было исправлено, большая часть затрагивает фатальные
+предупреждения и синтаксические ошибки.
 
 =item *
 
-Some failed regular expression matches such as C<'f' =~ /../g> were not
-resetting C<pos>.  Also, "match-once" patterns (C<m?...?g>) failed to reset
-it, too, when invoked a second time [perl #23180].
+Некоторые несовпавшие регулярные выражения, такие как C<'f' =~ /../g> не
+сбрасывали C<pos>.  Кроме того "совпавшие-лишь-раз" шаблоны (C<m?...?g>) не
+сбрасывали его также, когда вызывались второй раз [perl #23180].
 
 =item *
 
-Several bugs involving C<local *ISA> and C<local *Foo::> causing stale
-MRO caches have been fixed.
+Несколько ошибок, включающие C<local *ISA> и C<local *Foo::>, приводившие к
+устареванию MRO кэшей, были исправлены.
 
 =item *
 
-Defining a subroutine when its typeglob has been aliased no longer results
-in stale method caches.  This bug was introduced in Perl v5.10.
+Определение подпрограммы, когда для её typeglob был задан псевдоним больше не
+приводит к устареванию кэшей методов.  Эта ошибка появилась в Perl v5.10.
 
 =item *
 
-Localising a typeglob containing a subroutine when the typeglob's package
-has been deleted from its parent stash no longer produces an error.  This
-bug was introduced in Perl v5.14.
+Локализация typeglob'а, содержащего подпрограмму, когда пакет typeglob'а был
+удалён из своего родительского стэша больше не приводит к ошибке.  Эта ошибка
+появилась в Perl v5.14.
 
 =item *
 
-Under some circumstances, C<local *method=...> would fail to reset method
-caches upon scope exit.
+В некоторых ситуациях C<local *method=...> мог не сбросить кэши методов при
+выходе из области видимости.
 
 =item *
 
-C</[.foo.]/> is no longer an error, but produces a warning (as before) and
-is treated as C</[.fo]/> [perl #115818].
+C</[.foo.]/> больше не является ошибкой, но выводит предупреждение (как и
+раньше) и рассматривается как C</[.fo]/> [perl #115818].
 
 =item *
 
-C<goto $tied_var> now calls FETCH before deciding what type of goto
-(subroutine or label) this is.
+C<goto $tied_var> теперь вызывает FETCH перед тем как решит какого типа этот
+goto (подпрограмма или метка).
 
 =item *
 
-Renaming packages through glob assignment
-(C<*Foo:: = *Bar::; *Bar:: = *Baz::>) in combination with C<m?...?> and
-C<reset> no longer makes threaded builds crash.
+Переименование пакетов через присвоение glob
+(C<*Foo:: = *Bar::; *Bar:: = *Baz::>) в комбинации с C<m?...?> и C<reset> больше
+не приводит к падению сборки с поддержкой нитей.
 
 =item *
 
-A number of bugs related to assigning a list to hash have been fixed. Many of
-these involve lists with repeated keys like C<(1, 1, 1, 1)>.
+Некоторое число ошибок, относящиеся к присвоению списка хэшу было исправлено.
+Многие их них включают списки из повторяющихся ключей вида C<(1, 1, 1, 1)>.
 
 =over 4
 
 =item *
 
-The expression C<scalar(%h = (1, 1, 1, 1))> now returns C<4>, not C<2>.
+Выражение C<scalar(%h = (1, 1, 1, 1))> теперь возвращает C<4>, а не C<2>.
 
 =item *
 
-The return value of C<%h = (1, 1, 1)> in list context was wrong. Previously
-this would return C<(1, undef, 1)>, now it returns C<(1, undef)>.
+Возвращаемое значение C<%h = (1, 1, 1)> в списочном контексте было неправильным.
+Раньше возвращало C<(1, undef, 1)>, теперь возвращает C<(1, undef)>.
 
 =item *
 
-Perl now issues the same warning on C<($s, %h) = (1, {})> as it does for
-C<(%h) = ({})>, "Reference found where even-sized list expected".
+Теперь Perl выдаёт такое же предупреждение для C<($s, %h) = (1, {})>, какое он
+выдаёт для C<(%h) = ({})>, "Reference found where even-sized list expected"
+("Найдена ссылка там, где ожидался список с чётным числом элементов").
 
 =item *
 
-A number of additional edge cases in list assignment to hashes were
-corrected. For more details see commit 23b7025ebc.
+Несколько дополнительных краевых случаев в присвоении списков хэшу было
+исправлено.  Для дополнительных деталей смотрите коммит 23b7025ebc.
 
 =back
 
 =item *
 
-Attributes applied to lexical variables no longer leak memory.
-[perl #114764]
+С атрибутами, присвоенными лексическим переменным, больше не утекает память
+[perl #114764].
 
 =item *
 
-C<dump>, C<goto>, C<last>, C<next>, C<redo> or C<require> followed by a
-bareword (or version) and then an infix operator is no longer a syntax
-error.  It used to be for those infix operators (like C<+>) that have a
-different meaning where a term is expected.  [perl #105924]
+C<dump>, C<goto>, C<last>, C<next>, C<redo> или C<require> с последующим
+тривиальным словом (bareword) или версией и далее идущим инфиксным оператором
+больше не является синтаксической ошибкой.  Раньше так было для некоторых
+инфиксных операторов (вроде C<+>), которые имеют другое понимание где ожидается
+элемент [perl #105924].
 
 =item *
 
-C<require a::b . 1> and C<require a::b + 1> no longer produce erroneous
-ambiguity warnings.  [perl #107002]
+C<require a::b . 1> и C<require a::b + 1> больше не выдаёт ошибочное
+предупреждение об двусмысленности [perl #107002].
 
 =item *
 
-Class method calls are now allowed on any string, and not just strings
-beginning with an alphanumeric character.  [perl #105922]
+Вызов метода класса теперь разрешается для любой строки, а не только строки,
+начинающейся с буквенно-цифрового символа [perl #105922].
 
 =item *
 
-An empty pattern created with C<qr//> used in C<m///> no longer triggers
-the "empty pattern reuses last pattern" behaviour.  [perl #96230]
+Пустой шаблон созданный с помощью C<qr//>, используемый в C<m///> больше не
+вызывает поведения "пустой шаблон повторно использует последний шаблон"
+[perl #96230].
 
 =item *
 
-Tying a hash during iteration no longer results in a memory leak.
+Связывая хэш во время итерации больше не приводит к утечкам памяти.
 
 =item *
 
-Freeing a tied hash during iteration no longer results in a memory leak.
+Освобождение связанного хэша во время итерации больше не приводит к утечкам
+памяти.
 
 =item *
 
-List assignment to a tied array or hash that dies on STORE no longer
-results in a memory leak.
+Присвоение списка связанному массиву или хэшу, который умирает при операции
+STORE, больше не приводит к утечке памяти.
 
 =item *
 
-If the hint hash (C<%^H>) is tied, compile-time scope entry (which copies
-the hint hash) no longer leaks memory if FETCH dies.  [perl #107000]
+Если хинт-хэш (C<%^H>) является связанным, элемент области видимости во время
+компиляции (который копирует хинт-хэш) больше не теряет память если умирает
+вызов FETCH [perl #107000].
 
 =item *
 
-Constant folding no longer inappropriately triggers the special
-C<split " "> behaviour.  [perl #94490]
+Вычисление констант больше не вызывает неуместное специальное поведение
+C<split " "> [perl #94490].
 
 =item *
 
-C<defined scalar(@array)>, C<defined do { &foo }>, and similar constructs
-now treat the argument to C<defined> as a simple scalar.  [perl #97466]
+C<defined scalar(@array)>, C<defined do { &foo }> и схожие конструкции теперь
+рассматривают аргумент к C<defined> как простой скаляр [perl #97466].
 
 =item *
 
-Running a custom debugging that defines no C<*DB::DB> glob or provides a
-subroutine stub for C<&DB::DB> no longer results in a crash, but an error
-instead.  [perl #114990]
+Запуск отладчика, который не определяет глоб C<*DB::DB> или не предоставляет
+подпрограмму заглушку для C<&DB::DB> больше не приводит к краху, а выдаёт
+сообщение об ошибке [perl #114990].
 
 =item *
 
-C<reset ""> now matches its documentation.  C<reset> only resets C<m?...?>
-patterns when called with no argument.  An empty string for an argument now
-does nothing.  (It used to be treated as no argument.)  [perl #97958]
+C<reset ""> теперь соответствует своей документации. C<reset> сбрасывает только
+шаблон C<m?...?> при запуске без аргумента.  Пустая строка в аргументе теперь ни
+делает ничего. (Раньше это рассматривалось как отсутствие аргумента)
+[perl #97958].
 
 =item *
 
-C<printf> with an argument returning an empty list no longer reads past the
-end of the stack, resulting in erratic behaviour.  [perl #77094]
+C<printf> с аргументом, возвращающий пустой список больше не читает дальше конца
+стека, приводившего к ошибочному поведению [perl #77094].
 
 =item *
 
-C<--subname> no longer produces erroneous ambiguity warnings.
-[perl #77240]
+C<--subname> больше не выдаёт ошибочных неясных предупреждений [perl #77240].
 
 =item *
 
-C<v10> is now allowed as a label or package name.  This was inadvertently
-broken when v-strings were added in Perl v5.6.  [perl #56880]
+C<v10> теперь доступна как метка или имя пакета.  Это было нечаянно сломано,
+когда v-строки были добавлены в Perl v5.6 [perl #56880].
 
 =item *
 
-C<length>, C<pos>, C<substr> and C<sprintf> could be confused by ties,
-overloading, references and typeglobs if the stringification of such
-changed the internal representation to or from UTF-8.  [perl #114410]
+C<length>, C<pos>, C<substr> и C<sprintf> могут быть сбиты с толку связываниями,
+ссылками и typeglob'ами если привидение их к строковому виду меняет внутреннее
+представление в или из UTF-8 [perl #114410].
 
 =item *
 
-utf8::encode now calls FETCH and STORE on tied variables.  utf8::decode now
-calls STORE (it was already calling FETCH).
+utf8::encode теперь вызывает FETCH и STORE на связанных переменных.
+utf8::decode теперь вызывает STORE (FETCH уже был вызван).
 
 =item *
 
-C<$tied =~ s/$non_utf8/$utf8/> no longer loops infinitely if the tied
-variable returns a Latin-1 string, shared hash key scalar, or reference or
-typeglob that stringifies as ASCII or Latin-1.  This was a regression from
-v5.12.
+C<$tied =~ s/$non_utf8/$utf8/> больше не зацикливается в бесконечный цикл, если
+связанная переменная возвращает Latin-1 строку, разделяемый скаляр ключа хэша,
+или ссылку, или typeglob, который приводится к строковому виду как ASCII или
+Latin-1.  Это была регрессия, начиная с v5.12.
 
 =item *
 
-C<s///> without /e is now better at detecting when it needs to forego
-certain optimisations, fixing some buggy cases:
+C<s///> без /e теперь лучше определяет когда необходимо отказаться от
+определённых оптимизаций, исправляя некоторые ошибочные ситуации:
 
 =over
 
 =item *
 
-Match variables in certain constructs (C<&&>, C<||>, C<..> and others) in
-the replacement part; e.g., C<s/(.)/$l{$a||$1}/g>.  [perl #26986]
+Совпадение с переменными в определённых конструкциях  (C<&&>, C<||>, C<..> и
+другие) в части замены; например, C<s/(.)/$l{$a||$1}/g>.  [perl #26986]
 
 =item *
 
-Aliases to match variables in the replacement.
+Псевдонимы при поиске соответствия переменным в части замещения.
 
 =item *
 
-C<$REGERROR> or C<$REGMARK> in the replacement.  [perl #49190]
+C<$REGERROR> или C<$REGMARK> в замещении [perl #49190].
 
 =item *
 
-An empty pattern (C<s//$foo/>) that causes the last-successful pattern to
-be used, when that pattern contains code blocks that modify the variables
-in the replacement.
+Пустой шаблон (C<s//$foo/>), который приводит к тому, что используется последний
+успешно совпавший шаблон, в случае если шаблон содержит кодовый блок, который
+изменяет переменные в замещении.
 
 =back
 
 =item *
 
-The taintedness of the replacement string no longer affects the taintedness
-of the return value of C<s///e>.
+Заражённость замещаемой строки больше не влияет на заражённость возвращаемого
+значения C<s///e>.
 
 =item *
 
-The C<$|> autoflush variable is created on-the-fly when needed.  If this
-happened (e.g., if it was mentioned in a module or eval) when the
-currently-selected filehandle was a typeglob with an empty IO slot, it used
-to crash.  [perl #115206]
+Переменная автоматического сброса буферов C<$|> создаётся на лету при
+необходимости.  Если это происходило (например, если она была упомянута в модуле
+или в eval) когда текущий выбранный файловый дескриптор был typeglob с пустым IO
+слотом, раньше это приводило к краху [perl #115206].
 
 =item *
 
-Line numbers at the end of a string eval are no longer off by one.
-[perl #114658]
+Номера строк в конце eval строки больше не удлиняются на единицу [perl #114658].
 
 =item *
 
-@INC filters (subroutines returned by subroutines in @INC) that set $_ to a
-copy-on-write scalar no longer cause the parser to modify that string
-buffer in place.
+Фильтры @INC (подпрограммы возвращаемые подпрограммами в @INC), которые
+устанавливают $_ в копируемый-при-записи скаляр, больше не заставляют парсер
+модифицировать этот строковой буфер на месте.
 
 =item *
 
-C<length($object)> no longer returns the undefined value if the object has
-string overloading that returns undef.  [perl #115260]
+C<length($object)> больше не возвращает неопределённое значение, если объект
+имеет перегрузку строки, которая возвращает undef [perl #115260].
 
 =item *
 
-The use of C<PL_stashcache>, the stash name lookup cache for method calls, has
-been restored,
+Было восстановлено использование C<PL_stashcache>, кэша стэша используемого для
+поиска имён для вызова методов.
 
-Commit da6b625f78f5f133 in August 2011 inadvertently broke the code that looks
-up values in C<PL_stashcache>. As it's a only cache, quite correctly everything
-carried on working without it.
-
-=item *
-
-The error "Can't localize through a reference" had disappeared in v5.16.0
-when C<local %$ref> appeared on the last line of an lvalue subroutine.
-This error disappeared for C<\local %$ref> in perl v5.8.1.  It has now
-been restored.
+Коммит da6b625f78f5f133 в августе 2011 нечаянно сломал код, который получал
+значения в C<PL_stashcache>.  Так как это только кэш, всё корректно работало и
+без него.
 
 =item *
 
-The parsing of here-docs has been improved significantly, fixing several
-parsing bugs and crashes and one memory leak, and correcting wrong
-subsequent line numbers under certain conditions.
+Ошибка "Can't localize through a reference" ("Не могу локализовать через
+ссылку") исчезла в v5.16.0, когда C<local %$ref> появлялось на последней строке
+lvalue подпрограммы.  Эта ошибка исчезла для C<\local %$ref> в perl v5.8.1.
+Сейчас она была восстановлена,
 
 =item *
 
-Inside an eval, the error message for an unterminated here-doc no longer
-has a newline in the middle of it [perl #70836].
+Разбор встроенной документации был существенно улучшен, исправляя несколько
+ошибок разбора, падений и одной утечки памяти, а также корректируя неверную
+последовательность номеров строк при определённых условиях.
 
 =item *
 
-A substitution inside a substitution pattern (C<s/${s|||}//>) no longer
-confuses the parser.
+Внутри eval сообщение об ошибке для нетерминированных встроенных документах
+больше не имеет переноса строка в середине [perl #70836].
 
 =item *
 
-It may be an odd place to allow comments, but C<s//"" # hello/e> has
-always worked, I<unless> there happens to be a null character before the
-first #.  Now it works even in the presence of nulls.
+Замещение внутри замещающего шаблона (C<s/${s|||}//>) больше не смущает парсер.
+
+=item *
+
+Возможно не очень правильное место для разрешения комментариев, но
+C<s//"" # hello/e> всегда работало, I<только> если не было null символа перед
+первым #.  Теперь это работает даже при наличии null.
 
 =item *
 
