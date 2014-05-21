@@ -1,223 +1,227 @@
 =encoding utf8
 
-=head1 NAME
+=head1 Имя
 
-perldelta - what is new for perl v5.20.0
+perl5200delta - что нового в perl v5.20.0
 
-=head1 DESCRIPTION
+=head1 Описание
 
-This document describes differences between the 5.18.0 release and the
-5.20.0 release.
+Этот документ описывает изменения между релизом 5.18.0 и 5.20.0.
 
-If you are upgrading from an earlier release such as 5.16.0, first read
-L<perl5180delta>, which describes differences between 5.16.0 and 5.18.0.
+Если вы обновляетесь с более раннего релиза, как например, 5.16.0, сначала
+прочтите L<perl5180delta>, который описывает отличия между 5.16.0 и 5.18.0.
 
-=head1 Core Enhancements
+=head1 Базовые улучшения
 
-=head2 Experimental Subroutine signatures
+=head2 Экспериментальные сигнатуры функции
 
-Declarative syntax to unwrap argument list into lexical variables.
-C<sub foo ($a,$b) {...}> checks the number of arguments and puts the
-arguments into lexical variables.  Signatures are not equivalent to
-the existing idiom of C<sub foo { my($a,$b) = @_; ... }>.  Signatures
-are only available by enabling a non-default feature, and generate
-warnings about being experimental.  The syntactic clash with
-prototypes is managed by disabling the short prototype syntax when
-signatures are enabled.
+Декларативный синтаксис для разворачивания списка в лексические переменные.
+C<sub foo ($a,$b) {...}> проверяет число аргументов и помещает аргументы в
+лексические переменные. Сигнатуры не являются эквивалентом существующей идиоме
+C<sub foo { my($a,$b) = @_; ... }>. Сигнатуры доступны только при включении не
+используемой по умолчанию возможности и генерируют предупреждения о своей
+экспериментальности. Синтаксический конфликт с прототипами решён за счёт
+отключения короткой формы записи прототипа, когда сигнатуры включены.
 
-See L<perlsub/Signatures> for details.
+Смотрите детали в L<perlsub/Signatures>.
 
-=head2 C<sub>s now take a C<prototype> attribute
+=head2 C<sub> теперь может иметь атрибут C<prototype>
 
-When declaring or defining a C<sub>, the prototype can now be specified inside
-of a C<prototype> attribute instead of in parens following the name.
+При объявлении или создании C<sub> прототип теперь может быть указан внутри
+атрибута C<prototype> вместо записи его в скобках после имени.
 
-For example, C<sub foo($$){}> could be rewritten as
+Например, C<sub foo($$){}> может быть записано как
 C<sub foo : prototype($$){}>.
 
-=head2 More consistent prototype parsing
+=head2 Более последовательный разбор прототипа
 
-Multiple semicolons in subroutine prototypes have long been tolerated and
-treated as a single semicolon.  There was one case where this did not
-happen.  A subroutine whose prototype begins with "*" or ";*" can affect
-whether a bareword is considered a method name or sub call.  This now
-applies also to ";;;*".
+Раньше позволялось использовать несколько символов точки с запятой в прототипах
+подпрограмм и они рассматривались как одна точка с запятой. Но был один случай,
+в котором этого не происходило. Подпрограммы, чьи прототипы начинались с "*"
+или ";*" могли влиять на то, рассматривается ли простое слово именем метода или
+вызовом подпрограммы. Теперь тоже самое относится и к ";;;*".
 
-Whitespace has long been allowed inside subroutine prototypes, so
-C<sub( $ $ )> is equivalent to C<sub($$)>, but until now it was stripped
-when the subroutine was parsed.  Hence, whitespace was I<not> allowed in
-prototypes set by C<Scalar::Util::set_prototype>.  Now it is permitted,
-and the parser no longer strips whitespace.  This means
-C<prototype &mysub> returns the original prototype, whitespace and all.
+Пробельные символы долгое время были разрешены внутри прототипов подпрограмм,
+таким образом C<sub( $ $ )> было эквивалентно C<sub($$)>, но до текущего
+времени они удалялись при лексическом разборе. Поэтому пробельные символы I<не>
+были разрешены в прототипах задаваемых с помощью
+C<Scalar::Util::set_prototype>. Теперь они разрешены и парсер больше не удаляет
+пробельные символы. Это означает, что C<prototype &mysub> возвращает
+оригинальный прототип с пробелами и всем остальным.
 
-=head2 C<rand> now uses a consistent random number generator
+=head2 C<rand> теперь использует согласованный генератор случайных чисел
 
-Previously perl would use a platform specific random number generator, varying
-between the libc rand(), random() or drand48().
+Ранее perl использовал специфичный для каждой платформы генератор случайных
+чисел, варьируясь между libc rand(), random() или drand48().
 
-This meant that the quality of perl's random numbers would vary from platform
-to platform, from the 15 bits of rand() on Windows to 48-bits on POSIX
-platforms such as Linux with drand48().
+Это означало, что качество генератора случайных чисел менялось от платформы к
+платформе, начиная с 15-битного rand() на Windows до 48-битного на POSIX
+платформах, таких как Linux с drand48().
 
-Perl now uses its own internal drand48() implementation on all platforms.  This
-does not make perl's C<rand> cryptographically secure.  [perl #115928]
+Perl теперь использует свой собственную внутреннюю реализацию drand48() на всех
+платформах. Но это не делает C<rand> перла криптографически безопасным.
+[perl #115928]
 
-=head2 New slice syntax
+=head2 Новый синтаксис среза
 
-The new C<%hash{...}> and C<%array[...]> syntax returns a list of key/value (or
-index/value) pairs.  See L<perldata/"Key/Value Hash Slices">.
+Новый синтаксис C<%hash{...}> и C<%array[...]> возвращает список пар
+ключей/значений (или индексов/значений). Смотрите
+L<perldata/"Key/Value Hash Slices">.
 
-=head2 Experimental Postfix Dereferencing
+=head2 Экспериментальное постфиксное разыменование
 
-When the C<postderef> feature is in effect, the following syntactical
-equivalencies are set up:
+Когда включена возможность C<postderef>, устанавливаются следующие
+синтаксические эквивалентности:
 
-  $sref->$*;  # same as ${ $sref }  # interpolates
-  $aref->@*;  # same as @{ $aref }  # interpolates
-  $href->%*;  # same as %{ $href }
-  $cref->&*;  # same as &{ $cref }
-  $gref->**;  # same as *{ $gref }
+  $sref->$*;  # то же, что и ${ $sref }  # интерполяция
+  $aref->@*;  # то же, что и @{ $aref }  # интерполяция
+  $href->%*;  # то же, что и %{ $href }
+  $cref->&*;  # то же, что и &{ $cref }
+  $gref->**;  # то же, что и *{ $gref }
 
-  $aref->$#*; # same as $#{ $aref }
+  $aref->$#*; # то же что и $#{ $aref }
 
-  $gref->*{ $slot }; # same as *{ $gref }{ $slot }
+  $gref->*{ $slot }; # то же, что и *{ $gref }{ $slot }
 
-  $aref->@[ ... ];  # same as @$aref[ ... ]  # interpolates
-  $href->@{ ... };  # same as @$href{ ... }  # interpolates
-  $aref->%[ ... ];  # same as %$aref[ ... ]
-  $href->%{ ... };  # same as %$href{ ... }
+  $aref->@[ ... ];  # то же, что и @$aref[ ... ]  # интерполяция
+  $href->@{ ... };  # то же, что и @$href{ ... }  # интерполяция
+  $aref->%[ ... ];  # то же, что и %$aref[ ... ]
+  $href->%{ ... };  # то же, что и %$href{ ... }
 
-Those marked as interpolating only interpolate if the associated
-C<postderef_qq> feature is also enabled.  This feature is B<experimental> and
-will trigger C<experimental::postderef>-category warnings when used, unless
-they are suppressed.
+Те, что отмечены, как интерполяция, интерполируют только при включении
+возможности C<postderef_qq>. Эта возможность является B<экспериментальной> и
+приводит к выводу предупреждений категории C<experimental::postderef> при
+использовании, если только их вывод не подавлен.
 
-For more information, consult L<the Postfix Dereference Syntax section of
+Для большей информации, смотрите в L<the Postfix Dereference Syntax section of
 perlref|perlref/Postfix Dereference Syntax>.
 
-=head2 Unicode 6.3 now supported
+=head2 Теперь поддерживается Юникод 6.3
 
-Perl now supports and is shipped with Unicode 6.3 (though Perl may be
-recompiled with any previous Unicode release as well).  A detailed list of
-Unicode 6.3 changes is at L<http://www.unicode.org/versions/Unicode6.3.0/>.
+Perl теперь поддерживает и поставляется с Юникодом 6.3 (хотя Perl может быть
+компилирован с поддержкой любого предыдущего релиза Юникода). Детальный список
+изменений в Юникоде 6.3 доступен в
+L<http://www.unicode.org/versions/Unicode6.3.0/>.
 
-=head2 New C<\p{Unicode}> regular expression pattern property
+=head2 Новое свойство шаблонов регулярных выражений C<\p{Unicode}>
 
-This is a synonym for C<\p{Any}> and matches the set of Unicode-defined
-code points 0 - 0x10FFFF.
+Это синоним для C<\p{Any}> и совпадает с набором определённых в Юникоде кодов
+символом 0 - 0x10FFFF.
 
-=head2 Better 64-bit support
+=head2 Более лучшая поддержка 64-битных платформ
 
-On 64-bit platforms, the internal array functions now use 64-bit offsets,
-allowing Perl arrays to hold more than 2**31 elements, if you have the memory
-available.
+На 64-битных платформах, внутренние функции массивов теперь используют
+64-битные отступы, позволяя массивам Perl содержать больше 2**31 элементов,
+если у вас доступен такой объём памяти.
 
-The regular expression engine now supports strings longer than 2**31
-characters.  [perl #112790, #116907]
+Движок регулярных выражений теперь поддерживает строки длиннее чем 2**31
+символов. [perl #112790, #116907]
 
-The functions PerlIO_get_bufsiz, PerlIO_get_cnt, PerlIO_set_cnt and
-PerlIO_set_ptrcnt now have SSize_t, rather than int, return values and
-parameters.
+Функции PerlIO_get_bufsiz, PerlIO_get_cnt, PerlIO_set_cnt и PerlIO_set_ptrcnt
+теперь имеют тип SSize_t вместо int у возвращаемых значений и параметров.
 
-=head2 C<S<use locale>> now works on UTF-8 locales
+=head2 C<S<use locale>> теперь работает на UTF-8 локалях
 
-Until this release, only single-byte locales, such as the ISO 8859
-series were supported.  Now, the increasingly common multi-byte UTF-8
-locales are also supported.  A UTF-8 locale is one in which the
-character set is Unicode and the encoding is UTF-8.  The POSIX
-C<LC_CTYPE> category operations (case changing (like C<lc()>, C<"\U">),
-and character classification (C<\w>, C<\D>, C<qr/[[:punct:]]/>)) under
-such a locale work just as if not under locale, but instead as if under
-C<S<use feature 'unicode_strings'>>, except taint rules are followed.
-Sorting remains by code point order in this release.  [perl #56820].
+До этого выпуска поддерживались только однобайтные локали, такие как серия
+ISO 8859. Теперь всё более и более типичные мультибайтные UTF-8 локали также
+поддерживаются. UTF-8 локаль -- это такая локаль, которая имеет набор символов
+Юникод и кодировку UTF-8. POSIX-категория операций C<LC_CTYPE> (изменение
+регистра (как C<lc()>, C<"\U">) и классификация символов (C<\w>, C<\D>,
+C<qr/[[:punct:]]/>)) под такой локалью работает как если бы была включена
+возможность C<S<use feature 'unicode_strings'>>, за тем исключением если
+выполняются правила taint. Сортировка остаётся в порядке возрастания кода
+символа в этом релизе. [perl #56820].
 
-=head2 C<S<use locale>> now compiles on systems without locale ability
+=head2 C<S<use locale>> теперь компилируется на системах без поддержки локалей
 
-Previously doing this caused the program to not compile.  Within its
-scope the program behaves as if in the "C" locale.  Thus programs
-written for platforms that support locales can run on locale-less
-platforms without change.  Attempts to change the locale away from the
-"C" locale will, of course, fail.
+Ранее подобное выражение приводило к невозможности компиляции. В пределах
+действия прагмы программа ведёт себя как была установлена локаль "C". Таким
+образом программы, написанные с поддержкой локалей, могут быть запущены на
+платформах без поддержки локалей без изменений в коде. Попытка поменять
+значение локали на отличное от "C" разумеется будет безуспешной.
 
-=head2 More locale initialization fallback options
+=head2 Больше запасных вариантов для инициализации локали
 
-If there was an error with locales during Perl start-up, it immediately
-gave up and tried to use the C<"C"> locale.  Now it first tries using
-other locales given by the environment variables, as detailed in
-L<perllocale/ENVIRONMENT>.  For example, if C<LC_ALL> and C<LANG> are
-both set, and using the C<LC_ALL> locale fails, Perl will now try the
-C<LANG> locale, and only if that fails, will it fall back to C<"C">.  On
-Windows machines, Perl will try, ahead of using C<"C">, the system
-default locale if all the locales given by environment variables fail.
+Если происходила ошибка с локалями при запуске Perl, то он сразу сдавался и
+пытался использовать локаль C<"C">. Теперь он сначала пытается использовать
+другие локали, предоставленные переменными окружения, как описано в
+L<perllocale/ENVIRONMENT>. Например, если обе C<LC_ALL> и C<LANG> установлены,
+и использовать локаль из C<LC_ALL> не удалось, Perl теперь попытается
+использовать локаль из C<LANG>, и если эта попытка тоже будет безуспешной, он
+попытается откатиться на C<"C">. На Windows машинах, Perl перед использованием
+C<"C">, попытается использовать системную локаль по умолчанию, если все локали
+из переменных окружения не заработали.
 
-=head2 C<-DL> runtime option now added for tracing locale setting
+=head2 Опция запуска C<-DL> была добавлена для отслеживания установок локали
 
-This is designed for Perl core developers to aid in field debugging bugs
-regarding locales.
+Она предназначена для помощи разработчикам базового Perl в отладке ошибок,
+связанных с локалью.
 
-=head2 B<-F> now implies B<-a> and B<-a> implies B<-n>
+=head2 B<-F> теперь полразумевает B<-a>, а B<-a> подразумевает B<-n>
 
-Previously B<-F> without B<-a> was a no-op, and B<-a> without B<-n> or B<-p>
-was a no-op, with this change, if you supply B<-F> then both B<-a> and B<-n>
-are implied and if you supply B<-a> then B<-n> is implied.
+Раньше B<-F> без B<-a> не давала никакого эффекта, также как и B<-a> без B<-n>
+или B<-p>. С этим изменением если вы указываете B<-F>, то обе B<-a> и B<-n>
+подразумеваются, а если вы указываете B<-a>, то подразумевается B<-n>.
 
-You can still use B<-p> for its extra behaviour. [perl #116190]
+Вы по-прежнему можете указывать B<-p> для его дополнительного действия. [perl
+#116190]
 
-=head2 $a and $b warnings exemption
+=head2 удаление предупреждения для $a и $b
 
-The special variables $a and $b, used in C<sort>, are now exempt from "used
-once" warnings, even where C<sort> is not used.  This makes it easier for
-CPAN modules to provide functions using $a and $b for similar purposes.
-[perl #120462]
+Специальные переменные $a и $b, используемые в C<sort>, теперь не приводят к
+предупреждениям "used once" (использованы один раз), даже если они использованы
+вне C<sort>. Это позволит CPAN модулям предоставлять функции, использующие $a и
+$b для подобных же целей. [perl #120462]
 
-=head1 Security
+=head1 Безопасность
 
-=head2 Avoid possible read of free()d memory during parsing
+=head2 Избежание возможного чтения освобождённой памяти при синтаксическом
+разборе
 
-It was possible that free()d memory could be read during parsing in the unusual
-circumstance of the Perl program ending with a heredoc and the last line of the
-file on disk having no terminating newline character.  This has now been fixed.
+Раньше существовала возможность, что освобождённая память могла быть прочитана
+при синтаксическом разборе в необычных случаях, когда Perl программа
+заканчивалась встроенной документацией и последняя строка файла на диске не
+имела завершающего символа переноса строки. Это теперь исправлено.
 
-=head1 Incompatible Changes
+=head1 Несовместимые изменения
 
-=head2 C<do> can no longer be used to call subroutines
+=head2 C<do> больше нельзя использовать для вызова подпрограммы
 
-The C<do SUBROUTINE(LIST)> form has resulted in a deprecation warning
-since Perl v5.0.0, and is now a syntax error.
+Форма вызова C<do SUBROUTINE(LIST)> выводила предупреждение об устаревшей
+конструкции, начиная с Perl v5.0.0 и теперь это синтаксическая ошибка.
 
-=head2 Quote-like escape changes
+=head2 Изменения в экранировании в выражениях в кавычках
 
-The character after C<\c> in a double-quoted string ("..." or qq(...))
-or regular expression must now be a printable character and may not be
+Символ после C<\c> в строках с двойными кавычками ("..." или qq(...)) или в
+регулярных выражениях теперь должен быть печатным символом и не может быть
 C<{>.
 
-A literal C<{> after C<\B> or C<\b> is now fatal.
+Литера C<{> после C<\B> или C<\b> теперь фатальная ошибка.
 
-These were deprecated in perl v5.14.0.
+Это являлось устаревшей конструкцией в perl v5.14.0.
 
-=head2 Tainting happens under more circumstances; now conforms to documentation
+=head2 "Заражение" теперь происходит в большем числе случаев; теперь
+соответствует документации
 
-This affects regular expression matching and changing the case of a
-string (C<lc>, C<"\U">, I<etc>.) within the scope of C<use locale>.
-The result is now tainted based on the operation, no matter what the
-contents of the string were, as the documentation (L<perlsec>,
-L<perllocale/SECURITY>) indicates it should.  Previously, for the case
-change operation, if the string contained no characters whose case
-change could be affected by the locale, the result would not be tainted.
-For example, the result of C<uc()> on an empty string or one containing
-only above-Latin1 code points is now tainted, and wasn't before.  This
-leads to more consistent tainting results.  Regular expression patterns
-taint their non-binary results (like C<$&>, C<$2>) if and only if the
-pattern contains elements whose matching depends on the current
-(potentially tainted) locale.  Like the case changing functions, the
-actual contents of the string being matched now do not matter, whereas
-formerly it did.  For example, if the pattern contains a C<\w>, the
-results will be tainted even if the match did not have to use that
-portion of the pattern to succeed or fail, because what a C<\w> matches
-depends on locale.  However, for example, a C<.> in a pattern will not
-enable tainting, because the dot matches any single character, and what
-the current locale is doesn't change in any way what matches and what
-doesn't.
+Это затрагивает регулярные выражения совпадающие и меняющие регистр строк
+(C<lc>, C<"\U">, I<etc>.) внутри области действия C<use locale>. Результат
+теперь "заражён" (tainted) в соответствии с операцией независимо от содержимого
+там, где документация (L<perlsec>, L<perllocale/SECURITY>) указывает, что он
+должен. Раньше для операций изменения регистра, если строка содержала символы,
+чей регистр зависит от локали, результирующая строка не была "заражена".
+Например, результат C<uc()> на пустой строке или содержащей только коды
+символов вне пределов Latin1 теперь "заражён", чего не было раньше. Это ведёт к
+более согласованным результатам "заражения". Шаблоны регулярных выражений
+"заражают" свой небинарный результат (как C<$&>, C<$2>) тогда и только тогда,
+когда шаблон содержит элементы, чьё совпадение зависит от текущей (возможно
+"заражённой") локали. Также как и изменяющий регистр функции актуальное
+содержимое, в котором ищется совпадение теперь, не имеет значение, в то время
+как раньше имело. Например, если шаблон содержит C<\w>, результат будет
+"заражён", даже если поиск совпадения не использовал эту порцию шаблона для
+успешного или неуспешного поиска, поскольку совпадение C<\w> зависит от локали.
+Однако, например, C<.> в шаблонах не будет включать "заражение", поскольку
+точка совпадает любым одиночным символом и текущая локаль никак не может
+поменять результат поиска совпадения.
 
 =head2 C<\p{}>, C<\P{}> matching has changed for non-Unicode code
 points.
