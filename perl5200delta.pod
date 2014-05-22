@@ -223,181 +223,181 @@ C<{>.
 точка совпадает любым одиночным символом и текущая локаль никак не может
 поменять результат поиска совпадения.
 
-=head2 C<\p{}>, C<\P{}> matching has changed for non-Unicode code
-points.
+=head2 Поиск совпадений C<\p{}>, C<\P{}> изменился для не Юникодовых кодов
+символов.
 
-C<\p{}> and C<\P{}> are defined by Unicode only on Unicode-defined code
-points (C<U+0000> through C<U+10FFFF>).  Their behavior on matching
-these legal Unicode code points is unchanged, but there are changes for
-code points C<0x110000> and above.  Previously, Perl treated the result
-of matching C<\p{}> and C<\P{}> against these as C<undef>, which
-translates into "false".  For C<\P{}>, this was then complemented into
-"true".  A warning was supposed to be raised when this happened.
-However, various optimizations could prevent the warning, and the
-results were often counter-intuitive, with both a match and its seeming
-complement being false.  Now all non-Unicode code points are treated as
-typical unassigned Unicode code points.  This generally is more
-Do-What-I-Mean.  A warning is raised only if the results are arguably
-different from a strict Unicode approach, and from what Perl used to do.
-Code that needs to be strictly Unicode compliant can make this warning
-fatal, and then Perl always raises the warning.
+C<\p{}> и C<\P{}> определены в Юникоде только для определённых в Юникоде кодов
+символов (от C<U+0000> до C<U+10FFFF>). Их поведение при поиске совпадений для
+легальных Юникод кодов символов не изменилось, но есть изменения для кодовых
+точек от C<0x110000> и выше. Ранее Perl рассматривал результат совпадения с
+C<\p{}> и C<\P{}> с такими символами как C<undef>, который интерпретировался
+как "ложь". Для C<\P{}> это позже устанавливалось в "истину". Также
+предполагалось, что будет выдаваться предупреждение для таких случаев. Однако,
+различные оптимизации могли предотвращать появление предупреждения и часто
+приводили к нелогичным результатам как для поиска совпадения, так и кажущейся
+ложности обратного условия. Теперь все не Юникод коды символов рассматриваются
+как типичные коды символов, которые ещё не получили своё определение в
+Юникоде. Это в целом больше соответствует духу "делай то, что я имел ввиду".
+Предупреждение выводится только если результат может отличаться от строго
+следования стандарту Юникод. Код, который должен строго следовать стандарту
+Юникод может сделать это предупреждение фатальным и в таком случае Perl всегда
+будет выводить предупреждение.
 
-Details are in L<perlunicode/Beyond Unicode code points>.
+Детали в L<perlunicode/Beyond Unicode code points>.
 
-=head2 C<\p{All}> has been expanded to match all possible code points
+=head2 C<\p{All}> был расширен для совпадения со всеми возможными кодами
+символов
 
-The Perl-defined regular expression pattern element C<\p{All}>, unused
-on CPAN, used to match just the Unicode code points; now it matches all
-possible code points; that is, it is equivalent to C<qr/./s>.  Thus
-C<\p{All}> is no longer synonymous with C<\p{Any}>, which continues to
-match just the Unicode code points, as Unicode says it should.
+Определённый в Perl элемент шаблона регулярного выражения C<\p{All}>,
+неиспользуемый на CPAN, раньше совпадал только с кодами символов Юникода,
+теперь он совпадает со всеми возможными кодами символов, таким образом он
+эквивалентен C<qr/./s>. Следовательно C<\p{All}> больше не является синонимом
+C<\p{Any}>, который продолжает совпадать только с кодами символов Юникод, как
+и предписывает стандарт Юникод.
 
-=head2 Data::Dumper's output may change
+=head2 Вывод Data::Dumper может измениться
 
-Depending on the data structures dumped and the settings set for
-Data::Dumper, the dumped output may have changed from previous
-versions.
+В зависимости от выводимой структуры данных и настройках Data::Dumper, вывод
+может отличаться от предыдущих версий.
 
-If you have tests that depend on the exact output of Data::Dumper,
-they may fail.
+Если у вас есть тесты, которые зависят от точного вывода Data::Dumper, то они
+могут упасть.
 
-To avoid this problem in your code, test against the data structure
-from evaluating the dumped structure, instead of the dump itself.
+Чтобы избежать подобной проблемы в вашем коде, тестируйте структуру на
+совпадение с помощью вычисленного в eval дампа структуры, вместо самого дампа.
 
-=head2 Locale decimal point character no longer leaks outside of S<C<use locale>> scope
+=head2 Символ десятичной запятой текущей локали больше не просачивается за
+пределы области видимости S<C<use locale>>
 
-This is actually a bug fix, but some code has come to rely on the bug
-being present, so this change is listed here.  The current locale that
-the program is running under is not supposed to be visible to Perl code
-except within the scope of a S<C<use locale>>.  However, until now under
-certain circumstances, the character used for a decimal point (often a
-comma) leaked outside the scope.  If your code is affected by this
-change, simply add a S<C<use locale>>.
+На самом деле это исправление бага, но есть код, который зависит от присутствия
+этого бага, поэтому это изменение указано здесь. Текущая локаль, под которой
+запущена программа, не должны быть видна для Perl кода за исключением области
+видимости S<C<use locale>>. Однако, до текущего момента при некоторых условиях
+символ, который используется для десятичной запятой (часто это запятая),
+просачивался вне этой области видимости. Если ваш код затронут этим изменением,
+просто добавьте S<C<use locale>>.
 
-=head2 Assignments of Windows sockets error codes to $! now prefer F<errno.h> values over WSAGetLastError() values
+=head2 Присвоение кодов ошибки переменной C<$!> для сокетов на Windows теперь
+отдаёт приоритет значениям F<errno.h> над значениями WSAGetLastError()
 
-In previous versions of Perl, Windows sockets error codes as returned by
-WSAGetLastError() were assigned to $!, and some constants such as ECONNABORTED,
-not in F<errno.h> in VC++ (or the various Windows ports of gcc) were defined to
-corresponding WSAE* values to allow $! to be tested against the E* constants
-exported by L<Errno> and L<POSIX>.
+В предыдущих версиях Perl, коды ошибок для Windows сокетов, возвращаемые
+WSAGetLastError(), присваивались C<$!>, и некоторые константы, такие ка
+ECONNABORTED, отсутствующие в F<errno.h> в VC++ (или различных Windows портах
+gcc) были определены в соответствующие WSAE* значения, чтобы иметь возможность
+протестировать C<$!> на соответствие константам E*, экспортируемые L<Errno> и
+L<POSIX>.
 
-This worked well until VC++ 2010 and later, which introduced new E* constants
-with values E<gt> 100 into F<errno.h>, including some being (re)defined by perl
-to WSAE* values.  That caused problems when linking XS code against other
-libraries which used the original definitions of F<errno.h> constants.
+Это работало пока в VC++ 2010 и более поздних, которые представили новые E*
+константы со значениями E<gt> 100 в F<errno.h>, включая некоторые значения,
+которые были переопределены в perl к WSAE* значения. Это привело к проблемам
+при линковке XS кода с библиотеками, которые используют оригинальные
+определения констант из F<errno.h>.
 
-To avoid this incompatibility, perl now maps WSAE* error codes to E* values
-where possible, and assigns those values to $!.  The E* constants exported by
-L<Errno> and L<POSIX> are updated to match so that testing $! against them,
-wherever previously possible, will continue to work as expected, and all E*
-constants found in F<errno.h> are now exported from those modules with their
-original F<errno.h> values.
+Чтобы избежать поломки существующего Perl кода, который присваивает WSAE*
+значения в C<$!>, perl теперь перехватывает присвоение и производит такое же
+соответствие E* значениям, какие использует внутри при присвоении самой C<$!>.
 
-In order to avoid breakage in existing Perl code which assigns WSAE* values to
-$!, perl now intercepts the assignment and performs the same mapping to E*
-values as it uses internally when assigning to $! itself.
+Однако, одна обратная несовместимость остаётся: существующий Perl код, который
+сравнивает C<$!> с числовым значением кода ошибки WSAE*, которые раньше были
+присвоены в C<$!>, теперь окажется сломанным в тех случаях, когда
+соответствующее E* значение было присвоено вместо него. Это становится
+проблемой для E* значений E<lt> 100, которые всегда экспортировались из
+L<Errno> и L<POSIX> с их оригинальными F<errno.h> значениями, и поэтому не
+могли быть использованы для тестов кодов ошибок WSAE* (например, WSAEINVAL
+равен 10022, но соответствующее EINVAL равно 22). (E* значения E<gt> 100, при
+наличии, всё равно переопределяются в WSAE* значения, поэтому совместимость
+может быть достигнута при использовании E* констант, которые работали как до,
+так и после этого изменения, хотя и используя уже другие численные значения под
+капотом.)
 
-However, one backwards-incompatibility remains: existing Perl code which
-compares $! against the numeric values of the WSAE* error codes that were
-previously assigned to $! will now be broken in those cases where a
-corresponding E* value has been assigned instead.  This is only an issue for
-those E* values E<lt> 100, which were always exported from L<Errno> and
-L<POSIX> with their original F<errno.h> values, and therefore could not be used
-for WSAE* error code tests (e.g. WSAEINVAL is 10022, but the corresponding
-EINVAL is 22).  (E* values E<gt> 100, if present, were redefined to WSAE*
-values anyway, so compatibility can be achieved by using the E* constants,
-which will work both before and after this change, albeit using different
-numeric values under the hood.)
+=head2 Функции C<PerlIO_vsprintf> и C<PerlIO_sprintf> были удалены
 
-=head2 Functions C<PerlIO_vsprintf> and C<PerlIO_sprintf> have been removed
+Эти две функции, недокументированные, неиспользуемые на CPAN и имеющие
+проблемы, были удалены.
 
-These two functions, undocumented, unused in CPAN, and problematic, have been
-removed.
+=head1 Устаревшие конструкции
 
-=head1 Deprecations
+=head2 Класс символов C</\C/>
 
-=head2 The C</\C/> character class
+Класс символов C</\C/> в регулярных выражениях устарел. Начиная с perl 5.22 это
+будет выдавать предупреждение, а с perl 5.24 - станет ошибкой при компиляции
+регулярного выражения. Если вам требуется проверить отдельные байты, которые
+составляют UTF-8 символ, тогда используйте предварительно C<utf8::encode()> на
+строке (или копии).
 
-The C</\C/> regular expression character class is deprecated. From perl
-5.22 onwards it will generate a warning, and from perl 5.24 onwards it
-will be a regular expression compiler error. If you need to examine the
-individual bytes that make up a UTF8-encoded character, then use
-C<utf8::encode()> on the string (or a copy) first.
+=head2 Управляющие символы в именах переменных
 
-=head2 Literal control characters in variable names
+Устаревшими становятся вещи наподобие $\cT, где \cT -- это управляющий
+контрольный символ (такой как C<NAK> или C<NEGATIVE ACKNOWLEDGE>) в исходном
+коде. Удивительно, но оказывается, что изначально это использовалось как
+канонический способ доступа к таким переменным как $^T, со знаком вставки
+добавленным только как альтернатива.
 
-This deprecation affects things like $\cT, where \cT is a literal control (such
-as a C<NAK> or C<NEGATIVE ACKNOWLEDGE> character) in
-the source code.  Surprisingly, it appears that originally this was intended as
-the canonical way of accessing variables like $^T, with the caret form only
-being added as an alternative.
+Форма управляющих символов становится устаревшей по двум основным причинам. Это
+невозможность исправления багов, таких как $\cI не работающий как алиас для $^I,
+и их использование не переносимо на не-ASCII платформы: в то время как $^T
+будет работать везде, \cT является пробелом в EBCDIC. [perl #119123]
 
-The literal control form is being deprecated for two main reasons.  It has what
-are likely unfixable bugs, such as $\cI not working as an alias for $^I, and
-their usage not being portable to non-ASCII platforms: While $^T will work
-everywhere, \cT is whitespace in EBCDIC.  [perl #119123]
+=head2 Ссылка на нецелые или отрицательные целые в C<$/>
 
-=head2 References to non-integers and non-positive integers in C<$/>
+Присвоение C<$/> ссылки на ноль или ссылки на отрицательное целое теперь
+считается устаревшим, и будет вести себя B<в точности> как присвоение ей
+значения C<undef>. Если вам нужно slurp поведение устанавливайте C<$/> в
+C<undef> явно.
 
-Setting C<$/> to a reference to zero or a reference to a negative integer is
-now deprecated, and will behave B<exactly> as though it was set to C<undef>.
-If you want slurp behavior set C<$/> to C<undef> explicitly.
+Присвоение C<$/> ссылки на нецелочисленное значение теперь запрещено и будет
+приводить к ошибке. Perl никогда не документировал что будет происходить в
+данном контексте и поскольку раньше это соответствовало установке C<$/> в адрес
+ссылки, а в будущем это может начать вести себя по-другому, мы установили
+запрет на подобное использование.
 
-Setting C<$/> to a reference to a non integer is now forbidden and will
-throw an error. Perl has never documented what would happen in this
-context and while it used to behave the same as setting C<$/> to
-the address of the references in future it may behave differently, so we
-have forbidden this usage.
+=head2 Фцнкции поиска совпадения символов в POSIX
 
-=head2 Character matching routines in POSIX
-
-Use of any of these functions in the C<POSIX> module is now deprecated:
+Использование следующих функций в C<POSIX> модуле теперь считается устаревшим:
 C<isalnum>, C<isalpha>, C<iscntrl>, C<isdigit>, C<isgraph>, C<islower>,
-C<isprint>, C<ispunct>, C<isspace>, C<isupper>, and C<isxdigit>.  The
-functions are buggy and don't work on UTF-8 encoded strings.  See their
-entries in L<POSIX> for more information.
+C<isprint>, C<ispunct>, C<isspace>, C<isupper> и C<isxdigit>. Функции кишат
+багами и не работают с UTF-8 кодированными строками. Смотрите их описание в
+L<POSIX> для более подробной информации.
 
-A warning is raised on the first call to any of them from each place in
-the code that they are called.  (Hence a repeated statement in a loop
-will raise just the one warning.)
+Будет выводиться предупреждение при первом вызове любой из них из любого места
+кода, в котором они вызываются. (Следовательно повторная инструкция в цикле
+будет выводить только одно предупреждение).
 
-=head2 Interpreter-based threads are now I<discouraged>
+=head2 Треды на базе интерпретатора теперь I<не рекомендуются>
 
-The "interpreter-based threads" provided by Perl are not the fast, lightweight
-system for multitasking that one might expect or hope for.  Threads are
-implemented in a way that make them easy to misuse.  Few people know how to
-use them correctly or will be able to provide help.
+"Треды на базе интерпретатора", предоставляемые Perl не являются быстрой,
+легковесной системой для многозадачности как многие ожидают и надеются. Треды
+реализованы так, что очень легко их использовать неправильно. Немногие знают
+как использовать их правильно или способны помочь другим.
 
-The use of interpreter-based threads in perl is officially
-L<discouraged|perlpolicy/discouraged>.
+Использование тредов на базе интерпретатора в perl официально
+L<не рекомендуется|perlpolicy/discouraged>.
 
-=head2 Module removals
+=head2 Удаление модулей
 
-The following modules will be removed from the core distribution in a
-future release, and will at that time need to be installed from CPAN.
-Distributions on CPAN which require these modules will need to list them as
-prerequisites.
+Следующие модули будут удалены из базового дистрибутива в будущем релизе и
+должны будут устанавливаться со CPAN. Дистрибутивы на CPAN, которым требуются
+эти модули должны указать их в своих списках зависимостей.
 
-The core versions of these modules will now issue C<"deprecated">-category
-warnings to alert you to this fact.  To silence these deprecation warnings,
-install the modules in question from CPAN.
+Версии модулей из базового дистрибутива теперь будут выдавать предупреждения
+категории C<"устаревшие">, извещая вам об этом факте. Для подавления этих
+предупреждений установите эти модули со CPAN.
 
-Note that the planned removal of these modules from core does not reflect a
-judgement about the quality of the code and should not be taken as a suggestion
-that their use be halted.  Their disinclusion from core primarily hinges on
-their necessity to bootstrapping a fully functional, CPAN-capable Perl
-installation, not on concerns over their design.
+Обратите внимание, что запланированное удаление этих модулей из ядра не
+отражает суждение о качестве их кода и не намекает на остановку их разработки.
+Их удаление из ядра связано с необходимостью в бутстрапе для получения
+полнофункциональной CPAN-совместимой инсталляции Perl, и не касается их
+дизайна.
 
 =over
 
-=item L<CGI> and its associated CGI:: packages
+=item L<CGI> и связанные CGI:: пакеты
 
 =item L<inc::latest>
 
 =item L<Package::Constants>
 
-=item L<Module::Build> and its associated Module::Build:: packages
+=item L<Module::Build> и связанные Module::Build:: пакеты
 
 =back
 
