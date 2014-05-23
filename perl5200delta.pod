@@ -401,10 +401,10 @@ L<не рекомендуется|perlpolicy/discouraged>.
 
 =back
 
-=head2 Utility removals
+=head2 Удаление утилит
 
-The following utilities will be removed from the core distribution in a
-future release, and will at that time need to be installed from CPAN.
+Следующие утилиты будут удалены из базового дистрибутива в будущем релизе и
+должны будут устанавливаться со CPAN.
 
 =over 4
 
@@ -416,94 +416,97 @@ future release, and will at that time need to be installed from CPAN.
 
 =back
 
-=head1 Performance Enhancements
+=head1 Улучшения в производительности
 
 =over 4
 
 =item *
 
-Perl has a new copy-on-write mechanism that avoids the need to copy the
-internal string buffer when assigning from one scalar to another. This
-makes copying large strings appear much faster.  Modifying one of the two
-(or more) strings after an assignment will force a copy internally. This
-makes it unnecessary to pass strings by reference for efficiency.
+Perl имеет новый механизм копирования-при-записи, который избегает
+необходимости копирования внутреннего буфера строки при присвоении одного
+скаляра другому. Это значительно ускорит наблюдаемый процесс копирования
+больших строк. Изменение одной из двух (или большего числа) строк после
+присвоения приведёт к вынужденному внутреннему копированию. Что делает ненужным
+передачу строк по ссылке для эффективности.
 
-This feature was already available in 5.18.0, but wasn't enabled by
-default. It is the default now, and so you no longer need build perl with
-the F<Configure> argument:
+Данная возможность уже присутствовала в 5.18.0, но она не была включена по
+умолчанию. Теперь она доступна по умолчанию, поэтому вам больше не требуется
+собирать perl с аргументом F<Configure>:
 
     -Accflags=-DPERL_NEW_COPY_ON_WRITE
 
-It can be disabled (for now) in a perl build with:
+Но может быть отключена (теперь) при сборке perl с:
 
     -Accflags=-DPERL_NO_COW
 
-On some operating systems Perl can be compiled in such a way that any
-attempt to modify string buffers shared by multiple SVs will crash.  This
-way XS authors can test that their modules handle copy-on-write scalars
-correctly.  See L<perlguts/"Copy on Write"> for detail.
+На некоторых операционных системах Perl может быть собран так, что любая
+попытка модификации буфер строки разделённого с разными SV приведёт к краху.
+Таким образом авторы XS модулей могут проверить, что их модули могут работать с
+копируемых-при-записи скаляров корректно. Смотрите подробности в
+L<perlguts/"Copy on Write">.
 
 =item *
 
-Perl has an optimizer for regular expression patterns.  It analyzes the pattern
-to find things such as the minimum length a string has to be to match, etc.  It
-now better handles code points that are above the Latin1 range.
+Perl имеет оптимизатор для шаблонов регулярных выражений. Он анализирует
+шаблоны для поиска такие вещи как минимальная длина строки для совпадения и
+т.д. Теперь он лучше поддерживает коды символов за пределами диапазона Latin1.
 
 =item *
 
-Executing a regex that contains the C<^> anchor (or its variant under the
-C</m> flag) has been made much faster in several situations.
+Выполняя регулярное выражение, которое содержит якорь C<^> (или его вариации
+при наличии флага C</m>), теперь работает значительно быстрее в некоторых
+ситуациях.
 
 =item *
 
-Precomputed hash values are now used in more places during method lookup.
+Заранее вычисленные значения хеша теперь используются в больших местах при
+поиске метода.
 
 =item *
 
-Constant hash key lookups (C<$hash{key}> as opposed to C<$hash{$key}>) have
-long had the internal hash value computed at compile time, to speed up
-lookup.  This optimisation has only now been applied to hash slices as
-well.
+Поиск по ключу-константе хеша (C<$hash{key}> в отличии от C<$hash{$key}>) давно
+использует заранее вычисленное внутреннее значение хеша, чтобы ускорить поиск.
+Подобная оптимизация теперь применена и к срезам хеша.
 
 =item *
 
-Combined C<and> and C<or> operators in void context, like those
-generated for C<< unless ($a && $b) >> and C<< if ($a || b) >> now
-short circuit directly to the end of the statement. [perl #120128]
+Комбинированные операторы C<and> и C<or> в пустом контексте, как например,
+в C<< unless ($a && $b) >> и C<< if ($a || $b) >>, теперь сразу переходят к
+концу выражения. [perl #120128]
 
 =item *
 
-In certain situations, when C<return> is the last statement in a subroutine's
-main scope, it will be optimized out. This means code like:
+В тех ситуациях, когда C<return> это последний оператор в основной области
+видимости подпрограммы, он оптимизируется. Это значить, что код вида:
 
   sub baz { return $cat; }
 
-will now behave like:
+будет вести себя как:
 
   sub baz { $cat; }
 
-which is notably faster.
+что заметно быстрее.
 
 [perl #120765]
 
 =item *
 
-Code like:
+Код вида:
 
   my $x; # or @x, %x
   my $y;
 
-is now optimized to:
+теперь оптимизируется к:
 
   my ($x, $y);
 
-In combination with the L<padrange optimization introduced in
-v5.18.0|perl5180delta/Internal Changes>, this means longer uninitialized my
-variable statements are also optimized, so:
+В комбинации с L<оптимизацией padrange появившейся в
+v5.18.0|perl5180delta/Internal Changes>, это означает, что и более длинный
+список неинициализированных переменных оптимизируется:
 
   my $x; my @y; my %z;
 
-becomes:
+становится:
 
   my ($x, @y, %z);
 
@@ -511,697 +514,700 @@ becomes:
 
 =item *
 
-The creation of certain sorts of lists, including array and hash slices, is now
-faster.
+Создание некоторых видов списков, включая массивы или срезы хешей теперь
+выполняется быстрее.
 
 =item *
 
-The optimisation for arrays indexed with a small constant integer is now
-applied for integers in the range -128..127, rather than 0..255. This should
-speed up Perl code using expressions like C<$x[-1]>, at the expense of
-(presumably much rarer) code using expressions like C<$x[200]>.
+Оптимизация для массивов адресуемых небольшими постоянными целыми числами
+теперь применяется для целых в диапазоне -128..127, а не 0..255. Это должно
+ускорить Perl код, который использует выражения вида C<$x[-1]>, в ущерб
+(значительно более редко используемому) коду, использующий выражения C<$x[200]>.
 
 =item *
 
-The first iteration over a large hash (using C<keys> or C<each>) is now
-faster. This is achieved by preallocating the hash's internal iterator
-state, rather than lazily creating it when the hash is first iterated. (For
-small hashes, the iterator is still created only when first needed. The
-assumption is that small hashes are more likely to be used as objects, and
-therefore never allocated. For large hashes, that's less likely to be true,
-and the cost of allocating the iterator is swamped by the cost of allocating
-space for the hash itself.)
+Первая итерация над длинным хешем (используя C<keys> or C<each>) теперь
+выполняется быстрее. Это достигнуто за счёт предварительного выделения
+состояния внутреннего итератора хеша, вместо его ленивого создания, когда он
+обходится в первый раз. (Для маленьких хешей итератор по-прежнему создаётся при
+первой необходимости. Предполагается, что маленькие хеши используются для
+объектов и потому никогда не создаются. Для больших хешей, это более вероятно,
+и цена создания итератора поглощается стоимостью выделения места под сам хеш.)
 
 =item *
 
-When doing a global regex match on a string that came from the C<readline>
-or C<E<lt>E<gt>> operator, the data is no longer copied unnecessarily.
-[perl #121259]
+При выполнении глобального поиска совпадений в регулярном выражении в строке,
+которая приходит от C<readline> или оператора C<E<lt>E<gt>>, данные больше
+бесполезно не копируются. [perl #121259]
 
 =item *
 
-Dereferencing (as in C<$obj-E<gt>[0]> or C<$obj-E<gt>{k}>) is now faster
-when C<$obj> is an instance of a class that has overloaded methods, but
-doesn't overload any of the dereferencing methods C<@{}>, C<%{}>, and so on.
+Разыменование (как в C<$obj-E<gt>[0]> или C<$obj-E<gt>{k}>) теперь происходит
+быстрее, когда C<$obj> является экземпляром класса, который имеет перегруженные
+методы, но не перегружает ни одного из методов разыменования C<@{}>, C<%{}> и
+подобных.
 
 =item *
 
-Perl's optimiser no longer skips optimising code that follows certain
-C<eval {}> expressions (including those with an apparent infinite loop).
+Оптимизатор Perl больше не пропускает оптимизацию кода, который следует за
+некоторыми C<eval {}> выражениями (включая те, которые похожи на бесконечные
+циклы).
 
 =item *
 
-The implementation now does a better job of avoiding meaningless work at
-runtime. Internal effect-free "null" operations (created as a side-effect of
-parsing Perl programs) are normally deleted during compilation. That
-deletion is now applied in some situations that weren't previously handled.
+Реализация теперь ещё лучше избегает бессмысленной работы в режиме исполнения.
+Внутренние бесполезные "null" операции (созданные как побочный эффект при
+синтаксическом разборе Perl программы) обычно удаляются во время компиляции.
+Это удаление теперь применяется в некоторых ситуациях, которые раньше не
+обрабатывались.
 
 =item *
 
-Perl now does less disk I/O when dealing with Unicode properties that cover
-up to three ranges of consecutive code points.
+Perl теперь меньше нагружает дисковую I/O подсистему, когда работает со
+свойствами Юникода, которые покрывают до трёх последовательных диапазонов кодов
+символов.
 
 =back
 
-=head1 Modules and Pragmata
+=head1 Модули и прагмы
 
-=head2 New Modules and Pragmata
+=head2 Новые модули и прагмы
 
 =over 4
 
 =item *
 
-L<experimental> 0.007 has been added to the Perl core.
+L<experimental> 0.007 был добавлен базовую поставку Perl.
 
 =item *
 
-L<IO::Socket::IP> 0.29 has been added to the Perl core.
+L<IO::Socket::IP> 0.29 был добавлен в базовую поставку Perl.
 
 =back
 
-=head2 Updated Modules and Pragmata
+=head2 Обновлённые модули и прагмы
 
 =over 4
 
 =item *
 
-L<Archive::Tar> has been upgraded from version 1.90 to 1.96.
+L<Archive::Tar> был обновлён с версии 1.90 до 1.96.
 
 =item *
 
-L<arybase> has been upgraded from version 0.06 to 0.07.
+L<arybase> был обновлён с версии 0.06 до 0.07.
 
 =item *
 
-L<Attribute::Handlers> has been upgraded from version 0.94 to 0.96.
+L<Attribute::Handlers> был обновлён с версии 0.94 до 0.96.
 
 =item *
 
-L<attributes> has been upgraded from version 0.21 to 0.22.
+L<attributes> был обновлён с версии 0.21 до 0.22.
 
 =item *
 
-L<autodie> has been upgraded from version 2.13 to 2.23.
+L<autodie> был обновлён с версии 2.13 до 2.23.
 
 =item *
 
-L<AutoLoader> has been upgraded from version 5.73 to 5.74.
+L<AutoLoader> был обновлён с версии 5.73 до 5.74.
 
 =item *
 
-L<autouse> has been upgraded from version 1.07 to 1.08.
+L<autouse> был обновлён с версии 1.07 до 1.08.
 
 =item *
 
-L<B> has been upgraded from version 1.42 to 1.48.
+L<B> был обновлён с версии 1.42 до 1.48.
 
 =item *
 
-L<B::Concise> has been upgraded from version 0.95 to 0.992.
+L<B::Concise> был обновлён с версии 0.95 до 0.992.
 
 =item *
 
-L<B::Debug> has been upgraded from version 1.18 to 1.19.
+L<B::Debug> был обновлён с версии 1.18 до 1.19.
 
 =item *
 
-L<B::Deparse> has been upgraded from version 1.20 to 1.26.
+L<B::Deparse> был обновлён с версии 1.20 до 1.26.
 
 =item *
 
-L<base> has been upgraded from version 2.18 to 2.22.
+L<base> был обновлён с версии 2.18 до 2.22.
 
 =item *
 
-L<Benchmark> has been upgraded from version 1.15 to 1.18.
+L<Benchmark> был обновлён с версии 1.15 до 1.18.
 
 =item *
 
-L<bignum> has been upgraded from version 0.33 to 0.37.
+L<bignum> был обновлён с версии 0.33 до 0.37.
 
 =item *
 
-L<Carp> has been upgraded from version 1.29 to 1.3301.
+L<Carp> был обновлён с версии 1.29 до 1.3301.
 
 =item *
 
-L<CGI> has been upgraded from version 3.63 to 3.65.
-NOTE: L<CGI> is deprecated and may be removed from a future version of Perl.
+L<CGI> был обновлён с версии 3.63 до 3.65.
+Внимание: L<CGI> устарел и может быть удалён из будущей версии Perl.
 
 =item *
 
-L<charnames> has been upgraded from version 1.36 to 1.40.
+L<charnames> был обновлён с версии 1.36 до 1.40.
 
 =item *
 
-L<Class::Struct> has been upgraded from version 0.64 to 0.65.
+L<Class::Struct> был обновлён с версии 0.64 до 0.65.
 
 =item *
 
-L<Compress::Raw::Bzip2> has been upgraded from version 2.060 to 2.064.
+L<Compress::Raw::Bzip2> был обновлён с версии 2.060 до 2.064.
 
 =item *
 
-L<Compress::Raw::Zlib> has been upgraded from version 2.060 to 2.065.
+L<Compress::Raw::Zlib> был обновлён с версии 2.060 до 2.065.
 
 =item *
 
-L<Config::Perl::V> has been upgraded from version 0.17 to 0.20.
+L<Config::Perl::V> был обновлён с версии 0.17 до 0.20.
 
 =item *
 
-L<constant> has been upgraded from version 1.27 to 1.31.
+L<constant> был обновлён с версии 1.27 до 1.31.
 
 =item *
 
-L<CPAN> has been upgraded from version 2.00 to 2.05.
+L<CPAN> был обновлён с версии 2.00 до 2.05.
 
 =item *
 
-L<CPAN::Meta> has been upgraded from version 2.120921 to 2.140640.
+L<CPAN::Meta> был обновлён с версии 2.120921 до 2.140640.
 
 =item *
 
-L<CPAN::Meta::Requirements> has been upgraded from version 2.122 to 2.125.
+L<CPAN::Meta::Requirements> был обновлён с версии 2.122 до 2.125.
 
 =item *
 
-L<CPAN::Meta::YAML> has been upgraded from version 0.008 to 0.012.
+L<CPAN::Meta::YAML> был обновлён с версии 0.008 до 0.012.
 
 =item *
 
-L<Data::Dumper> has been upgraded from version 2.145 to 2.151.
+L<Data::Dumper> был обновлён с версии 2.145 до 2.151.
 
 =item *
 
-L<DB> has been upgraded from version 1.04 to 1.07.
+L<DB> был обновлён с версии 1.04 до 1.07.
 
 =item *
 
-L<DB_File> has been upgraded from version 1.827 to 1.831.
+L<DB_File> был обновлён с версии 1.827 до 1.831.
 
 =item *
 
-L<DBM_Filter> has been upgraded from version 0.05 to 0.06.
+L<DBM_Filter> был обновлён с версии 0.05 до 0.06.
 
 =item *
 
-L<deprecate> has been upgraded from version 0.02 to 0.03.
+L<deprecate> был обновлён с версии 0.02 до 0.03.
 
 =item *
 
-L<Devel::Peek> has been upgraded from version 1.11 to 1.16.
+L<Devel::Peek> был обновлён с версии 1.11 до 1.16.
 
 =item *
 
-L<Devel::PPPort> has been upgraded from version 3.20 to 3.21.
+L<Devel::PPPort> был обновлён с версии 3.20 до 3.21.
 
 =item *
 
-L<diagnostics> has been upgraded from version 1.31 to 1.34.
+L<diagnostics> был обновлён с версии 1.31 до 1.34.
 
 =item *
 
-L<Digest::MD5> has been upgraded from version 2.52 to 2.53.
+L<Digest::MD5> был обновлён с версии 2.52 до 2.53.
 
 =item *
 
-L<Digest::SHA> has been upgraded from version 5.84 to 5.88.
+L<Digest::SHA> был обновлён с версии 5.84 до 5.88.
 
 =item *
 
-L<DynaLoader> has been upgraded from version 1.18 to 1.25.
+L<DynaLoader> был обновлён с версии 1.18 до 1.25.
 
 =item *
 
-L<Encode> has been upgraded from version 2.49 to 2.60.
+L<Encode> был обновлён с версии 2.49 до 2.60.
 
 =item *
 
-L<encoding> has been upgraded from version 2.6_01 to 2.12.
+L<encoding> был обновлён с версии 2.6_01 до 2.12.
 
 =item *
 
-L<English> has been upgraded from version 1.06 to 1.09.
+L<English> был обновлён с версии 1.06 до 1.09.
 
 =item *
 
-L<Errno> has been upgraded from version 1.18 to 1.20_03.
+L<Errno> был обновлён с версии 1.18 до 1.20_03.
 
 =item *
 
-L<Exporter> has been upgraded from version 5.68 to 5.70.
+L<Exporter> был обновлён с версии 5.68 до 5.70.
 
 =item *
 
-L<ExtUtils::CBuilder> has been upgraded from version 0.280210 to 0.280216.
+L<ExtUtils::CBuilder> был обновлён с версии 0.280210 до 0.280216.
 
 =item *
 
-L<ExtUtils::Command> has been upgraded from version 1.17 to 1.18.
+L<ExtUtils::Command> был обновлён с версии 1.17 до 1.18.
 
 =item *
 
-L<ExtUtils::Embed> has been upgraded from version 1.30 to 1.32.
+L<ExtUtils::Embed> был обновлён с версии 1.30 до 1.32.
 
 =item *
 
-L<ExtUtils::Install> has been upgraded from version 1.59 to 1.67.
+L<ExtUtils::Install> был обновлён с версии 1.59 до 1.67.
 
 =item *
 
-L<ExtUtils::MakeMaker> has been upgraded from version 6.66 to 6.98.
+L<ExtUtils::MakeMaker> был обновлён с версии 6.66 до 6.98.
 
 =item *
 
-L<ExtUtils::Miniperl> has been upgraded from version  to 1.01.
+L<ExtUtils::Miniperl> был обновлён с версии  до 1.01.
 
 =item *
 
-L<ExtUtils::ParseXS> has been upgraded from version 3.18 to 3.24.
+L<ExtUtils::ParseXS> был обновлён с версии 3.18 до 3.24.
 
 =item *
 
-L<ExtUtils::Typemaps> has been upgraded from version 3.19 to 3.24.
+L<ExtUtils::Typemaps> был обновлён с версии 3.19 до 3.24.
 
 =item *
 
-L<ExtUtils::XSSymSet> has been upgraded from version 1.2 to 1.3.
+L<ExtUtils::XSSymSet> был обновлён с версии 1.2 до 1.3.
 
 =item *
 
-L<feature> has been upgraded from version 1.32 to 1.36.
+L<feature> был обновлён с версии 1.32 до 1.36.
 
 =item *
 
-L<fields> has been upgraded from version 2.16 to 2.17.
+L<fields> был обновлён с версии 2.16 до 2.17.
 
 =item *
 
-L<File::Basename> has been upgraded from version 2.84 to 2.85.
+L<File::Basename> был обновлён с версии 2.84 до 2.85.
 
 =item *
 
-L<File::Copy> has been upgraded from version 2.26 to 2.29.
+L<File::Copy> был обновлён с версии 2.26 до 2.29.
 
 =item *
 
-L<File::DosGlob> has been upgraded from version 1.10 to 1.12.
+L<File::DosGlob> был обновлён с версии 1.10 до 1.12.
 
 =item *
 
-L<File::Fetch> has been upgraded from version 0.38 to 0.48.
+L<File::Fetch> был обновлён с версии 0.38 до 0.48.
 
 =item *
 
-L<File::Find> has been upgraded from version 1.23 to 1.27.
+L<File::Find> был обновлён с версии 1.23 до 1.27.
 
 =item *
 
-L<File::Glob> has been upgraded from version 1.20 to 1.23.
+L<File::Glob> был обновлён с версии 1.20 до 1.23.
 
 =item *
 
-L<File::Spec> has been upgraded from version 3.40 to 3.47.
+L<File::Spec> был обновлён с версии 3.40 до 3.47.
 
 =item *
 
-L<File::Temp> has been upgraded from version 0.23 to 0.2304.
+L<File::Temp> был обновлён с версии 0.23 до 0.2304.
 
 =item *
 
-L<FileCache> has been upgraded from version 1.08 to 1.09.
+L<FileCache> был обновлён с версии 1.08 до 1.09.
 
 =item *
 
-L<Filter::Simple> has been upgraded from version 0.89 to 0.91.
+L<Filter::Simple> был обновлён с версии 0.89 до 0.91.
 
 =item *
 
-L<Filter::Util::Call> has been upgraded from version 1.45 to 1.49.
+L<Filter::Util::Call> был обновлён с версии 1.45 до 1.49.
 
 =item *
 
-L<Getopt::Long> has been upgraded from version 2.39 to 2.42.
+L<Getopt::Long> был обновлён с версии 2.39 до 2.42.
 
 =item *
 
-L<Getopt::Std> has been upgraded from version 1.07 to 1.10.
+L<Getopt::Std> был обновлён с версии 1.07 до 1.10.
 
 =item *
 
-L<Hash::Util::FieldHash> has been upgraded from version 1.10 to 1.15.
+L<Hash::Util::FieldHash> был обновлён с версии 1.10 до 1.15.
 
 =item *
 
-L<HTTP::Tiny> has been upgraded from version 0.025 to 0.043.
+L<HTTP::Tiny> был обновлён с версии 0.025 до 0.043.
 
 =item *
 
-L<I18N::Langinfo> has been upgraded from version 0.10 to 0.11.
+L<I18N::Langinfo> был обновлён с версии 0.10 до 0.11.
 
 =item *
 
-L<I18N::LangTags> has been upgraded from version 0.39 to 0.40.
+L<I18N::LangTags> был обновлён с версии 0.39 до 0.40.
 
 =item *
 
-L<if> has been upgraded from version 0.0602 to 0.0603.
+L<if> был обновлён с версии 0.0602 до 0.0603.
 
 =item *
 
-L<inc::latest> has been upgraded from version 0.4003 to 0.4205.
-NOTE: L<inc::latest> is deprecated and may be removed from a future version of Perl.
+L<inc::latest> был обновлён с версии 0.4003 до 0.4205.
+Внимание: L<inc::latest> устарел и может быть удалён из будущей версии Perl.
 
 =item *
 
-L<integer> has been upgraded from version 1.00 to 1.01.
+L<integer> был обновлён с версии 1.00 до 1.01.
 
 =item *
 
-L<IO> has been upgraded from version 1.28 to 1.31.
+L<IO> был обновлён с версии 1.28 до 1.31.
 
 =item *
 
-L<IO::Compress::Gzip> and friends have been upgraded from version 2.060 to
-2.064.
+L<IO::Compress::Gzip> и друзья были обновлены с версии 2.060 до 2.064.
 
 =item *
 
-L<IPC::Cmd> has been upgraded from version 0.80 to 0.92.
+L<IPC::Cmd> был обновлён с версии 0.80 до 0.92.
 
 =item *
 
-L<IPC::Open3> has been upgraded from version 1.13 to 1.16.
+L<IPC::Open3> был обновлён с версии 1.13 до 1.16.
 
 =item *
 
-L<IPC::SysV> has been upgraded from version 2.03 to 2.04.
+L<IPC::SysV> был обновлён с версии 2.03 до 2.04.
 
 =item *
 
-L<JSON::PP> has been upgraded from version 2.27202 to 2.27203.
+L<JSON::PP> был обновлён с версии 2.27202 до 2.27203.
 
 =item *
 
-L<List::Util> has been upgraded from version 1.27 to 1.38.
+L<List::Util> был обновлён с версии 1.27 до 1.38.
 
 =item *
 
-L<locale> has been upgraded from version 1.02 to 1.03.
+L<locale> был обновлён с версии 1.02 до 1.03.
 
 =item *
 
-L<Locale::Codes> has been upgraded from version 3.25 to 3.30.
+L<Locale::Codes> был обновлён с версии 3.25 до 3.30.
 
 =item *
 
-L<Locale::Maketext> has been upgraded from version 1.23 to 1.25.
+L<Locale::Maketext> был обновлён с версии 1.23 до 1.25.
 
 =item *
 
-L<Math::BigInt> has been upgraded from version 1.9991 to 1.9993.
+L<Math::BigInt> был обновлён с версии 1.9991 до 1.9993.
 
 =item *
 
-L<Math::BigInt::FastCalc> has been upgraded from version 0.30 to 0.31.
+L<Math::BigInt::FastCalc> был обновлён с версии 0.30 до 0.31.
 
 =item *
 
-L<Math::BigRat> has been upgraded from version 0.2604 to 0.2606.
+L<Math::BigRat> был обновлён с версии 0.2604 до 0.2606.
 
 =item *
 
-L<MIME::Base64> has been upgraded from version 3.13 to 3.14.
+L<MIME::Base64> был обновлён с версии 3.13 до 3.14.
 
 =item *
 
-L<Module::Build> has been upgraded from version 0.4003 to 0.4205.
-NOTE: L<Module::Build> is deprecated and may be removed from a future version of Perl.
+L<Module::Build> был обновлён с версии 0.4003 до 0.4205.
+Внимание: L<Module::Build> устарел и может быть удалён из будущей версии Perl.
 
 =item *
 
-L<Module::CoreList> has been upgraded from version 2.89 to 3.10.
+L<Module::CoreList> был обновлён с версии 2.89 до 3.10.
 
 =item *
 
-L<Module::Load> has been upgraded from version 0.24 to 0.32.
+L<Module::Load> был обновлён с версии 0.24 до 0.32.
 
 =item *
 
-L<Module::Load::Conditional> has been upgraded from version 0.54 to 0.62.
+L<Module::Load::Conditional> был обновлён с версии 0.54 до 0.62.
 
 =item *
 
-L<Module::Metadata> has been upgraded from version 1.000011 to 1.000019.
+L<Module::Metadata> был обновлён с версии 1.000011 до 1.000019.
 
 =item *
 
-L<mro> has been upgraded from version 1.11 to 1.16.
+L<mro> был обновлён с версии 1.11 до 1.16.
 
 =item *
 
-L<Net::Ping> has been upgraded from version 2.41 to 2.43.
+L<Net::Ping> был обновлён с версии 2.41 до 2.43.
 
 =item *
 
-L<Opcode> has been upgraded from version 1.25 to 1.27.
+L<Opcode> был обновлён с версии 1.25 до 1.27.
 
 =item *
 
-L<Package::Constants> has been upgraded from version 0.02 to 0.04.
-NOTE: L<Package::Constants> is deprecated and may be removed from a future version of Perl.
+L<Package::Constants> был обновлён с версии 0.02 до 0.04.
+Внимание: L<Package::Constants> устарел и может быть удалён из будущей версии Perl.
 
 =item *
 
-L<Params::Check> has been upgraded from version 0.36 to 0.38.
+L<Params::Check> был обновлён с версии 0.36 до 0.38.
 
 =item *
 
-L<parent> has been upgraded from version 0.225 to 0.228.
+L<parent> был обновлён с версии 0.225 до 0.228.
 
 =item *
 
-L<Parse::CPAN::Meta> has been upgraded from version 1.4404 to 1.4414.
+L<Parse::CPAN::Meta> был обновлён с версии 1.4404 до 1.4414.
 
 =item *
 
-L<Perl::OSType> has been upgraded from version 1.003 to 1.007.
+L<Perl::OSType> был обновлён с версии 1.003 до 1.007.
 
 =item *
 
-L<perlfaq> has been upgraded from version 5.0150042 to 5.0150044.
+L<perlfaq> был обновлён с версии 5.0150042 до 5.0150044.
 
 =item *
 
-L<PerlIO> has been upgraded from version 1.07 to 1.09.
+L<PerlIO> был обновлён с версии 1.07 до 1.09.
 
 =item *
 
-L<PerlIO::encoding> has been upgraded from version 0.16 to 0.18.
+L<PerlIO::encoding> был обновлён с версии 0.16 до 0.18.
 
 =item *
 
-L<PerlIO::scalar> has been upgraded from version 0.16 to 0.18.
+L<PerlIO::scalar> был обновлён с версии 0.16 до 0.18.
 
 =item *
 
-L<PerlIO::via> has been upgraded from version 0.12 to 0.14.
+L<PerlIO::via> был обновлён с версии 0.12 до 0.14.
 
 =item *
 
-L<Pod::Escapes> has been upgraded from version 1.04 to 1.06.
+L<Pod::Escapes> был обновлён с версии 1.04 до 1.06.
 
 =item *
 
-L<Pod::Functions> has been upgraded from version 1.06 to 1.08.
+L<Pod::Functions> был обновлён с версии 1.06 до 1.08.
 
 =item *
 
-L<Pod::Html> has been upgraded from version 1.18 to 1.21.
+L<Pod::Html> был обновлён с версии 1.18 до 1.21.
 
 =item *
 
-L<Pod::Parser> has been upgraded from version 1.60 to 1.62.
+L<Pod::Parser> был обновлён с версии 1.60 до 1.62.
 
 =item *
 
-L<Pod::Perldoc> has been upgraded from version 3.19 to 3.23.
+L<Pod::Perldoc> был обновлён с версии 3.19 до 3.23.
 
 =item *
 
-L<Pod::Usage> has been upgraded from version 1.61 to 1.63.
+L<Pod::Usage> был обновлён с версии 1.61 до 1.63.
 
 =item *
 
-L<POSIX> has been upgraded from version 1.32 to 1.38_03.
+L<POSIX> был обновлён с версии 1.32 до 1.38_03.
 
 =item *
 
-L<re> has been upgraded from version 0.23 to 0.26.
+L<re> был обновлён с версии 0.23 до 0.26.
 
 =item *
 
-L<Safe> has been upgraded from version 2.35 to 2.37.
+L<Safe> был обновлён с версии 2.35 до 2.37.
 
 =item *
 
-L<Scalar::Util> has been upgraded from version 1.27 to 1.38.
+L<Scalar::Util> был обновлён с версии 1.27 до 1.38.
 
 =item *
 
-L<SDBM_File> has been upgraded from version 1.09 to 1.11.
+L<SDBM_File> был обновлён с версии 1.09 до 1.11.
 
 =item *
 
-L<Socket> has been upgraded from version 2.009 to 2.013.
+L<Socket> был обновлён с версии 2.009 до 2.013.
 
 =item *
 
-L<Storable> has been upgraded from version 2.41 to 2.49.
+L<Storable> был обновлён с версии 2.41 до 2.49.
 
 =item *
 
-L<strict> has been upgraded from version 1.07 to 1.08.
+L<strict> был обновлён с версии 1.07 до 1.08.
 
 =item *
 
-L<subs> has been upgraded from version 1.01 to 1.02.
+L<subs> был обновлён с версии 1.01 до 1.02.
 
 =item *
 
-L<Sys::Hostname> has been upgraded from version 1.17 to 1.18.
+L<Sys::Hostname> был обновлён с версии 1.17 до 1.18.
 
 =item *
 
-L<Sys::Syslog> has been upgraded from version 0.32 to 0.33.
+L<Sys::Syslog> был обновлён с версии 0.32 до 0.33.
 
 =item *
 
-L<Term::Cap> has been upgraded from version 1.13 to 1.15.
+L<Term::Cap> был обновлён с версии 1.13 до 1.15.
 
 =item *
 
-L<Term::ReadLine> has been upgraded from version 1.12 to 1.14.
+L<Term::ReadLine> был обновлён с версии 1.12 до 1.14.
 
 =item *
 
-L<Test::Harness> has been upgraded from version 3.26 to 3.30.
+L<Test::Harness> был обновлён с версии 3.26 до 3.30.
 
 =item *
 
-L<Test::Simple> has been upgraded from version 0.98 to 1.001002.
+L<Test::Simple> был обновлён с версии 0.98 до 1.001002.
 
 =item *
 
-L<Text::ParseWords> has been upgraded from version 3.28 to 3.29.
+L<Text::ParseWords> был обновлён с версии 3.28 до 3.29.
 
 =item *
 
-L<Text::Tabs> has been upgraded from version 2012.0818 to 2013.0523.
+L<Text::Tabs> был обновлён с версии 2012.0818 до 2013.0523.
 
 =item *
 
-L<Text::Wrap> has been upgraded from version 2012.0818 to 2013.0523.
+L<Text::Wrap> был обновлён с версии 2012.0818 до 2013.0523.
 
 =item *
 
-L<Thread> has been upgraded from version 3.02 to 3.04.
+L<Thread> был обновлён с версии 3.02 до 3.04.
 
 =item *
 
-L<Thread::Queue> has been upgraded from version 3.02 to 3.05.
+L<Thread::Queue> был обновлён с версии 3.02 до 3.05.
 
 =item *
 
-L<threads> has been upgraded from version 1.86 to 1.93.
+L<threads> был обновлён с версии 1.86 до 1.93.
 
 =item *
 
-L<threads::shared> has been upgraded from version 1.43 to 1.46.
+L<threads::shared> был обновлён с версии 1.43 до 1.46.
 
 =item *
 
-L<Tie::Array> has been upgraded from version 1.05 to 1.06.
+L<Tie::Array> был обновлён с версии 1.05 до 1.06.
 
 =item *
 
-L<Tie::File> has been upgraded from version 0.99 to 1.00.
+L<Tie::File> был обновлён с версии 0.99 до 1.00.
 
 =item *
 
-L<Tie::Hash> has been upgraded from version 1.04 to 1.05.
+L<Tie::Hash> был обновлён с версии 1.04 до 1.05.
 
 =item *
 
-L<Tie::Scalar> has been upgraded from version 1.02 to 1.03.
+L<Tie::Scalar> был обновлён с версии 1.02 до 1.03.
 
 =item *
 
-L<Tie::StdHandle> has been upgraded from version 4.3 to 4.4.
+L<Tie::StdHandle> был обновлён с версии 4.3 до 4.4.
 
 =item *
 
-L<Time::HiRes> has been upgraded from version 1.9725 to 1.9726.
+L<Time::HiRes> был обновлён с версии 1.9725 до 1.9726.
 
 =item *
 
-L<Time::Piece> has been upgraded from version 1.20_01 to 1.27.
+L<Time::Piece> был обновлён с версии 1.20_01 до 1.27.
 
 =item *
 
-L<Unicode::Collate> has been upgraded from version 0.97 to 1.04.
+L<Unicode::Collate> был обновлён с версии 0.97 до 1.04.
 
 =item *
 
-L<Unicode::Normalize> has been upgraded from version 1.16 to 1.17.
+L<Unicode::Normalize> был обновлён с версии 1.16 до 1.17.
 
 =item *
 
-L<Unicode::UCD> has been upgraded from version 0.51 to 0.57.
+L<Unicode::UCD> был обновлён с версии 0.51 до 0.57.
 
 =item *
 
-L<utf8> has been upgraded from version 1.10 to 1.13.
+L<utf8> был обновлён с версии 1.10 до 1.13.
 
 =item *
 
-L<version> has been upgraded from version 0.9902 to 0.9908.
+L<version> был обновлён с версии 0.9902 до 0.9908.
 
 =item *
 
-L<vmsish> has been upgraded from version 1.03 to 1.04.
+L<vmsish> был обновлён с версии 1.03 до 1.04.
 
 =item *
 
-L<warnings> has been upgraded from version 1.18 to 1.23.
+L<warnings> был обновлён с версии 1.18 до 1.23.
 
 =item *
 
-L<Win32> has been upgraded from version 0.47 to 0.49.
+L<Win32> был обновлён с версии 0.47 до 0.49.
 
 =item *
 
-L<XS::Typemap> has been upgraded from version 0.10 to 0.13.
+L<XS::Typemap> был обновлён с версии 0.10 до 0.13.
 
 =item *
 
-L<XSLoader> has been upgraded from version 0.16 to 0.17.
+L<XSLoader> был обновлён с версии 0.16 до 0.17.
 
 =back
 
-=head1 Documentation
+=head1 Документация
 
-=head2 New Documentation
+=head2 Новая документация
 
 =head3 L<perlrepository>
 
-This document was removed (actually, renamed L<perlgit> and given a major
-overhaul) in Perl v5.14, causing Perl documentation websites to show the now
-out of date version in Perl v5.12 as the latest version.  It has now been
-restored in stub form, directing readers to current information.
+Этот документ был удалён (на самом деле переименован в L<perlgit>, получив
+тщательный пересмотр) в Perl v5.14, приведя к тому, что веб-сайты с
+документацией Perl показывали устаревшую версию из Perl v5.12 как последнюю
+версию. Теперь он был восстановлен в форме заглушки, направляя читателя к
+текущей информации.
 
-=head2 Changes to Existing Documentation
+=head2 Изменения в существующей документации
 
 =head3 L<perldata>
 
@@ -1209,8 +1215,8 @@ restored in stub form, directing readers to current information.
 
 =item *
 
-New sections have been added to document the new index/value array slice and
-key/value hash slice syntax.
+В документ Была добавлена новая секция о новом синтаксисе идекса/значения среза
+массива и ключе/значении среза хэша.
 
 =back
 
@@ -1220,8 +1226,8 @@ key/value hash slice syntax.
 
 =item *
 
-The C<DB::goto> and C<DB::lsub> debugger subroutines are now documented.  [perl
-#77680]
+Подпрограммы отладчика C<DB::goto> и C<DB::lsub> теперь задокументированы.
+[perl #77680]
 
 =back
 
@@ -1231,21 +1237,22 @@ The C<DB::goto> and C<DB::lsub> debugger subroutines are now documented.  [perl
 
 =item *
 
-C<\s> matching C<\cK> is marked experimental.
+C<\s>, совпадающее с C<\cK>, отмечено как экспериментальное.
 
 =item *
 
-ithreads were accepted in v5.8.0 (but are discouraged as of v5.20.0).
+ithreads были приняты в v5.8.0 (но не рекомендуются с v5.20.0).
 
 =item *
 
-Long doubles are not considered experimental.
+Числа с плавающей запятой выше двойной точности больше не рассматриваются
+экспериментальными.
 
 =item *
 
-Code in regular expressions, regular expression backtracking verbs,
-and lvalue subroutines are no longer listed as experimental.  (This
-also affects L<perlre> and L<perlsub>.)
+Код в регулярных выражениях, перебор с возвратом в регулярных выражениях и
+lvalue-подпрограммы больше не указываются как экспериментальные. (Это также
+затрагивает L<perlre> и L<perlsub>.)
 
 =back
 
@@ -1255,34 +1262,34 @@ also affects L<perlre> and L<perlsub>.)
 
 =item *
 
-C<chop> and C<chomp> now note that they can reset the hash iterator.
+В C<chop> и C<chomp> теперь есть замечание, что они могут сбросить итератор
+хеша.
 
 =item *
 
-C<exec>'s handling of arguments is now more clearly documented.
+Обработка аргументов в C<exec> теперь задокументирована более чётко.
 
 =item *
 
-C<eval EXPR> now has caveats about expanding floating point numbers in some
-locales.
+C<eval EXPR> теперь содержит предупреждение о расширении чисел с плавающей
+запятой в некоторых локалях.
 
 =item *
 
-C<goto EXPR> is now documented to handle an expression that evalutes to a
-code reference as if it was C<goto &$coderef>.  This behavior is at least ten
-years old.
+В C<goto EXPR> теперь задокументировано, что поддерживаются выражения, которые
+вычисляются в ссылку на код, как если было записано C<goto &$coderef>. Такому
+поведению уже как минимум десять лет.
 
 =item *
 
-Since Perl v5.10, it has been possible for subroutines in C<@INC> to return
-a reference to a scalar holding initial source code to prepend to the file.
-This is now documented.
+Начиная с Perl v5.10, присутствовала возможность для подпрограмм в C<@INC>
+возвращать ссылку на скаляр, содержащий начальный фрагмент исходного кода для
+вставки в начало файла. Теперь это задокументировано.
 
 =item *
 
-The documentation of C<ref> has been updated to recommend the use of
-C<blessed>, C<isa> and C<reftype> when dealing with references to blessed
-objects.
+Была обновлена документация C<ref> с рекомендацией использования C<blessed>,
+C<isa> и C<reftype> при работе с ссылками на благословлённые объекты.
 
 =back
 
@@ -1292,13 +1299,13 @@ objects.
 
 =item *
 
-Numerous minor changes have been made to reflect changes made to the perl
-internals in this release.
+Было сделано несколько небольших изменений, отражающих внутренние изменения
+сделанные в этом релизе perl.
 
 =item *
 
-New sections on L<Read-Only Values|perlguts/"Read-Only Values"> and
-L<Copy on Write|perlguts/"Copy on Write"> have been added.
+Были добавлены новые секции: L<Значения только для чтения|perlguts/"Read-Only Values"> и
+L<Копирование при записи|perlguts/"Copy on Write">
 
 =back
 
@@ -1308,8 +1315,8 @@ L<Copy on Write|perlguts/"Copy on Write"> have been added.
 
 =item *
 
-The L<Super Quick Patch Guide|perlhack/SUPER QUICK PATCH GUIDE> section has
-been updated.
+Была обновлена секция L<Супер быстрое руководство по патчам|perlhack/SUPER
+QUICK PATCH GUIDE>.
 
 =back
 
@@ -1319,8 +1326,7 @@ been updated.
 
 =item *
 
-The documentation has been updated to include some more examples of C<gdb>
-usage.
+Обновлена документация, включившая ещё несколько примеров использования C<gdb>.
 
 =back
 
