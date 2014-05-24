@@ -1336,11 +1336,11 @@ QUICK PATCH GUIDE>.
 
 =item *
 
-The L<perllexwarn> documentation used to describe the hierarchy of warning
-categories understood by the L<warnings> pragma. That description has now
-been moved to the L<warnings> documentation itself, leaving L<perllexwarn>
-as a stub that points to it. This change consolidates all documentation for
-lexical warnings in a single place.
+Документация L<perllexwarn> раньше описывала иерархию категорий предупреждений,
+которые понимает прагма L<warnings>. Это описание теперь перенесено в саму
+документацию L<warnings>, оставляя L<perllexwarn> как заглушку к ней. Это
+изменение объединяет всю документацию для лексчиеских предупреждений в одном
+месте.
 
 =back
 
@@ -1350,8 +1350,8 @@ lexical warnings in a single place.
 
 =item *
 
-The documentation now mentions F<fc()> and C<\F>, and includes many
-clarifications and corrections in general.
+Документация теперь упоминает F<fc()> и C<\F>, и включает множество общих
+пояснений и исправлений.
 
 =back
 
@@ -1361,8 +1361,8 @@ clarifications and corrections in general.
 
 =item *
 
-The language design of Perl has always called for monomorphic operators.
-This is now mentioned explicitly.
+Дизайн языка Perl всегда призывал к мономорфным оператором. Теперь это
+упоминается явно.
 
 =back
 
@@ -1372,13 +1372,13 @@ This is now mentioned explicitly.
 
 =item *
 
-The C<open> tutorial has been completely rewritten by Tom Christiansen, and now
-focuses on covering only the basics, rather than providing a comprehensive
-reference to all things openable.  This rewrite came as the result of a
-vigorous discussion on perl5-porters kicked off by a set of improvements
-written by Alexander Hartmaier to the existing L<perlopentut>.  A "more than
-you ever wanted to know about C<open>" document may follow in subsequent
-versions of perl.
+Руководство по C<open> было полностью переписано Томом Кристиансеном и теперь
+фокусируется на раскрытии только основ, вместо предоставления всеобъемлющей
+документации по всем вещам, которые можно открыть. Эта работа появилась
+вследствие активного обсуждения в perl5-porters начатое с набора улучшений,
+написанных Александром Хартмайером в существующий L<perlopentut>. Документ
+"больше, чем вы когда-либо захотите узнать об C<open>" может последовать в
+следующих версиях perl.
 
 =back
 
@@ -1388,18 +1388,18 @@ versions of perl.
 
 =item *
 
-The fact that the regexp engine makes no effort to call (?{}) and (??{})
-constructs any specified number of times (although it will basically DWIM
-in case of a successful match) has been documented.
+Тот факт, что движок регулярных выражений не делает попыток вызова конструкций
+(?{}) и (??{}) любое указанное число раз (хотя он в целом DWIM в случае
+успешного совпадения) было задокументировано.
 
 =item *
 
-The C</r> modifier (for non-destructive substitution) is now documented. [perl
+C</r> модификатор (для недеструктивных замен) теперь задокументирован.[perl
 #119151]
 
 =item *
 
-The documentation for C</x> and C<(?# comment)> has been expanded and clarified.
+Документация для C</x> и C<(?# comment)> была расширена и прояснена.
 
 =back
 
@@ -1409,8 +1409,7 @@ The documentation for C</x> and C<(?# comment)> has been expanded and clarified.
 
 =item *
 
-The documentation has been updated in the light of recent changes to
-F<regcomp.c>.
+Документация была обновлена в свете последних изменений в F<regcomp.c>.
 
 =back
 
@@ -1420,13 +1419,14 @@ F<regcomp.c>.
 
 =item *
 
-The need to predeclare recursive functions with prototypes in order for the
-prototype to be honoured in the recursive call is now documented. [perl #2726]
+Теперь задокументирована необходимость предекларации рекурсивных функций
+прототипами для того, чтобы эти прототипы учитывались в рекурсивных вызовах.
+[perl #2726]
 
 =item *
 
-A list of subroutine names used by the perl implementation is now included.
-[perl #77680]
+Теперь включён список имён подпрограмм, используемые в реализации perl. [perl
+#77680]
 
 =back
 
@@ -1436,7 +1436,7 @@ A list of subroutine names used by the perl implementation is now included.
 
 =item *
 
-There is now a L<JavaScript|perltrap/JavaScript Traps> section.
+Появилась секция L<JavaScript|perltrap/JavaScript Traps>.
 
 =back
 
@@ -1446,8 +1446,7 @@ There is now a L<JavaScript|perltrap/JavaScript Traps> section.
 
 =item *
 
-The documentation has been updated to reflect C<Bidi_Class> changes in
-Unicode 6.3.
+Обновлена документация для отражения изменений в C<Bidi_Class> в Юникоде 6.3.
 
 =back
 
@@ -1457,14 +1456,14 @@ Unicode 6.3.
 
 =item *
 
-A new section explaining the performance issues of $`, $& and $', including
-workarounds and changes in different versions of Perl, has been added.
+Была добавлена новая секция, объясняющая проблемы с производительностью в $`,
+$& и $', включая способы обхода и изменения в различных версиях Perl.
 
 =item *
 
-Three L<English> variable names which have long been documented but do not
-actually exist have been removed from the documentation.  These were
-C<$OLD_PERL_VERSION>, C<$OFMT>, and C<$ARRAY_BASE>.
+Три L<English> имени переменных, которые долго были задокументированы, но на
+самом деле не существовали, были удалены из документации. Это были
+C<$OLD_PERL_VERSION>, C<$OFMT> и C<$ARRAY_BASE>.
 
 =back
 
@@ -1474,19 +1473,19 @@ C<$OLD_PERL_VERSION>, C<$OFMT>, and C<$ARRAY_BASE>.
 
 =item *
 
-Several problems in the C<MY_CXT> example have been fixed.
+Было исправлено несколько проблем в примере C<MY_CXT>.
 
 =back
 
-=head1 Diagnostics
+=head1 Диагностика
 
-The following additions or changes have been made to diagnostic output,
-including warnings and fatal error messages.  For the complete list of
-diagnostic messages, see L<perldiag>.
+Следующие дополнения и изменения было сделано в диагностическом вывод, включая
+предупреждения и фатальные сообщения об ошибках. Для полного списка
+диагностических сообщений смотрите L<perldiag>.
 
-=head2 New Diagnostics
+=head2 Новая диагностика
 
-=head3 New Errors
+=head3 Новые ошибки
 
 =over 4
 
