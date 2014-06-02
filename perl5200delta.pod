@@ -1493,32 +1493,32 @@ C<$OLD_PERL_VERSION>, C<$OFMT> и C<$ARRAY_BASE>.
 
 L<delete argument is indexE<sol>value array slice, use array slice|perldiag/"delete argument is index/value array slice, use array slice">
 
-(F) You used index/value array slice syntax (C<%array[...]>) as the argument to
-C<delete>.  You probably meant C<@array[...]> with an @ symbol instead.
+Вы использовали синтаксис индекс/значение среза массива (C<%array[...]>) как
+аргумент для C<delete>. Вероятно вы имели ввиду C<@array[...]> с символом @.
 
 =item *
 
 L<delete argument is keyE<sol>value hash slice, use hash slice|perldiag/"delete argument is key/value hash slice, use hash slice">
 
-(F) You used key/value hash slice syntax (C<%hash{...}>) as the argument to
-C<delete>.  You probably meant C<@hash{...}> with an @ symbol instead.
+Вы использовали синтаксис среза ключ/значение (C<%hash{...}>) как аргумент для
+C<delete>. Вероятно вы имели ввиду C<@hash{...}> с символом @.
 
 =item *
 
 L<Magical list constants are not supported|perldiag/"Magical list constants are
 not supported">
 
-(F) You assigned a magical array to a stash element, and then tried to use the
-subroutine from the same slot.  You are asking Perl to do something it cannot
-do, details subject to change between Perl versions.
+Вы присвоили магический массив элементу стэша и затем попытались использовать
+подпрограмму из этого же слота. Вы попросили сделать Perl то, что он не в
+состоянии, детали зависят от версии Perl.
 
 =item *
 
-Added L<Setting $E<sol> to a %s reference is forbidden|perldiag/"Setting $E<sol> to %s reference is forbidden">
+Добавлена L<Setting $E<sol> to a %s reference is forbidden|perldiag/"Setting $E<sol> to %s reference is forbidden">
 
 =back
 
-=head3 New Warnings
+=head3 Новые предупреждения
 
 =over 4
 
@@ -1526,22 +1526,22 @@ Added L<Setting $E<sol> to a %s reference is forbidden|perldiag/"Setting $E<sol>
 
 L<%s on reference is experimental|perldiag/"push on reference is experimental">:
 
-The "auto-deref" feature is experimental.
+Возможность "авто-разыменования" является экспериментальной.
 
-Starting in v5.14.0, it was possible to use push, pop, keys, and other
-built-in functions not only on aggregate types, but on references to
-them.  The feature was not deployed to its original intended
-specification, and now may become redundant to postfix dereferencing.
-It has always been categorized as an experimental feature, and in
-v5.20.0 is carries a warning as such.
+Начиная с v5.14.0 стало возможно использовать push, pop, keys и другие
+встроенные функции не только на соответствующих типах данных, но и ссылках на
+них. Эта возможность не была распространена согласно своей спецификации и
+теперь стала излишней в свете постфиксного разыменования. Она всегда относилась
+к экспериментальным возможностям и в v5.20.0 имеет соответствующее
+предупреждение.
 
-Warnings will now be issued at compile time when these operations are
-detected.
+Теперь выводится предупреждение во время компиляции, если обнаруживаются
+подобные операции.
 
   no if $] >= 5.01908, warnings => "experimental::autoderef";
 
-Consider, though, replacing the use of these features, as they may
-change behavior again before becoming stable.
+Тем не менее, рассмотрите возможность замены подобной возможности, так как её
+поведение может измениться после того, как она станет стабильной.
 
 =item *
 
@@ -1549,59 +1549,63 @@ L<A sequence of multiple spaces in a charnames alias definition is deprecated|pe
 
 L<Trailing white-space in a charnames alias definition is deprecated|perldiag/"Trailing white-space in a charnames alias definition is deprecated">
 
-These two deprecation warnings involving C<\N{...}> were incorrectly
-implemented.  They did not warn by default (now they do) and could not be
-made fatal via C<< use warnings FATAL => 'deprecated' >> (now they can).
+Эти два предупреждения об устаревших конструкциях, касающиеся C<\N{...}>, были
+неправильно реализованы. Они не выводили предупреждения (теперь выводят) и не
+могли быть сделаны фатальными через C<< use warnings FATAL => 'deprecated' >>
+(теперь могут).
 
 =item *
 
 L<Attribute prototype(%s) discards earlier prototype attribute in same sub|perldiag/"Attribute prototype(%s) discards earlier prototype attribute in same sub">
 
-(W misc) A sub was declared as C<sub foo : prototype(A) : prototype(B) {}>, for
-example.  Since each sub can only have one prototype, the earlier
-declaration(s) are discarded while the last one is applied.
+(W misc) Подпрограмма была объявлена, например, как C<sub foo : prototype(A) :
+prototype(B) {}>. Так как каждая подпрограмма может иметь только один прототип,
+ранние объявления отбрасываются и используется последнее.
 
 =item *
 
 L<Invalid \0 character in %s for %s: %s\0%s|perldiag/"Invalid \0 character in %s for %s: %s\0%s">
 
-(W syscalls) Embedded \0 characters in pathnames or other system call arguments
-produce a warning as of 5.20.  The parts after the \0 were formerly ignored by
-system calls.
+(W syscalls) Встроенный символ \0 в файловых путях или в аргументах других
+системных вызовов, начиная с 5.20, приводит к предупреждениям. Часть после \0
+раньше игнорировалась в системных вызовах.
 
 =item *
 
 L<Matched non-Unicode code point 0x%X against Unicode property; may not be portable|perldiag/"Matched non-Unicode code point 0x%X against Unicode property; may not be portable">.
 
-This replaces the message "Code point 0x%X is not Unicode, all \p{} matches
-fail; all \P{} matches succeed".
+Это заменяет сообщение "Code point 0x%X is not Unicode, all \p{} matches fail;
+all \P{} matches succeed". (Код символа 0x%X не является Юникод-символом, поиск
+совпадения \p{} всегда неудачен, а \P{} всегда успешен.)
 
 =item *
 
 L<Missing ']' in prototype for %s : %s|perldiag/"Missing ']' in prototype for %s : %s">
 
-(W illegalproto) A grouping was started with C<[> but never closed with C<]>.
+(W illegalproto) Группировка была начата с C<[> но не была закрыта завершающим
+C<]>.
 
 =item *
 
 L<Possible precedence issue with control flow operator|perldiag/"Possible precedence issue with control flow operator">
 
-(W syntax) There is a possible problem with the mixing of a control flow
-operator (e.g. C<return>) and a low-precedence operator like C<or>.  Consider:
+(W syntax) Возможна проблема при смешивании операторов управляющих исполнением
+(например, C<return>) и низко-приоритетных операторов, таких как C<or>.
+Рассмотрим:
 
     sub { return $a or $b; }
 
-This is parsed as:
+Это разбирается как:
 
     sub { (return $a) or $b; }
 
-Which is effectively just:
+Что эквивалентно:
 
     sub { return $a; }
 
-Either use parentheses or the high-precedence variant of the operator.
+Необходимо использовать либо скобки, либо более высоко-приоритетный оператор.
 
-Note this may be also triggered for constructs like:
+Предупреждение также может выводиться и для подобных конструкций:
 
     sub { 1 if die; }
 
@@ -1609,10 +1613,11 @@ Note this may be also triggered for constructs like:
 
 L<Postfix dereference is experimental|perldiag/"Postfix dereference is experimental">
 
-(S experimental::postderef) This warning is emitted if you use the experimental
-postfix dereference syntax.  Simply suppress the warning if you want to use the
-feature, but know that in doing so you are taking the risk of using an
-experimental feature which may change or be removed in a future Perl version:
+(S experimental::postderef) Это предупреждение выводится, если вы используете
+синтаксис экспериментального постфиксного разыменования. Просто подавляйте это
+предупреждение, если вы хотите использовать эту возможность, но знайте, что
+делая так вы берёте на себя риск использования экспериментальной возможности,
+которая может измениться или может быть удалена в будущих версиях Perl:
 
     no warnings "experimental::postderef";
     use feature "postderef", "postderef_qq";
@@ -1625,35 +1630,35 @@ experimental feature which may change or be removed in a future Perl version:
 
 L<Prototype '%s' overridden by attribute 'prototype(%s)' in %s|perldiag/"Prototype '%s' overridden by attribute 'prototype(%s)' in %s">
 
-(W prototype) A prototype was declared in both the parentheses after the sub
-name and via the prototype attribute.  The prototype in parentheses is useless,
-since it will be replaced by the prototype from the attribute before it's ever
-used.
+(W prototype) Прототип был объявлен и в скобках после имени подпрограммы, и
+с использованием атрибута prototype. Прототип в скобках бесполезен, так как он
+был заменён прототипом из атрибута раньше чем будет использован.
 
 =item *
 
 L<Scalar value @%s[%s] better written as $%s[%s]|perldiag/"Scalar value @%s[%s] better written as $%s[%s]">
 
-(W syntax) In scalar context, you've used an array index/value slice (indicated
-by %) to select a single element of an array.  Generally it's better to ask for
-a scalar value (indicated by $).  The difference is that C<$foo[&bar]> always
-behaves like a scalar, both in the value it returns and when evaluating its
-argument, while C<%foo[&bar]> provides a list context to its subscript, which
-can do weird things if you're expecting only one subscript.  When called in
-list context, it also returns the index (what C<&bar> returns) in addition to
-the value.
+(W syntax) В скалярном контексте вы использовали срез индекс/значение массива
+(на что указывает %), чтобы получить один элемент массива. Обычно лучше
+запрашивать скалярное значение (указывая $). Разница в том, что C<$foo[&bar]>
+всегда ведёт себя как скаляр, как при возвращение значения, так и вычислении
+своего аргумента, в том время как C<%foo[&bar]> создаёт списочный контекст для
+получателя, который может привести странным результатам, если вы ожидаете
+только одним элемент. При вызове в списочном контексте он также возвращает
+индекс (который возвращает C<&bar>) в дополнении к значению.
 
 =item *
 
 L<Scalar value @%s{%s} better written as $%s{%s}|perldiag/"Scalar value @%s{%s} better written as $%s{%s}">
 
-(W syntax) In scalar context, you've used a hash key/value slice (indicated by
-%) to select a single element of a hash.  Generally it's better to ask for a
-scalar value (indicated by $).  The difference is that C<$foo{&bar}> always
-behaves like a scalar, both in the value it returns and when evaluating its
-argument, while C<@foo{&bar}> and provides a list context to its subscript,
-which can do weird things if you're expecting only one subscript.  When called
-in list context, it also returns the key in addition to the value.
+(W syntax) В скалярном контексте вы использовали срез ключ/значение хеша (на
+что указывает %), чтобы получить один элемент хеша. Обычно лучше запрашивать
+скалярное значение (указывая $). Разница в том, что C<$foo{&bar}> всегда ведёт
+себя как скаляр, как при возвращение значения, так и вычислении своего
+аргумента, в том время как C<@foo{&bar}> создаёт списочный контекст для
+получателя, который может привести странным результатам, если вы ожидаете
+только одним элемент. При вызове в списочном контексте он также возвращает он
+также возвращает ключ в дополнении к значению.
 
 =item *
 
@@ -1663,83 +1668,87 @@ L<Setting $E<sol> to a reference to %s as a form of slurp is deprecated, treatin
 
 L<Unexpected exit %u|perldiag/"Unexpected exit %u">
 
-(S) exit() was called or the script otherwise finished gracefully when
-C<PERL_EXIT_WARN> was set in C<PL_exit_flags>.
+(S) Был вызван exit() или скрипт успешно завершился, если C<PERL_EXIT_WARN> был
+установлен в C<PL_exit_flags>.
 
 =item *
 
 L<Unexpected exit failure %d|perldiag/"Unexpected exit failure %d">
 
-(S) An uncaught die() was called when C<PERL_EXIT_WARN> was set in
+(S) Неперехваченный die() был вызван при C<PERL_EXIT_WARN> установленном в
 C<PL_exit_flags>.
 
 =item *
 
 L<Use of literal control characters in variable names is deprecated|perldiag/"Use of literal control characters in variable names is deprecated">
 
-(D deprecated) Using literal control characters in the source to refer to the
-^FOO variables, like $^X and ${^GLOBAL_PHASE} is now deprecated.  This only
-affects code like $\cT, where \cT is a control (like a C<SOH>) in the
-source code: ${"\cT"} and $^T remain valid.
+(D deprecated) Использование управляющих символов в исходном коде для ссылки на
+^FOO переменные, такие как $^X и ${^GLOBAL_PHASE}, теперь является устаревшим.
+Это затрагивает только код, подобный $\cT, где \cT -- это контрольный символ
+(как C<SOH>) в исходном коде: ${"\cT"} и $^T продолжают работать.
 
 =item *
 
 L<Useless use of greediness modifier|perldiag/"Useless use of greediness modifier '%c' in regex; marked by <-- HERE in m/%s/">
 
-This fixes [Perl #42957].
+Это исправляет ошибку [Perl #42957].
 
 =back
 
-=head2 Changes to Existing Diagnostics
+=head2 Изменения в существующей диагностике
 
 =over 4
 
 =item *
 
-Warnings and errors from the regexp engine are now UTF-8 clean.
+Предупреждения и ошибки движка регулярных выражений теперь содержат корректный
+UTF-8.
 
 =item *
 
-The "Unknown switch condition" error message has some slight changes.  This
-error triggers when there is an unknown condition in a C<(?(foo))> conditional.
-The error message used to read:
+Сообщение об ошибке "Unknown switch condition" (Неизвестное условие в
+переключателе) получило незначительное изменение. Это ошибка происходит, когда
+неизвестное условие в условном выражении C<(?(foo))>. Раньше сообщение выглядело
+так:
 
     Unknown switch condition (?(%s in regex;
 
-But what %s could be was mostly up to luck.  For C<(?(foobar))>, you might have
-seen "fo" or "f".  For Unicode characters, you would generally get a corrupted
-string.  The message has been changed to read:
+Но значение %s зависело от удачи. Для C<(?(foobar))>, вы могли видеть "fo" или
+"f". Для символов Юникод вы могли получить искаженную строку. Сообщение было
+изменено к следующему виду: 
 
     Unknown switch condition (?(...)) in regex;
 
-Additionally, the C<'E<lt>-- HERE'> marker in the error will now point to the
-correct spot in the regex.
+Дополнительно, маркер C<'E<lt>-- HERE'> в сообщении об ошибке теперь указывает
+на правильную позицию в регулярном выражении.
 
 =item *
 
-The "%s "\x%X" does not map to Unicode" warning is now correctly listed as a
-severe warning rather than as a fatal error.
+Предупреждение "%s "\x%X" does not map to Unicode" теперь корректно указано как
+строгое предупредение, а не фатальная ошибка.
 
 =item *
 
-Under rare circumstances, one could get a "Can't coerce readonly REF to
-string" instead of the customary "Modification of a read-only value".  This
-alternate error message has been removed.
+В некоторых редких случаях можно было получить сообщение "Can't coerce readonly REF to
+string" (не могу изменить ссылку, доступную только на чтение) вместо привычного
+"Modification of a read-only value" (модификация значения, доступного только на
+чтение). Это альтернативное сообщение было удалено.
 
 =item *
 
-"Ambiguous use of * resolved as operator *": This and similar warnings
-about "%" and "&" used to occur in some circumstances where there was no
-operator of the type cited, so the warning was completely wrong.  This has
-been fixed [perl #117535, #76910].
+Сообщение "Ambiguous use of * resolved as operator *" (неоднозначное использование *,
+используется как оператор *) о "%" и "&" раньше появлялось при некоторых
+условиях, там где отсутствовал процитированный оператор, поэтому предупреждение
+было полностью некорректным. Это было исправлено [perl #117535, #76910].
 
 =item *
 
-Warnings about malformed subroutine prototypes are now more consistent in
-how the prototypes are rendered.  Some of these warnings would truncate
-prototypes containing nulls.  In other cases one warning would suppress
-another.  The warning about illegal characters in prototypes no longer says
-"after '_'" if the bad character came before the underscore.
+Предупреждения о некорректных прототипах функций теперь больше соответствуют
+тому, как они отображаются. Некоторые из этих предупреждений будут урезать
+прототипы, которые содержат нулевой символ. В других случаях одно предупреждение
+будет подавлять другое. Предупреждение о некорректных символах в прототипах
+больше не выводят "after '_'" (после), если плохой символ появился до
+подчёркивания.
 
 =item *
 
@@ -1749,44 +1758,27 @@ mE<sol>%sE<sol>|perldiag/"Perl folding rules are not up-to-date for 0x%X;
 please use the perlbug utility to report; in regex; marked by <-- HERE in
 m/%s/">
 
-This message is now only in the regexp category, and not in the deprecated
-category.  It is still a default (i.e., severe) warning [perl #89648].
+Это сообщение теперь находится в категории регулярных выражений, а не в
+категории устаревших. Это по-прежнему предупреждение по умолчанию (т.е. строгое)
+[perl #89648].
 
 =item *
 
 L<%%s[%s] in scalar context better written as $%s[%s]|perldiag/"%%s[%s] in scalar context better written as $%s[%s]">
 
-This warning now occurs for any C<%array[$index]> or C<%hash{key}> known to
-be in scalar context at compile time.  Previously it was worded "Scalar
-value %%s[%s] better written as $%s[%s]".
+Это предупреждение теперь выводится для любого из C<%array[$index]> или
+C<%hash{key}>, если известно на этапе компиляции, что они в скалярном контексте.
+Ранее оно звучало как "Scalar value %%s[%s] better written as $%s[%s]".
 
 =item *
 
 L<Switch condition not recognized in regex; marked by <-- HERE in mE<sol>%sE<sol>|perldiag/"Switch condition not recognized in regex; marked by <-- HERE in m/%s/">:
 
-The description for this diagnostic has been extended to cover all cases where the warning may occur.
-Issues with the positioning of the arrow indicator have also been resolved.
+Описание этого диагностического сообщения было расширено для отражения всех
+случаев, когда данное предупреждение возникает. Проблемы с положением индикатора
+стрелки также были исправлены.
 
-=item *
-
-The error messages for C<my($a?$b$c)> and C<my(do{})> now mention "conditional
-expression" and "do block", respectively, instead of reading 'Can't declare
-null operation in "my"'.
-
-=item *
-
-When C<use re "debug"> executes a regex containing a backreference, the
-debugging output now shows what string is being matched.
-
-=item *
-
-The now fatal error message C<Character following "\c" must be ASCII> has been
-reworded as C<Character following "\c" must be printable ASCII> to emphasize
-that in C<\cI<X>>, I<X> must be a I<printable (non-control)> ASCII character.
-
-=back
-
-=head1 Utility Changes
+=head1 Изменения в утилитах
 
 =head3 L<a2p>
 
@@ -1794,45 +1786,48 @@ that in C<\cI<X>>, I<X> must be a I<printable (non-control)> ASCII character.
 
 =item *
 
-A possible crash from an off-by-one error when trying to access before the
-beginning of a buffer has been fixed.  [perl #120244]
+Возможный крах в результате ошибки на один байт, при попытке доступа перед
+началом буфера было исправлено. [perl #120244]
 
 =back
 
 =head3 F<bisect.pl>
 
-The git bisection tool F<Porting/bisect.pl> has had many enhancements.
+В утилите для git bisect F<Porting/bisect.pl> было сделано множество
+исправлений.
 
-It is provided as part of the source distribution but not installed because
-it is not self-contained as it relies on being run from within a git
-checkout. Note also that it makes no attempt to fix tests, correct runtime
-bugs or make something useful to install - its purpose is to make minimal
-changes to get any historical revision of interest to build and run as close
-as possible to "as-was", and thereby make C<git bisect> easy to use.
+Она распространяется как часть дистрибутива исходных кодов, но не
+устанавливается, так как она не является самодостаточной, так как она полагается
+на то, что запускается из директории с git checkout. Кроме того, она не пытается
+исправить тесты, исправить ошибки в работе или сделать что-либо полезное для
+инсталляции -- её назначение сделать минимальное изменение, чтобы получить
+нужную версию из истории, чтобы собрать и запустить наиболее близко к состоянию
+"как было", и соответственно упростить использование C<git bisect>.
 
 =over 4
 
 =item *
 
-Can optionally run the test case with a timeout.
+Может опционально запустить тест с таймаутом.
 
 =item *
 
-Can now run in-place in a clean git checkout.
+Может быть непосредственно запущенно в чистом git checkout.
 
 =item *
 
-Can run the test case under C<valgrind>.
+Может запустить тест под C<valgrind>.
 
 =item *
 
-Can apply user supplied patches and fixes to the source checkout before
-building.
+Может применить пользовательские патчи и фиксы к исходному коду текущей ревизии
+перед сборкой.
 
 =item *
 
-Now has fixups to enable building several more historical ranges of bleadperl,
-which can be useful for pinpointing the origins of bugs or behaviour changes.
+Имеет исправления, для возможности сборки немного большего числа исторических
+диапазонов bleadperl, что может быть полезно для поиска источника ошибки или
+изменения поведения.
 
 =back
 
@@ -1842,7 +1837,7 @@ which can be useful for pinpointing the origins of bugs or behaviour changes.
 
 =item *
 
-L<find2perl> now handles C<?> wildcards correctly.  [perl #113054]
+L<find2perl> теперь поддерживает символ C<?> корректно. [perl #113054]
 
 =back
 
@@ -1852,229 +1847,234 @@ L<find2perl> now handles C<?> wildcards correctly.  [perl #113054]
 
 =item *
 
-F<perlbug> now has a C<-p> option for attaching patches with a bug report.
+F<perlbug> теперь имеет опцию C<-p> для вложения патчей к отчётам об ошибках.
 
 =item *
 
-L<perlbug> has been modified to supply the report template with CRLF line
-endings on Windows.
-[L<perl #121277|https://rt.perl.org/Public/Bug/Display.html?id=121277>]
+Шаблон отчёта L<perlbug> был исправлен для поддержки CRLF концов строк на
+Windows. [L<perl #121277|https://rt.perl.org/Public/Bug/Display.html?id=121277>]
 
 =item *
 
-L<perlbug> now makes as few assumptions as possible about the encoding of the
-report.  This will likely change in the future to assume UTF-8 by default but
-allow a user override.
+L<perlbug>, насколько это возможно, делает меньше допущений о кодировке отчёта.
+Предположение об UTF-8 по умолчанию вероятно будет изменено в будущем, чтобы
+позволить пользователю переопределить кодировку.
 
 =back
 
-=head1 Configuration and Compilation
+=head1 Конфигурация и компиляция
 
 =over 4
 
 =item *
 
-The F<Makefile.PL> for L<SDBM_File> now generates a better F<Makefile>, which
-avoids a race condition during parallel makes, which could cause the build to
-fail.  This is the last known parallel make problem (on *nix platforms), and
-therefore we believe that a parallel make should now always be error free.
+F<Makefile.PL> для L<SDBM_File> теперь производит гораздо лучший F<Makefile>,
+который избегает условий гонки, при параллельной сборке, которые могли приводить
+к ошибкам сборки. Это последняя из известных проблем при параллельной сборке
+make (на *nix платформах) и, таким образом, мы верим, что параллельный make
+теперь всегда будет свободен от ошибок.
 
 =item *
 
-F<installperl> and F<installman>'s option handling has been refactored to use
-L<Getopt::Long>. Both are used by the F<Makefile> C<install> targets, and
-are not installed, so these changes are only likely to affect custom
-installation scripts.
+Поддержка опций в F<installperl> и F<installman> была переработана на
+использование L<Getopt::Long>. Обе используются целью F<Makefile> C<install> и
+не устанавливаются, поэтому эти изменения затронут вероятно только самодельные
+инсталляционные скрипты.
 
 =over 4
 
 =item *
 
-Single letter options now also have long names.
+Однобуквенные опции теперь имеют и длинные имена.
 
 =item *
 
-Invalid options are now rejected.
+Некорректные опции теперь отвергаются.
 
 =item *
 
-Command line arguments that are not options are now rejected.
+Аргументы командной строки, которые не являются опциями теперь отвергаются.
 
 =item *
 
-Each now has a C<--help> option to display the usage message.
+Каждые теперь имеют опцию C<--help> для отображения сообщения об использовании.
 
 =back
 
-The behaviour for all valid documented invocations is unchanged.
+Поведение при всех корректных задокументированных вызовах не изменилось.
 
 =item *
 
-Where possible, the build now avoids recursive invocations of F<make> when
-building pure-Perl extensions, without removing any parallelism from the
-build. Currently around 80 extensions can be processed directly by the
-F<make_ext.pl> tool, meaning that 80 invocations of F<make> and 160
-invocations of F<miniperl> are no longer made.
+Где это возможно, сборка избегает рекурсивных вызовов F<make>, когда собирает
+чистые Perl расширения, не убирая параллельности сборки. На данные момент
+порядка 80 расширений могут быть обработаны непосредственно утилитой
+F<make_ext.pl>, это означает, что больше не делается 80 вызовов F<make> и 160
+вызовов F<miniperl>.
 
 =item *
 
-The build system now works correctly when compiling under GCC or Clang with
-link-time optimization enabled (the C<-flto> option). [perl #113022]
+Сборочная система работает корректно при сборке с включённым использованием GCC или Clang
+оптимизации линковки (опция C<-flto>). [perl #113022]
 
 =item *
 
-Distinct library basenames with C<d_libname_unique>.
+Уникальные базовые имена библиотек с C<d_libname_unique>.
 
-When compiling perl with this option, the library files for XS modules are
-named something "unique" -- for example, Hash/Util/Util.so becomes
-Hash/Util/PL_Hash__Util.so.  This behavior is similar to what currently
-happens on VMS, and serves as groundwork for the Android port.
-
-=item *
-
-C<sysroot> option to indicate the logical root directory under gcc and clang.
-
-When building with this option set, both Configure and the compilers search
-for all headers and libraries under this new sysroot, instead of /.
-
-This is a huge time saver if cross-compiling, but can also help
-on native builds if your toolchain's files have non-standard locations.
+При компиляции perl с этой опцией библиотечные файлы XS модулей именуются
+уникально. Например, Hash/Util/Util.so становится Hash/Util/PL_Hash__Util.so.
+Это поведение соответствует тому, что на данный момент происходит в VMS и
+служит основой для работы над портом на Android.
 
 =item *
 
-The cross-compilation model has been renovated.
-There's several new options, and some backwards-incompatible changes:
+Опция C<sysroot> для указания логического корневого каталога для gcc и clang.
 
-We now build binaries for miniperl and generate_uudmap to be used on the host,
-rather than running every miniperl call on the target; this means that, short
-of 'make test', we no longer need access to the target system once Configure is
-done.  You can provide already-built binaries through the C<hostperl> and
-C<hostgenerate> options to Configure.
+При сборке с этой установленной опцией, как Configure, так и компиляторы ищут
+заголовки и библиотеки в этом новом sysroot, вместо /.
 
-Additionally, if targeting an EBCDIC platform from an ASCII host,
-or viceversa, you'll need to run Configure with C<-Uhostgenerate>, to
-indicate that generate_uudmap should be run on the target.
+Это экономит значительное время при кросс-компиляции, а также может помочь при
+нативной сборке, если файлы вашего набор утилит сборки имеют нестандартное
+положение.
 
-Finally, there's also a way of having Configure end early, right after
-building the host binaries, by cross-compiling without specifying a
+=item *
+
+Модель кросс-компиляции была обновлена. Появилось несколько новых опций и
+некоторые несовместимые изменения:
+
+Сейчас мы собираем бинарные файлы для miniperl и generate_uudmap для
+использования на хосте, вместо запуска каждого вызова miniperl на целевой
+платформе; это означает более короткий 'make test', нам не требуется доступ к
+целевой системой после того как отработает Configure. Вы также может
+предоставить уже собранный бинарный файл через опции Configure C<hostperl> и
+C<hostgenerate>.
+
+Дополнительно, если целевая платформа EBCDIC, а на хосте ASCII, или наоборот,
+вам потребуется запускать Configure с опцией C<-Uhostgenerate>, указывающей на
+то, что generate_uudmap должен быть запущен на целевой платформе.
+
+И, наконец, также есть возможность завершить Configure раньше, сразу после
+сборки бинарных файлов на хосте, запусти кросс-компиляцию без указания
 C<targethost>.
 
-The incompatible changes include no longer using xconfig.h, xlib, or
-Cross.pm, so canned config files and Makefiles will have to be updated.
+Также к несовместимым изменениям относится отсутствие использования xconfig.h,
+xlib или Cross.pm, поэтому сохранённые файлы конфигурации и Makefile должны
+быть обновлены.
 
 =item *
 
-Related to the above, there is now a way of specifying the location of sh
-(or equivalent) on the target system: C<targetsh>.
+Связанная с вышеописанным, появилась возможность указания расположения
+командной оболочки sh (или эквивалента) на целевой системе: C<targetsh>.
 
-For example, Android has its sh in /system/bin/sh, so if cross-compiling
-from a more normal Unixy system with sh in /bin/sh, "targetsh" would end
-up as /system/bin/sh, and "sh" as /bin/sh.
+Например, Android имеет свой sh в /system/bin/sh, поэтому при кросс-компиляции
+из более привычного в Unix системах расположения sh в /bin/sh, "targetsh"
+получит значение /system/bin/sh, а "sh" - /bin/sh.
 
 =item *
 
-By default, B<gcc> 4.9 does some optimizations that break perl.  The B<-fwrapv>
-option disables those optimizations (and probably others), so for B<gcc> 4.3
-and later (since the there might be similar problems lurking on older versions
-too, but B<-fwrapv> was broken before 4.3, and the optimizations probably won't
-go away), F<Configure> now adds B<-fwrapv> unless the user requests
-B<-fno-wrapv>, which disables B<-fwrapv>, or B<-fsanitize=undefined>, which
-turns the overflows B<-fwrapv> ignores into runtime errors.
+По умолчанию, B<gcc> 4.9 делает некоторые оптимизации, которые ломают perl.
+Опция B<-fwrapv> отключает эти оптимизации (и возможно другие), поэтому для
+B<gcc> 4.3 и более поздних (так как могут быть подобные проблемы в старых
+релизах, но B<-fwrapv> был сломан до 4.3, и оптимизация вероятно никуда не
+денется), F<Configure> добавляет B<-fwrapv>, если только пользователь не
+запросил B<-fno-wrapv>, который отключает B<-fwrapv>, или
+B<-fsanitize=undefined>, который игнорирует переполнения B<-fwrapv> в ошибках
+исполнения.
 [L<perl #121505|https://rt.perl.org/Public/Bug/Display.html?id=121505>]
 
 =back
 
-=head1 Testing
+=head1 Тестирование
 
 =over 4
 
 =item *
 
-The C<test.valgrind> make target now allows tests to be run in parallel.
-This target allows Perl's test suite to be run under Valgrind, which detects
-certain sorts of C programming errors, though at significant cost in running
-time. On suitable hardware, allowing parallel execution claws back a lot of
-that additional cost. [perl #121431]
+Цель make C<test.valgrind> теперь позволяет выполнение параллельных тестов. Эта
+цель разрешает запуск тестового набора Perl под Valgrind, который определяет
+некоторые виды ошибок в C-программировании ценой более длительного выполнения.
+На подходящем "железе" возможность параллельного запуска отыгрывает эти
+дополнительные затраты. [perl #121431]
 
 =item *
 
-Various tests in F<t/porting/> are no longer skipped when the perl
-F<.git> directory is outside the perl tree and pointed to by
-C<$GIT_DIR>. [perl #120505]
+Различные тесты в F<t/porting/> больше не пропускаются, если каталог F<.git>
+находится вне дерева perl и задаётся переменной C<$GIT_DIR> [perl #120505].
 
 =item *
 
-The test suite no longer fails when the user's interactive shell maintains a
-C<$PWD> environment variable, but the F</bin/sh> used for running tests
-doesn't.
+Тестовый набор больше не завершается ошибкой, если пользовательский
+интерактивная командный интерпретатор поддерживает переменную окружения
+C<$PWD>, а F</bin/sh> используемый для запусков тестов - нет.
 
 =back
 
-=head1 Platform Support
+=head1 Поддержка палтформ
 
-=head2 New Platforms
+=head2 Новые платформы
 
 =over 4
 
 =item Android
 
-Perl can now be built for Android, either natively or through
-cross-compilation, for all three currently available architectures (ARM,
-MIPS, and x86), on a wide range of versions.
+Perl теперь может быть собран для Android как нативно, так и через
+кросс-компиляцию, для всех трёх доступных архитектур (ARM, MIPS и x86) для
+широкого диапазона версий.
 
 =item Bitrig
 
-Compile support has been added for Bitrig, a fork of OpenBSD.
+Поддержка компиляции была добавлена для Bitrig - форк OpenBSD.
 
 =item FreeMiNT
 
-Support has been added for FreeMiNT, a free open-source OS for the Atari ST
-system and its successors, based on the original MiNT that was officially
-adopted by Atari.
+Была добавлена поддержка для FreeMINT, свободной ОС с открытыми исходниками для
+системы Atari ST и её наследников, основанных на оригинальной MINT, которая
+ранее перешла к Atari.
 
 =item Synology
 
-Synology ships its NAS boxes with a lean Linux distribution (DSM) on relative
-cheap CPU's (like the Marvell Kirkwood mv6282 - ARMv5tel or Freescale QorIQ
-P1022 ppc - e500v2) not meant for workstations or development. These boxes
-should build now. The basic problems are the non-standard location for tools.
+Synology поставляет свои NAS-устройства с урезанным Linux дистрибутивом (DSM)
+на относительно дешёвом CPU (как, например, Marvell Kirkwood mv6282 - ARMv5tel
+или Freescale QorIQ P1022 ppc - e500v2) не предназначенный для рабочих станций
+или разработки. Эти устройства теперь должны собираться. Основная проблема была
+в нестандартном расположении утилит.
 
 =back
 
-=head2 Discontinued Platforms
+=head2 Более неподдерживаемые платформы
 
 =over 4
 
 =item C<sfio>
 
-Code related to supporting the C<sfio> I/O system has been removed.
+Код, относящийся к поддержке системы ввода/вывода C<sfio>, был удалён.
 
-Perl 5.004 added support to use the native API of C<sfio>, AT&T's Safe/Fast
-I/O library. This code still built with v5.8.0, albeit with many regression
-tests failing, but was inadvertently broken before the v5.8.1 release,
-meaning that it has not worked on any version of Perl released since then.
-In over a decade we have received no bug reports about this, hence it is clear
-that no-one is using this functionality on any version of Perl that is still
-supported to any degree.
+В Perl 5.004 была добавлена поддержка родного API C<sfio> - безопасной и
+быстрой библиотеки ввода/вывода AT&T. Этот код по-прежнему собирается с v5.8.0,
+хоть и с множеством падающих регрессивных тестов, но оказался нечаянно сломан перед
+релизом v5.8.1, что означает, что он больше не работал на всех последующих
+версиях Perl после него. На протяжении десятилетия мы не получили ни одного
+отчёта об ошибке об этом, отсюда становится понятно, что никто не использует
+эту функциональность на всех версиях Perl, которые в той или иной степени
+поддерживаются.
 
 =item AT&T 3b1
 
-Configure support for the 3b1, also known as the AT&T Unix PC (and the similar
-AT&T 7300), has been removed.
+Была удалена поддержка для 3b1 в Configure, также известной как AT&T Unix PC (и
+похожий AT&T 7300).
 
 =item DG/UX
 
-DG/UX was a Unix sold by Data General. The last release was in April 2001.
-It only runs on Data General's own hardware.
+DG/UX был Unix'ом проданным Data General. Последний релиз был в апреле 2001. Он
+работает только на собственном оборудовании Data General.
 
 =item EBCDIC
 
-In the absence of a regular source of smoke reports, code intended to support
-native EBCDIC platforms will be removed from perl before 5.22.0.
+В отсутствии источника регулярных отчётов о сборке, код, отвечающий за
+поддержку платформ EBCDIC будет удалён в perl перед выпуском 5.22.0.
 
 =back
 
-=head2 Platform-Specific Notes
+=head2 Платформо-специфичные замечания
 
 =over 4
 
@@ -2084,49 +2084,48 @@ native EBCDIC platforms will be removed from perl before 5.22.0.
 
 =item *
 
-recv() on a connected handle would populate the returned sender
-address with whatever happened to be in the working buffer.  recv()
-now uses a workaround similar to the Win32 recv() wrapper and returns
-an empty string when recvfrom(2) doesn't modify the supplied address
-length. [perl #118843]
+recv() на подключённом дескрипторе будет передавать возвращённый адрес
+отправителя, что бы не случилось с рабочим буфером. recv() теперь использует
+обходной манёвр, аналогичный обёртке Win32 recv() и возвращает пустую строку,
+если recvfrom(2) не изменяет переданную длину адреса. [perl #118843]
 
 =item *
 
-Fixed a build error in cygwin.c on Cygwin 1.7.28.
+Исправлена ошибка сборки в cygwin.c на Cygwin 1.7.28.
 
-Tests now handle the errors that occur when C<cygserver> isn't
-running.
+Тесты теперь обрабатывают ошибки, которые происходят, когда C<cygserver> не
+запущен.
 
 =back
 
 =item GNU/Hurd
 
-The BSD compatibility library C<libbsd> is no longer required for builds.
+Библиотека для совместимости с BSD C<libbsd> больше не требуется для сборки.
 
 =item Linux
 
-The hints file now looks for C<libgdbm_compat> only if C<libgdbm> itself is
-also wanted. The former is never useful without the latter, and in some
-circumstances, including it could actually prevent building.
+Файл хинтов теперь ищет C<libgdbm_compat> только если сам C<libgdbm> также
+требуется. Первый бесполезен без последнего и, в некоторых случаях, включение
+его может привести к отказу сборки.
 
 =item Mac OS
 
-The build system now honors an C<ld> setting supplied by the user running
-F<Configure>.
+Сборочная система теперь учитывает настройку C<ld>, переданную пользователем
+при запуске F<Configure>.
 
 =item MidnightBSD
 
-C<objformat> was removed from version 0.4-RELEASE of MidnightBSD and had been
-deprecated on earlier versions.  This caused the build environment to be
-erroneously configured for C<a.out> rather than C<elf>.  This has been now
-been corrected.
+C<objformat> был удалён, начиная с версии 0.4-RELEASE MidnightBSD и являлся
+устаревшим в ранних версиях. Это приводило к тому, что сборочное окружение
+ошибочно конфигурировалось для C<a.out>, вместо C<elf>. Теперь это исправлено.
 
-=item Mixed-endian platforms
+=item Платформы со смешанным порядком байтов
 
-The code supporting C<pack> and C<unpack> operations on mixed endian
-platforms has been removed. We believe that Perl has long been unable to
-build on mixed endian architectures (such as PDP-11s), so we don't think
-that this change will affect any platforms which were able to build v5.18.0.
+Код, поддерживающий операции C<pack> и C<unpack> на платформах со смашанным
+порядком байтов был удалён. Мы уверены, что Perl больше не собирается на
+архитектурах со смешанным порядком байт (таким как PDP-11s), поэтому мы не
+думаем, что это изменение затронет какие-либо платформы, на которых собирался
+v5.18.0.
 
 =item VMS
 
@@ -2134,20 +2133,20 @@ that this change will affect any platforms which were able to build v5.18.0.
 
 =item *
 
-The C<PERL_ENV_TABLES> feature to control the population of %ENV at perl
-start-up was broken in Perl 5.16.0 but has now been fixed.
+Возможность C<PERL_ENV_TABLES> для контроля заполнения %ENV при старте perl
+была сломана в Perl 5.16.0, но теперь была исправлена.
 
 =item *
 
-Skip access checks on remotes in opendir().  [perl #121002]
+Пропуск проверок доступа в opendir() для внешних файлов. [perl #121002]
 
 =item *
 
-A check for glob metacharacters in a path returned by the
-L<C<glob()>|perlfunc/glob> operator has been replaced with a check for VMS
-wildcard characters.  This saves a significant number of unnecessary
-L<C<lstat()>|perlfunc/lstat> calls such that some simple glob operations become
-60-80% faster.
+Проверка для метасимволов глоба для путей, возвращаемых оператором
+L<C<glob()>|perlfunc/glob> была заменена проверкой для VMS символов
+подстановки. Это позволяет избегать большое число не нужных вызовов
+L<C<lstat()>|perlfunc/lstat>, что делает простые глоб-операции быстрее на
+60-80%.
 
 =back
 
@@ -2157,17 +2156,17 @@ L<C<lstat()>|perlfunc/lstat> calls such that some simple glob operations become
 
 =item *
 
-C<rename> and C<link> on Win32 now set $! to ENOSPC and EDQUOT when
-appropriate.  [perl #119857]
+C<rename> и C<link> на Win32 теперь устанавливают $! в ENOSPC и EDQUOT в
+соответствующих случаях. [perl #119857]
 
 =item *
 
-The BUILD_STATIC and ALL_STATIC makefile options for linking some or (nearly)
-all extensions statically (into perl520.dll, and into a separate
-perl-static.exe too) were broken for MinGW builds. This has now been fixed.
+Опции makefile BUILD_STATIC и ALL_STATIC для линковки некоторых или (почти)
+всех расширений статически (в perl520.dll, и также в отдельный perl-static.exe)
+были сломаны для сборок MinGW. Теперь это исправлено.
 
-The ALL_STATIC option has also been improved to include the Encode and Win32
-extensions (for both VC++ and MinGW builds).
+Опция ALL_STATIC также была улучшена и включает расширения Encode и Win32 (для
+обоих сборок VC++ и MinGW).
 
 =item *
 
