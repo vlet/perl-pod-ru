@@ -2170,89 +2170,90 @@ C<rename> и C<link> на Win32 теперь устанавливают $! в EN
 
 =item *
 
-Support for building with Visual C++ 2013 has been added.  There are currently
-two possible test failures (see L<perlwin32/"Testing Perl on Windows">) which
-will hopefully be resolved soon.
+Была добавлена поддержка сборки с Visual C++ 2013. На данный момент есть два
+возможных падающих теста (смотрите L<perlwin32/"Testing Perl on Windows">),
+которые в скором времени будут благополучно исправлены.
 
 =item *
 
-Experimental support for building with Intel C++ Compiler has been added.  The
-nmake makefile (win32/Makefile) and the dmake makefile (win32/makefile.mk) can
-be used.  A "nmake test" will not pass at this time due to F<cpan/CGI/t/url.t>.
+Была добавлена экспериментальная поддержка сборки компилятором Intel C++
+Compiler. Могут быть использованы nmake makefile (win32/Makefile) и dmake
+makefile (win32/makefile.mk). "nmake test" на данный момент не проходит из-за
+F<cpan/CGI/t/url.t>.
 
 =item *
 
-Killing a process tree with L<perlfunc/kill> and a negative signal, was broken
-starting in 5.18.0. In this bug, C<kill> always returned 0 for a negative
-signal even for valid PIDs, and no processes were terminated. This has been
-fixed [perl #121230].
+Уничтожение дерева процессов с помощью L<perlfunc/kill> и отрицательного
+сигнала было сломана, начиная с 5.18.0. При этой ошибке C<kill> всегда
+возвращал 0 для негативного сигнала даже для корректных PID и процессы не
+уничтожались. Это было исправлено [perl #121230].
 
 =item *
 
-The time taken to build perl on Windows has been reduced quite significantly
-(time savings in the region of 30-40% are typically seen) by reducing the
-number of, usually failing, I/O calls for each L<C<require()>|perlfunc/require>
-(for B<miniperl.exe> only).
+Время, затрачиваемое на сборку perl на WIndows, было существенно сокращено
+(обычно отмечается экономия времени в диапазоне 30-40%) за счёт сокращения
+(обычно неудачных) вызовов ввода/вывода для каждого
+L<C<require()>|perlfunc/require> (только для B<miniperl.exe>).
 [L<perl #121119|https://rt.perl.org/Public/Bug/Display.html?id=121119>]
 
 =item *
 
-About 15 minutes of idle sleeping was removed from running C<make test> due to
-a bug in which the timeout monitor used for tests could not be cancelled once
-the test completes, and the full timeout period elapsed before running the next
-test file.
+Примерно 15 минут простоя было удалено при запуске C<make test> из-за ошибки, в
+которой таймаут, используемый для тестов, не мог быть отменён после завершения
+теста, поэтому до запуска следующего теста проходил полный период таймаута.
 [L<perl #121395|https://rt.perl.org/Public/Bug/Display.html?id=121395>]
 
 =item *
 
-On a perl built without pseudo-fork (pseudo-fork builds were not affected by
-this bug), killing a process tree with L<C<kill()>|perlfunc/kill> and a negative
-signal resulted in C<kill()> inverting the returned value.  For example, if
-C<kill()> killed 1 process tree PID then it returned 0 instead of 1, and if
-C<kill()> was passed 2 invalid PIDs then it returned 2 instead of 0.  This has
-probably been the case since the process tree kill feature was implemented on
-Win32.  It has now been corrected to follow the documented behaviour.
+На perl, собранного без псевдо-форка (сборка с псевдо-форком не затронута этой
+ошибкой), уничтожение дерева процессов с помощью L<C<kill()>|perlfunc/kill> и
+негативного сигнала приводила к тому, что C<kill()> инвертировал возвращаемое
+значение. Например, если C<kill()> убивал один PID дерева процессов, тогда он
+возвращал 0 вместо 1, а если C<kill()> получал два некорректных PID, тогда он
+возвращал 2, вместо 0. Это приводило проблемам, так как возможность уничтожения
+дерева процессов была реализована на Win32. Теперь это исправлено в
+соответствии с документацией.
 [L<perl #121230|https://rt.perl.org/Public/Bug/Display.html?id=121230>]
 
 =item *
 
-When building a 64-bit perl, an uninitialized memory read in B<miniperl.exe>,
-used during the build process, could lead to a 4GB B<wperl.exe> being created.
-This has now been fixed.  (Note that B<perl.exe> itself was unaffected, but
-obviously B<wperl.exe> would have been completely broken.)
+При сборке 64-битного perl, не инициализированное чтение памяти в
+B<miniperl.exe>, используемого в сборочном процессе, могло приводить к созданию
+4GB B<wperl.exe>. Теперь это было исправлено. (Обратите внимание, что
+B<perl.exe> сам по себе не затронут, но B<wperl.exe> был полностью сломан).
 [L<perl #121471|https://rt.perl.org/Public/Bug/Display.html?id=121471>]
 
 =item *
 
-Perl can now be built with B<gcc> version 4.8.1 from L<http://www.mingw.org>.
-This was previously broken due to an incorrect definition of DllMain() in one
-of perl's source files.  Earlier B<gcc> versions were also affected when using
-version 4 of the w32api package.  Versions of B<gcc> available from
-L<http://mingw-w64.sourceforge.net/> were not affected.
+Perl теперь может быть собран с B<gcc> версии 4.8.1 от L<http://www.mingw.org>.
+Ранее он был сломан из-за некорректного определения DllMain() в одном из
+исходных файлов perl. Ранние версии B<gcc> также были затронуты, если
+использовали версию 4 пакета w32api. Версии B<gcc> доступные с
+L<http://mingw-w64.sourceforge.net/> не были затронуты.
 [L<perl #121643|https://rt.perl.org/Public/Bug/Display.html?id=121643>]
 
 =item *
 
-The test harness now has no failures when perl is built on a FAT drive with the
-Windows OS on an NTFS drive.
+Тесты теперь проходят без ошибок, если perl собран на разделе с FAT, а
+Windows OS находится на NTFS разделе.
 [L<perl #21442|https://rt.perl.org/Public/Bug/Display.html?id=21442>]
 
 =item *
 
-When cloning the context stack in fork() emulation, Perl_cx_dup()
-would crash accessing parameter information for context stack entries
-that included no parameters, as with C<&foo;>.
+При клонировании стека контекста при эмуляции fork(), Perl_cx_dup() падал при
+попытке доступа к информации о параметрах для данных стека контекста, который
+не включал параметров, как, например, в C<&foo;>.
 [L<perl #121721|https://rt.perl.org/Public/Bug/Display.html?id=121721>]
 
 =item *
 
-Introduced by
-L<perl #113536|https://rt.perl.org/Public/Bug/Display.html?id=113536>, a memory
-leak on every call to C<system> and backticks (C< `` >), on most Win32 Perls
-starting from 5.18.0 has been fixed.  The memory leak only occurred if you
-enabled psuedo-fork in your build of Win32 Perl, and were running that build on
-Server 2003 R2 or newer OS.  The leak does not appear on WinXP SP3.
-[L<perl #121676|https://rt.perl.org/Public/Bug/Display.html?id=121676>]
+Была исправлена, появившаяся в L<perl
+#113536|https://rt.perl.org/Public/Bug/Display.html?id=113536>, утечка памяти
+на каждый вызов C<system> и апострофов (C< `` >) для большинства вариантов Perl
+на Win32, начиная с 5.18.0. Утечка происходила только если вы включали
+псевдо-форк в вашей сборке Win32 Perl и запускали эту сборку на Server 2003 R2
+или более новой ОС. Эта утечка не возникала на WinXP SP3. [L<perl
+#121676|https://rt.perl.org/Public/Bug/Display.html?id=121676>]
 
 =back
 
