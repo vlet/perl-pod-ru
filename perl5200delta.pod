@@ -2795,207 +2795,217 @@ C</\x{100}[xy]\x{100}{2}/>.
 
 =back
 
-=head2 Perl 5 Debugger and -d
+=head2 Отладчик Perl 5 и -d
 
 =over 4
 
 =item *
 
-The debugger's C<man> command been fixed. It was broken in the v5.18.0
-release. The C<man> command is aliased to the names C<doc> and C<perldoc> -
-all now work again.
+Команда C<man> отладчика была исправлена. Она была сломана в релизе v5.18.0.
+Команда C<man> сделана синонимом имён C<doc> и C<perldoc> - теперь всё снова
+работает.
 
 =item *
 
-C<@_> is now correctly visible in the debugger, fixing a regression
-introduced in v5.18.0's debugger. [RT #118169]
+C<@_> теперь корректно видна в отладчике, исправляя регрессию, появившуюся в
+отладчике v5.18.0. [RT #118169]
 
 =item *
 
-Under copy-on-write builds (the default as of 5.20.0) C<< ${'_<-e'}[0] >>
-no longer gets mangled.  This is the first line of input saved for the
-debugger's use for one-liners [perl #118627].
+Для сборок с включённым копированием-при-записи (по умолчанию в 5.20.0)
+C<< ${'_<-e'}[0] >> больше не искажается. Это первая строка ввода, сохраняемая
+для использования отладчиком, при использовании однострочников [perl #118627].
 
 =item *
 
-On non-threaded builds, setting C<${"_E<lt>filename"}> to a reference or
-typeglob no longer causes C<__FILE__> and some error messages to produce a
-corrupt string, and no longer prevents C<#line> directives in string evals from
-providing the source lines to the debugger.  Threaded builds were unaffected.
+В сборках без поддержки тредов, установка C<${"_E<lt>filename"}> ссылке или
+typeglob'у больше не приводит к тому, что C<__FILE__> и некоторые сообщения об
+ошибках выводят испорченную строку и не препятствует директивам C<#line> в
+строчных eval передавать строку исходников отладчику. Сборки с поддержкой
+тредов не затронуты.
 
 =item *
 
-Starting with Perl 5.12, line numbers were off by one if the B<-d> switch was
-used on the #! line.  Now they are correct.
+Начиная с Perl 5.12, номера строки были меньше на единицу, если переключатель
+B<-d> был использован в строчке с #!. Теперь это исправлено.
 
 =item *
 
-C<*DB::DB = sub {} if 0> no longer stops Perl's debugging mode from finding
-C<DB::DB> subs declared thereafter.
+C<*DB::DB = sub {} if 0> больше не препятствует режиму отладки Perl в поиске
+объявления подпрограммы C<DB::DB> далее в программе.
 
 =item *
 
-C<%{'_<...'}> hashes now set breakpoints on the corresponding C<@{'_<...'}>
-rather than whichever array C<@DB::dbline> is aliased to.  [perl #119799]
+Хеши C<%{'_<...'}> теперь устанавливают точки останова в соответствующие
+C<@{'_<...'}> вместо произвольного массива, который сделан синонимом
+C<@DB::dbline>. [perl #119799]
 
 =item *
 
-Call set-magic when setting $DB::sub.  [perl #121255]
+Вызывается set-magic, при установке $DB::sub. [perl #121255]
 
 =item *
 
-The debugger's "n" command now respects lvalue subroutines and steps over
-them [perl #118839].
+Команда отладчика "n" теперь учитывает lvalue подпрограммы и проходит через них
+[perl #118839].
 
 =back
 
-=head2 Lexical Subroutines
+=head2 Лексические подпрограммы
 
 =over 4
 
 =item *
 
-Lexical constants (C<my sub a() { 42 }>) no longer crash when inlined.
+Лексические константы (C<my sub a() { 42 }>) больше не приводят к краху при
+встраивании. 
 
 =item *
 
-Parameter prototypes attached to lexical subroutines are now respected when
-compiling sub calls without parentheses.  Previously, the prototypes were
-honoured only for calls I<with> parentheses. [RT #116735]
+Прототипы параметров, привязываемые к лексическим подпрограммам теперь
+учитывают при компиляции вызовы подпрограмм без скобок. Ранее прототипы
+учитывались только при вызове I<со> скобками. [RT #116735]
 
 =item *
 
-Syntax errors in lexical subroutines in combination with calls to the same
-subroutines no longer cause crashes at compile time.
+Синтаксические ошибки в лексических подпрограммах в комбинации с вызовами той
+же подпрограммы больше не приводят к краху во время компиляции.
 
 =item *
 
-Deep recursion warnings no longer crash lexical subroutines. [RT #118521]
+Предупреждения о глубокой рекурсии больше не приводят к краху лексических
+подпрограмм. [RT #118521]
 
 =item *
 
-The dtrace sub-entry probe now works with lexical subs, instead of
-crashing [perl #118305].
+Проверка подпрограмм в dtrace теперь работает и с лексическими подпрограммами,
+вместо краха [perl #118305].
 
 =item *
 
-Undefining an inlinable lexical subroutine (C<my sub foo() { 42 } undef
-&foo>) would result in a crash if warnings were turned on.
+Неопределённая и встроенная лексическая подпрограмма (C<my sub foo() { 42 } undef
+&foo>) приводила к краху, если были включены предупреждения.
 
 =item *
 
-An undefined lexical sub used as an inherited method no longer crashes.
+Неопределённая лексическая подпрограмма, используемая как наследуемый метод,
+больше не приводит к краху.
 
 =item *
 
-The presence of a lexical sub named "CORE" no longer stops the CORE::
-prefix from working.
+Присутствие лексической подпрограммы с именем "CORE" больше не мешает работать
+суффиксу CORE::.
 
 =back
 
-=head2 Everything Else
+=head2 Всё остальное
 
 =over 4
 
 =item *
 
-The OP allocation code now returns correctly aligned memory in all cases
-for C<struct pmop>. Previously it could return memory only aligned to a
-4-byte boundary, which is not correct for an ithreads build with 64 bit IVs
-on some 32 bit platforms. Notably, this caused the build to fail completely
-on sparc GNU/Linux. [RT #118055]
+Код выделения OP теперь возвращает корректно выровненную память во всех случаях
+для C<struct pmop>. Ранее он возвращал память выровненную по 4-байтной границе,
+что неправильно для ithreads сборок с 64-битным IV и на некоторых 32-битных
+платформах. Это приводило к полному краху сборки на sparc GNU/Linux. [RT
+#118055] 
 
 =item *
 
-Evaluating large hashes in scalar context is now much faster, as the number
-of used chains in the hash is now cached for larger hashes. Smaller hashes
-continue not to store it and calculate it when needed, as this saves one IV.
-That would be 1 IV overhead for every object built from a hash. [RT #114576]
+Вычисление больших хешей в скалярном контексте теперь значительно быстрее, так
+как число используемых цепочек теперь кэшируется для больших хешей. Небольшие
+хеши продолжают не сохранять это значение, а вычислять когда требуется, так как
+это экономит один IV. Это также даст накладные расходы в 1 IV для любого
+объекта сделанного из хеша. [RT #114576]
 
 =item *
 
-Perl v5.16 inadvertently introduced a bug whereby calls to XSUBs that were
-not visible at compile time were treated as lvalues and could be assigned
-to, even when the subroutine was not an lvalue sub.  This has been fixed.
+В Perl v5.16 появилась ошибка, в которой вызов XSUB, которая не была видна во
+время компиляции расценивалась как lvalue и, что к ней можно присваивать
+значения, даже если подпрограмма не являлась lvalue. Это было исправлено.
 [RT #117947]
 
 =item *
 
-In Perl v5.18.0 dualvars that had an empty string for the string part but a
-non-zero number for the number part starting being treated as true.  In
-previous versions they were treated as false, the string representation
-taking precedeence.  The old behaviour has been restored. [RT #118159]
+В Perl v5.18.0 двойные переменные, которые имели пустую строку для строковой
+части и ненулевое число для цифровой части стали расцениваться как истинное
+значение. В предыдущих версиях они трактовались как ложное значение, строковое
+представление имело более высокий прецедент. Было восстановлено старое
+поведение. [RT #118159]
 
 =item *
 
-Since Perl v5.12, inlining of constants that override built-in keywords of
-the same name had countermanded C<use subs>, causing subsequent mentions of
-the constant to use the built-in keyword instead.  This has been fixed.
+Начиная с Perl v5.12, встраивание констант, которые переназначали встроенные
+ключевые слова с тем же именем отменяли C<use subs>, заставляя последующие
+упоминания констант использовать встроенное ключевое слово. Это было
+исправлено.
 
 =item *
 
-The warning produced by C<-l $handle> now applies to IO refs and globs, not
-just to glob refs.  That warning is also now UTF8-clean. [RT #117595]
+Предупреждение, выводимое C<-l $handle>, теперь относится к IO ссылкам и
+глобам, а не только ссылкам глобов. Предупреждение также теперь содержит
+корректный UTF-8. [RT #117595]
 
 =item *
 
-C<delete local $ENV{nonexistent_env_var}> no longer leaks memory.
+C<delete local $ENV{nonexistent_env_var}> больше не приводит к утечкам памяти.
 
 =item *
 
-C<sort> and C<require> followed by a keyword prefixed with C<CORE::> now
-treat it as a keyword, and not as a subroutine or module name. [RT #24482]
+C<sort> и C<require> с последующим ключевым словом с префиксом C<CORE::> теперь
+рассматривают его как ключевое слово, а не имя подпрограммы или модуля.
+[RT #24482]
 
 =item *
 
-Through certain conundrums, it is possible to cause the current package to
-be freed.  Certain operators (C<bless>, C<reset>, C<open>, C<eval>) could
-not cope and would crash.  They have been made more resilient. [RT #117941]
+Через определённые головоломные трюки возможно вызвать освобождение текущего
+пакета. Некоторые операторы (C<bless>, C<reset>, C<open>, C<eval>) могут не
+обработать такую ситуацию и привести к краху. Они теперь сделаны более гибкими.
+[RT #117941]
 
 =item *
 
-Aliasing filehandles through glob-to-glob assignment would not update
-internal method caches properly if a package of the same name as the
-filehandle existed, resulting in filehandle method calls going to the
-package instead.  This has been fixed.
+Создание псевдонима файлового дескриптора через присвоение глоб глобу не
+обновит внутренний метод для корректного кэширования, если существует пакет с тем же
+именем, что и файловый дескриптор, приводя не к вызову метода файлового
+дескриптора, а вызову метода пакета. Теперь это исправлено.
 
 =item *
 
-C<./Configure -de -Dusevendorprefix> didn't default. [RT #64126]
+C<./Configure -de -Dusevendorprefix> не был по умолчанию. [RT #64126]
 
 =item *
 
-The C<Statement unlikely to be reached> warning was listed in
-L<perldiag> as an C<exec>-category warning, but was enabled and disabled
-by the C<syntax> category.  On the other hand, the C<exec> category
-controlled its fatal-ness.  It is now entirely handled by the C<exec>
-category.
+
+Предупреждение C<Statement unlikely to be reached> было указано в L<perldiag>
+как предупреждение категории  C<exec>, но включалось и выключалось через
+категорию C<syntax>. Теперь оно полностью поддерживается категорией C<exec>.
 
 =item *
 
-The "Replacement list is longer that search list" warning for C<tr///> and
-C<y///> no longer occurs in the presence of the C</c> flag. [RT #118047]
+Предупреждение "Replacement list is longer that search list" для C<tr///> и
+C<y///> больше не происходит в присутствии C</c> flag. [RT #118047]
 
 =item *
 
-Stringification of NVs are not cached so that the lexical locale controls
-stringification of the decimal point. [perl #108378] [perl #115800]
+Преобразование к строке NV больше не кэшируется, так как лексическая локаль
+контролирует преобразование к строке десятичной запятой. [perl #108378]
+[perl #115800]
 
 =item *
 
-There have been several fixes related to Perl's handling of locales.  perl
-#38193 was described above in L</Internal Changes>.
-Also fixed is 
-#118197, where the radix (decimal point) character had to be an ASCII
-character (which doesn't work for some non-Western languages);
-and #115808, in which C<POSIX::setlocale()> on failure returned an
-C<undef> which didn't warn about not being defined even if those
-warnings were enabled.
+Было сделано несколько исправлений, относящихся к поддержке локалей в Perl.
+perl #38193 был описан выше в L</Internal Changes>. Также был исправлен
+#118197, где символ десятичной запятой должен был быть ASCII символом (что не
+работает для некоторых незападных языков); и #115808, в котором
+C<POSIX::setlocale()> при ошибке возвращала C<undef> и не выдавала никаких
+предупреждений о неопределённости, даже если подобные предупреждения были
+включены.
 
 =item *
 
-Compiling a C<split> operator whose third argument is a named constant
-evaulating to 0 no longer causes the constant's value to change.
+Компиляция оператора C<split>, чей третий аргумент является именованной
+константой, вычисляемой в 0, больше не вызывает изменение значения константы.
 
 =item *
 
